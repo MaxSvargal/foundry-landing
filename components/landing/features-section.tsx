@@ -81,58 +81,65 @@ function DeployVisual() {
 }
 
 function AIVisual() {
+  // Pre-calculate coordinates to avoid hydration mismatch
+  const nodes = [0, 1, 2, 3, 4, 5].map((i) => {
+    const angle = (i * 60) * (Math.PI / 180);
+    const radius = 50;
+    return {
+      x: (100 + Math.cos(angle) * radius).toFixed(1),
+      y: (80 + Math.sin(angle) * radius).toFixed(1),
+      delay: `${i * 0.3}s`,
+    };
+  });
+
   return (
     <svg viewBox="0 0 200 160" className="w-full h-full">
       {/* Central node */}
       <circle cx="100" cy="80" r="12" fill="currentColor">
         <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite" />
       </circle>
-      
+
       {/* Orbiting nodes */}
-      {[0, 1, 2, 3, 4, 5].map((i) => {
-        const angle = (i * 60) * (Math.PI / 180);
-        const radius = 50;
-        return (
-          <g key={i}>
-            {/* Connection line */}
-            <line
-              x1="100"
-              y1="80"
-              x2={100 + Math.cos(angle) * radius}
-              y2={80 + Math.sin(angle) * radius}
-              stroke="currentColor"
-              strokeWidth="1"
-              opacity="0.3"
-            >
-              <animate
-                attributeName="opacity"
-                values="0.3;0.8;0.3"
-                dur="2s"
-                begin={`${i * 0.3}s`}
-                repeatCount="indefinite"
-              />
-            </line>
-            
-            {/* Outer node */}
-            <circle
-              cx={100 + Math.cos(angle) * radius}
-              cy={80 + Math.sin(angle) * radius}
-              r="6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <animate
-                attributeName="r"
-                values="6;8;6"
-                dur="2s"
-                begin={`${i * 0.3}s`}
-                repeatCount="indefinite"
-              />
-            </circle>
-          </g>
-        );
-      })}
+      {nodes.map((node, i) => (
+        <g key={i}>
+          {/* Connection line */}
+          <line
+            x1="100"
+            y1="80"
+            x2={node.x}
+            y2={node.y}
+            stroke="currentColor"
+            strokeWidth="1"
+            opacity="0.3"
+          >
+            <animate
+              attributeName="opacity"
+              values="0.3;0.8;0.3"
+              dur="2s"
+              begin={node.delay}
+              repeatCount="indefinite"
+            />
+          </line>
+
+          {/* Outer node */}
+          <circle
+            cx={node.x}
+            cy={node.y}
+            r="6"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <animate
+              attributeName="r"
+              values="6;8;6"
+              dur="2s"
+              begin={node.delay}
+              repeatCount="indefinite"
+            />
+          </circle>
+        </g>
+      ))}
       
       {/* Pulse rings */}
       <circle cx="100" cy="80" r="30" fill="none" stroke="currentColor" strokeWidth="1" opacity="0">

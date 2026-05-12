@@ -59,7 +59,7 @@ export function CtaSection() {
 
                 <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-xl">
                   Domain-heavy, long-lived, and regulated — and you want to build it in a way 
-                  your team, your AI, and your auditors can all understand three years from now.
+                  your team, your AI, and your auditors can all understand real system behavior years later.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-start gap-4">
@@ -80,7 +80,7 @@ export function CtaSection() {
                 </div>
 
                 <p className="text-sm text-muted-foreground mt-8 font-mono">
-                  Foundry is built for you.
+                  Foundry is built with love.
                 </p>
               </div>
 

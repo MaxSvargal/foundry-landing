@@ -6,13 +6,15 @@ import { ArrowRight, Check } from "lucide-react";
 const plans = [
   {
     name: "Open Source",
-    description: "The full Foundry architecture, yours to own",
+    description: "The full Foundry, yours to own",
     price: { monthly: 0, annual: 0 },
     features: [
-      "Ash + Phoenix + Oban stack",
-      "Spec-kit linter",
-      "System map generation",
-      "ADR scaffolding",
+      "Own Ash + Phoenix + Oban stack",
+      "Built-in spec driven methodology",
+      "Governance linter",
+      "System map generation and visualization",
+      "Behavior test visual tracing",
+      "Basic copilot agent",
       "Community support",
     ],
     cta: "View on GitHub",
@@ -24,12 +26,10 @@ const plans = [
     price: { monthly: 49, annual: 39 },
     features: [
       "Everything in Open Source",
-      "Governed copilot (full context)",
-      "Branch-first proposals",
-      "Change classification routing",
-      "Review panel integration",
+      "Extended governed AI copilot agent",
+      "Cloud infractructure 1 instance",
+      "Up to 1 CPU and 512 MB RAM + 1 GB PostgreSQL",
       "Priority support",
-      "Compliance link enforcement",
     ],
     cta: "Start trial",
     popular: true,
@@ -40,12 +40,10 @@ const plans = [
     price: { monthly: null, annual: null },
     features: [
       "Everything in Team",
-      "Custom spec-kit rules",
-      "Audit-ready reporting",
+      "Dedicated domain architect",
+      "Branch-first proposals",
       "On-premise deployment",
       "SLA guarantee",
-      "Dedicated domain architect",
-      "Custom compliance links",
       "Custom contracts",
     ],
     cta: "Talk to us",
@@ -71,6 +69,9 @@ export function PricingSection() {
           </h2>
           <p className="text-lg text-muted-foreground max-w-xl">
             The architecture is yours, regardless of plan. No proprietary runtime. No black box.
+          </p>
+          <p className="text-lg text-muted-foreground max-w-xl">
+            Every Foundry project compiles to a standard Elixir application. You own it entirely.
           </p>
         </div>
 
@@ -169,14 +170,6 @@ export function PricingSection() {
             </div>
           ))}
         </div>
-
-        {/* Bottom Note */}
-        <p className="mt-12 text-center text-sm text-muted-foreground">
-          Every Foundry project compiles to a standard Elixir application. You own it entirely.{" "}
-          <a href="#" className="underline underline-offset-4 hover:text-foreground transition-colors">
-            Compare all features
-          </a>
-        </p>
       </div>
     </section>
   );

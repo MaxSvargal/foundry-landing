@@ -26,7 +26,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
       {/* Animated sphere background */}
-      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] lg:w-[800px] lg:h-[900px] opacity-50 pointer-events-none overflow-visible">
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[600px] h-[600px] lg:w-[1000px] lg:h-[1000px] opacity-50 pointer-events-none overflow-visible">
         <AnimatedTetrahedron />
       </div>
       
@@ -57,18 +57,6 @@ export function HeroSection() {
       </div>
       
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 py-32 lg:py-64">
-        {/* Eyebrow */}
-        <div 
-          className={`mb-8 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground">
-            <span className="w-8 h-px bg-foreground/30" />
-            Elixir &middot; Ash &middot; BEAM &middot; Phoenix LiveView
-          </span>
-        </div>
-        
         {/* Main headline */}
         <div className="mb-12">
           <h1 
@@ -76,7 +64,7 @@ export function HeroSection() {
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <span className="block">The codebase</span>
+            <span className="block">Your codebase</span>
             <span className="block">
               that{" "}
               <span className="relative inline-block">
@@ -110,7 +98,7 @@ export function HeroSection() {
             }`}
           >
             The governed development environment for complex domain platforms on Elixir and Ash.
-            Your codebase is the spec. It never lies.
+            <br/>Your codebase is the spec. It never lies.
           </p>
           
           {/* CTAs */}
