@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { LiquidGlassBackdrop } from "./liquid-glass-backdrop";
 
 const features = [
   {
@@ -274,26 +275,26 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-16 py-12 lg:py-20 border-b border-foreground/10">
+      <div className="flex flex-col gap-8 border-b border-black/10 py-12 lg:flex-row lg:gap-16 lg:py-20">
         {/* Number */}
         <div className="shrink-0">
-          <span className="font-mono text-sm text-muted-foreground">{feature.number}</span>
+          <span className="font-mono text-sm text-black/40">{feature.number}</span>
         </div>
         
         {/* Content */}
         <div className="flex-1 grid lg:grid-cols-2 gap-8 items-center">
           <div>
-            <h3 className="text-3xl lg:text-4xl font-display mb-4 group-hover:translate-x-2 transition-transform duration-500">
+            <h3 className="mb-4 text-3xl font-display text-black transition-transform duration-500 group-hover:translate-x-2 lg:text-4xl">
               {feature.title}
             </h3>
-            <p className="text-lg text-muted-foreground leading-relaxed">
+            <p className="text-lg leading-relaxed text-black/72">
               {feature.description}
             </p>
           </div>
           
           {/* Visual */}
           <div className="flex justify-center lg:justify-end">
-            <div className="w-48 h-40 text-foreground">
+            <div className="h-40 w-48 text-black/80">
               <AnimatedVisual type={feature.visual} />
             </div>
           </div>
@@ -323,31 +324,36 @@ export function FeaturesSection() {
     <section
       id="features"
       ref={sectionRef}
-      className="relative py-24 lg:py-32"
+      className="relative overflow-hidden bg-transparent py-24 text-[#14110f] lg:py-32"
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Header */}
-        <div className="mb-16 lg:mb-24">
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
-            <span className="w-8 h-px bg-foreground/30" />
-            The problem nobody talks about honestly
-          </span>
-          <h2
-            className={`text-4xl lg:text-6xl font-display tracking-tight transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            }`}
-          >
-            Starting is no longer
-            <br />
-            <span className="text-muted-foreground">the hard part.</span>
-          </h2>
-        </div>
+      <LiquidGlassBackdrop />
+      <div className="pointer-events-none absolute inset-x-6 top-0 z-[3] h-48 bg-[radial-gradient(circle_at_top,rgba(255,255,255,1),rgba(255,255,255,0.54)_36%,transparent_76%)] blur-3xl lg:inset-x-12" />
+      <div className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(255,255,255,0.22),rgba(255,255,255,0.08)_20%,rgba(255,255,255,0.02)_52%,rgba(255,255,255,0.14)_100%)]" />
+      <div className="relative z-10 mx-auto max-w-[1400px] px-6 lg:px-12">
+        <div className="px-1 py-10 lg:px-4 lg:py-16">
+          {/* Header */}
+          <div className="mb-16 lg:mb-24">
+            <span className="mb-6 inline-flex items-center gap-3 text-sm font-mono text-black/52">
+              <span className="h-px w-8 bg-black/20" />
+              The problem nobody talks about honestly
+            </span>
+            <h2
+              className={`text-4xl font-display tracking-tight text-black transition-all duration-700 lg:text-6xl ${
+                isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
+              }`}
+            >
+              Starting is no longer
+              <br />
+              <span className="text-black/45">the hard part.</span>
+            </h2>
+          </div>
 
-        {/* Features List */}
-        <div>
-          {features.map((feature, index) => (
-            <FeatureCard key={feature.number} feature={feature} index={index} />
-          ))}
+          {/* Features List */}
+          <div>
+            {features.map((feature, index) => (
+              <FeatureCard key={feature.number} feature={feature} index={index} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
