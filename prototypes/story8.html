@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Your Codebase is the Spec</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');
+
+    :root {
+      --bg-dark: #050408;
+      --bg-light: #f8fafc; /* Professional slate-50 off-white */
+      --fg-dark: #ffffff;
+      --fg-light: #0f172a; /* Slate 900 for softer, readable black */
+      --accent: #FC7B03;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      color: var(--fg-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.8s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================
+       CANVAS & VISUAL EFFECTS
+       ========================================= */
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      /* Smoothly animates the blur and contrast */
+      transition: filter 1.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1), mix-blend-mode 1.2s ease;
+      will-change: filter, opacity;
+      filter: invert(0) hue-rotate(0deg) contrast(1) blur(0px);
+      opacity: 1;
+    }
+
+    /* Light Mode: Soft, lazy ambient watercolor wash */
+    body.light-mode {
+      background-color: var(--bg-light);
+      color: var(--fg-light);
+    }
+    
+    body.light-mode #fluid-canvas {
+      /* Blur completely removes sharp edges, contrast flattens the intense colors */
+      filter: invert(1) hue-rotate(180deg) contrast(0.6) blur(8px);
+      mix-blend-mode: multiply;
+      opacity: 0.15; /* Pushes it far into the background */
+    }
+
+    /* Architectural Grid */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.1;
+      background-image: 
+        linear-gradient(to right, currentColor 1px, transparent 1px),
+        linear-gradient(to bottom, currentColor 1px, transparent 1px);
+      background-size: 8.33% 12.5%;
+      transition: opacity 0.8s ease;
+    }
+
+    body.light-mode .grid-lines {
+      opacity: 0.03; /* Barely visible in light mode */
+    }
+
+    /* =========================================
+       UI LAYERS & TYPOGRAPHY
+       ========================================= */
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; 
+    }
+
+    .interactive {
+      pointer-events: auto; 
+    }
+
+    .hero-text {
+      font-size: clamp(3.5rem, 11vw, 9.5rem);
+      line-height: 0.84;
+      font-weight: 400;
+      letter-spacing: -0.04em;
+      text-shadow: 1px 0px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .hero-desc {
+      text-shadow: 1px 0px 2px rgba(0, 0, 0, 0.22);
+    }
+
+    .word-rotator {
+      display: inline-flex;
+      min-width: 1.2em;
+      color: var(--accent);
+    }
+
+    .animate-char {
+      display: inline-block;
+      animation: charIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================================
+       COMPONENTS
+       ========================================= */
+    /* Buttons */
+    .btn-primary {
+      background-color: var(--fg-dark);
+      color: var(--bg-dark);
+      box-shadow: 0 0 40px rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+    body.light-mode .btn-primary {
+      background-color: var(--fg-light);
+      color: var(--bg-light);
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--fg-dark);
+      color: var(--fg-dark);
+      transition: all 0.3s ease;
+    }
+    body.light-mode .btn-secondary {
+      border-color: var(--fg-light);
+      color: var(--fg-light);
+    }
+    .btn-secondary:hover {
+      background-color: var(--fg-dark);
+      color: var(--bg-dark);
+    }
+    body.light-mode .btn-secondary:hover {
+      background-color: var(--fg-light);
+      color: var(--bg-light);
+    }
+
+    /* Marquee */
+    .marquee-container {
+      position: absolute;
+      bottom: 3rem;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      opacity: 0.4;
+      transition: opacity 0.8s ease;
+    }
+    body.light-mode .marquee-container {
+      opacity: 0.25; /* Less distracting in light mode */
+    }
+    .marquee-content {
+      display: flex;
+      gap: 6rem;
+      animation: scroll 90s linear infinite;
+      will-change: transform;
+      width: max-content;
+    }
+    .marquee-content:hover {
+      animation-play-state: paused;
+    }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Glass Cards */
+    .glass-card {
+      background: rgba(128, 128, 128, 0.03);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(128, 128, 128, 0.1);
+      border-radius: 2.5rem;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    body.light-mode .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Visualization -->
+  <canvas id="fluid-canvas"></canvas>
+  <!-- <div class="grid-lines"></div> -->
+
+  <!-- Main UI -->
+  <main class="ui-layer">
+    
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center px-6 lg:px-20 relative">
+      <div class="max-w-[1440px] mx-auto w-full">
+        <div class="flex items-center gap-8 lg:flex-row flex-col">
+          <img src="http://localhost:3000/foundry-logo.png" alt="Foundry Logo" class="w-auto h-48 lg:h-96">
+          
+          <h1 class="hero-text">
+            Your codebase <br>
+            that <span class="word-rotator" id="rotate-word">governs</span>
+          </h1>
+        </div>
+        
+        <div class="hero-desc mt-16 grid lg:grid-cols-2 gap-12 items-center">
+          <div class="max-w-xl text-gray-50">
+            <p class="text-2xl lg:text-3xl/10 font-medium mb-3">
+              Foundry is the governed development environment for complex domain platforms. Turn your code and tests into a living, visualizable spec, eliminating drift and keeping your team in sync.
+            </p>
+            <p class="text-xl lg:text-2xl leading-tight italic">
+              The codebase that never lies.
+            </p>
+          </div>
+          
+          <div class="flex flex-wrap gap-5 justify-center lg:justify-end">
+            <button class="interactive btn-primary px-10 py-5 rounded-full font-bold text-lg hover:scale-105">
+              Take a Tour →
+            </button>
+            <button class="interactive btn-secondary px-10 py-5 rounded-full font-bold text-lg">
+              Source Code
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Marquee -->
+      <div class="marquee-container">
+        <!-- <div class="marquee-content whitespace-nowrap">
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+        </div> -->
+        <!-- Masking container -->
+        <div class="overflow-hidden whitespace-nowrap py-10">
+          
+          <!-- Moving Track -->
+          <div class="marquee-content flex items-baseline gap-12">
+            
+            <!-- First Set -->
+            <div class="flex items-baseline gap-12">
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets on a single  </span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">0%</span><span class="text-xs uppercase font-bold tracking-widest">Spec-Code Drift</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">10x</span><span class="text-xs uppercase font-bold tracking-widest">Faster Reviews</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">-94%</span><span class="text-xs uppercase font-bold tracking-widest">Cloud Bill</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">100%</span><span class="text-xs uppercase font-bold tracking-widest">Visualizable code</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">Eject</span><span class="text-xs uppercase font-bold tracking-widest">at any time</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings in case</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+            </div>
+
+            <!-- Second Set (Exact Copy) -->
+            <div class="flex items-baseline gap-12" aria-hidden="true">
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets on single node</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">0%</span><span class="text-xs uppercase font-bold tracking-widest">Spec-Code Drift</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">10x</span><span class="text-xs uppercase font-bold tracking-widest">Faster Reviews</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">-94%</span><span class="text-xs uppercase font-bold tracking-widest">Cloud Bill</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">100%</span><span class="text-xs uppercase font-bold tracking-widest">Visualizable code</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">Eject</span><span class="text-xs uppercase font-bold tracking-widest">at any time</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings in case</span></div>
+              <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deep Focus Section -->
+    <section class="min-h-screen py-40 px-6 lg:px-20 flex items-center">
+      <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-3 gap-8">
+        
+        <div class="interactive lg:col-span-2 glass-card p-12 lg:p-16">
+          <h2 class="text-5xl lg:text-7xl font-black mb-8 tracking-tighter">Code is the visualizable spec.</h2>
+          <p class="text-2xl opacity-80 leading-relaxed mb-6 font-medium">
+            Foundry generates graph maps from code using static analysis. 
+            The agent sees the entire system map in context.
+          </p>
+          <p class="text-2xl opacity-80 leading-relaxed font-bold">
+            Working not with grepped code, but with a full declarative model.
+          </p>
+        </div>
+        
+        <div class="flex flex-col gap-8">
+          <div class="interactive glass-card p-10 flex-1 hover:border-indigo-500/30">
+            <h3 class="text-indigo-500 font-black mb-3 uppercase text-xs tracking-widest">Static Analysis</h3>
+            <p class="text-2xl font-bold">The code is the topography.</p>
+          </div>
+          <div class="interactive glass-card p-10 flex-1 bg-indigo-600 border-none text-white shadow-2xl hover:bg-indigo-500">
+            <h3 class="text-white/80 font-black mb-3 uppercase text-xs tracking-widest">Governance</h3>
+            <p class="text-2xl font-bold">Reality, enforced by compiler.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById('fluid-canvas');
+
+      // 1. Initialize Fluid
+      WebGLFluid(canvas, {
+        TRIGGER: 'hover',
+        IMMEDIATE: true,             
+        AUTO: false,                 
+        SIM_RESOLUTION: 128,         
+        DYE_RESOLUTION: 1024,        
+        DENSITY_DISSIPATION: 0.97,   
+        VELOCITY_DISSIPATION: 0.98,  
+        PRESSURE: 0.8,               
+        CURL: 30,                    
+        SPLAT_RADIUS: 0.25,          
+        SPLAT_FORCE: 6000,           
+        SHADING: true,               
+        COLORFUL: true,              
+        COLOR_UPDATE_SPEED: 4,       
+        TRANSPARENT: true,           
+        BLOOM: true,                 
+        BLOOM_ITERATIONS: 8,
+        BLOOM_RESOLUTION: 256,
+        BLOOM_INTENSITY: 0.8,
+        BLOOM_THRESHOLD: 0.6,
+        SUNRAYS: true,               
+        SUNRAYS_RESOLUTION: 196,
+        SUNRAYS_WEIGHT: 1.0,
+      });
+
+      // 2. Optimized & Throttled Event Bridge
+      let isThrottled = false;
+      let lightModeSkipCounter = 0;
+      
+      function proxyEvent(e) {
+        if (e.isProxy) return;
+
+        if (isThrottled) return;
+
+        // "Lazy Fluid" Logic: If in light mode, skip 2 out of 3 events 
+        // to make the smoke generation much less aggressive and intense.
+        if (document.body.classList.contains('light-mode')) {
+          lightModeSkipCounter++;
+          if (lightModeSkipCounter % 3 !== 0) return;
+        }
+
+        isThrottled = true;
+        requestAnimationFrame(() => { isThrottled = false; });
+
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+
+        if (clientX === undefined || clientY === undefined) return;
+
+        const event = new MouseEvent(e.type, {
+          clientX,
+          clientY,
+          bubbles: false, 
+          cancelable: true,
+          view: window
+        });
+        
+        event.isProxy = true; 
+        canvas.dispatchEvent(event);
+      }
+
+      const eventTypes = ['mousemove', 'mousedown', 'mouseup', 'touchstart', 'touchmove'];
+      eventTypes.forEach(type => {
+        window.addEventListener(type, proxyEvent, { passive: true });
+      });
+
+      // 3. Word Rotator
+      const words = ["governs", "enforces", "scales", "endures"];
+      let wordIdx = 0;
+      const rotateEl = document.getElementById('rotate-word');
+      
+      function updateWord() {
+        wordIdx = (wordIdx + 1) % words.length;
+        const word = words[wordIdx];
+        rotateEl.innerHTML = '';
+        
+        word.split('').forEach((char, i) => {
+          const span = document.createElement('span');
+          span.textContent = char;
+          span.className = 'animate-char';
+          span.style.animationDelay = `${i * 35}ms`; 
+          rotateEl.appendChild(span);
+        });
+      }
+      
+      updateWord();
+      setInterval(updateWord, 3000);
+
+      // 4. Scroll Inversion Logic
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const threshold = window.innerHeight * 0.4;
+            document.body.classList.toggle('light-mode', window.scrollY > threshold);
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    });
+  </script>
+</body>
+</html>
