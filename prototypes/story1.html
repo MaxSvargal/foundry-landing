@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry - Topography of Intent</title>
+  <style>
+    :root {
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --glass-bg: rgba(20, 13, 43, 0.4);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --accent: #00f0ff;
+      --accent-gold: #ffd700;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #050408;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* WebGL Fluid Background */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: auto; /* Let user interact initially */
+      transition: opacity 1s ease;
+    }
+
+    /* The Glass City (SVG Topography) */
+    #topography {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .node {
+      fill: rgba(10, 5, 20, 0.8);
+      stroke: rgba(255, 255, 255, 0.2);
+      stroke-width: 2;
+      transition: stroke 0.5s ease, fill 0.5s ease;
+    }
+
+    .pipe {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 4;
+      stroke-linecap: round;
+      transition: stroke 0.5s ease;
+    }
+
+    .pipe-active {
+      stroke: var(--accent);
+      stroke-width: 6;
+      filter: drop-shadow(0 0 10px var(--accent));
+    }
+
+    .node-active {
+      stroke: var(--accent);
+      fill: rgba(0, 240, 255, 0.1);
+      filter: drop-shadow(0 0 15px var(--accent));
+    }
+
+    .hologram {
+      stroke-dasharray: 10 10;
+      stroke: var(--accent-gold);
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    /* Scrollable Content */
+    #scroll-container {
+      position: relative;
+      z-index: 3;
+      pointer-events: none; /* Let clicks pass to canvas */
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    .glass-panel {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 800px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .glass-panel.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0 0 1rem 0;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-shadow: 0px 4px 24px rgba(0,0,0,0.8);
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin: 0 0 1rem 0;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Agent Terminal UI */
+    #agent-terminal {
+      position: fixed;
+      bottom: 40px;
+      left: 40px;
+      width: 400px;
+      background: rgba(5, 4, 8, 0.8);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      color: #a0a0a0;
+      z-index: 4;
+      opacity: 0;
+      transform: translateX(-50px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
+    #agent-terminal.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .terminal-line {
+      margin-bottom: 8px;
+      opacity: 0;
+    }
+
+    .terminal-line.typed {
+      opacity: 1;
+    }
+
+    .highlight {
+      color: var(--accent-gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- WebGL Fluid Background -->
+  <canvas id="fluid-canvas"></canvas>
+
+  <!-- The Glass City Topography Overlay -->
+  <svg id="topography" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+    <!-- Pipes (Edges) -->
+    <path id="pipe-1" class="pipe" d="M 200 300 L 400 150" />
+    <path id="pipe-2" class="pipe" d="M 200 300 L 400 450" />
+    <path id="pipe-3" class="pipe" d="M 400 150 L 700 300" />
+    <path id="pipe-4" class="pipe" d="M 400 450 L 700 300" />
+    
+    <!-- Holographic Pipe (Agent Proposal) -->
+    <path id="pipe-holo" class="pipe hologram" d="M 700 300 L 900 150" />
+
+    <!-- Nodes (Vertices) -->
+    <circle id="node-start" class="node" cx="200" cy="300" r="30" />
+    <circle id="node-auth" class="node" cx="400" cy="150" r="40" />
+    <circle id="node-ledger" class="node" cx="400" cy="450" r="40" />
+    <circle id="node-core" class="node" cx="700" cy="300" r="50" />
+    
+    <!-- Holographic Node (Agent Proposal) -->
+    <circle id="node-holo" class="node hologram" cx="900" cy="150" r="35" />
+    
+    <!-- Node Labels -->
+    <text x="200" y="305" fill="white" font-size="12" text-anchor="middle" opacity="0.6">Entry</text>
+    <text x="400" y="155" fill="white" font-size="12" text-anchor="middle" opacity="0.6">Auth</text>
+    <text x="400" y="455" fill="white" font-size="12" text-anchor="middle" opacity="0.6">Ledger</text>
+    <text x="700" y="305" fill="white" font-size="14" text-anchor="middle" opacity="0.8">Domain</text>
+    <text id="text-holo" x="900" y="155" fill="#ffd700" font-size="12" text-anchor="middle" class="hologram">Compliance</text>
+  </svg>
+
+  <!-- Narrative Scrolling Content -->
+  <div id="scroll-container">
+    
+    <!-- Scene 1: The Void -->
+    <section id="scene-1">
+      <div class="glass-panel">
+        <h1>FOUNDRY</h1>
+        <p>Move your cursor. Code is generated effortlessly.<br>But without structure, energy dissipates into the void.</p>
+      </div>
+    </section>
+
+    <!-- Scene 2: Crystallization -->
+    <section id="scene-2">
+      <div class="glass-panel">
+        <h2>The codebase is not text.<br>It is a topography.</h2>
+        <p>Static analysis captures your intent. The chaotic fluid crystallizes into a governed architecture. You don't read the matrix; you watch the city breathe.</p>
+      </div>
+    </section>
+
+    <!-- Scene 3: The Pulse -->
+    <section id="scene-3">
+      <div class="glass-panel">
+        <h2>Watch your logic run.</h2>
+        <p>Never read a stack trace again. Visual logic review traces live execution paths through your declarative model.</p>
+      </div>
+    </section>
+
+    <!-- Scene 4: The Agent -->
+    <section id="scene-4">
+      <div class="glass-panel">
+        <h2>An agent that sees the whole city.</h2>
+        <p>It doesn't grep text. It simulates physics inside your live architecture, proposing and validating changes before they merge.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- Agent UI -->
+  <div id="agent-terminal">
+    <div class="terminal-line" id="term-1">> User: Route VIP UK withdrawals through secondary compliance.</div>
+    <div class="terminal-line" id="term-2" style="color: var(--accent);">> Agent: Scanning topography...</div>
+    <div class="terminal-line" id="term-3">> Agent: Found UK District & Compliance Gates.</div>
+    <div class="terminal-line highlight" id="term-4">> Agent: Proposing structural change. Simulating dry-run...</div>
+  </div>
+
+  <!-- Load WebGL Fluid Simulation -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  
+  <script>
+    // Initialize Fluid Simulation
+    const canvas = document.getElementById('fluid-canvas');
+    WebGLFluid(canvas, {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      SIM_RESOLUTION: 128,
+      DYE_RESOLUTION: 1024,
+      DENSITY_DISSIPATION: 0.96, // Slightly faster dissipation to look like energy
+      VELOCITY_DISSIPATION: 0.98,
+      PRESSURE: 0.8,
+      CURL: 30,
+      SPLAT_RADIUS: 0.25,
+      SPLAT_FORCE: 6000,
+      SHADING: true,
+      COLORFUL: true,
+      COLOR_UPDATE_SPEED: 10,
+      BLOOM: true,
+      BLOOM_ITERATIONS: 8,
+      BLOOM_RESOLUTION: 256,
+      BLOOM_INTENSITY: 0.8,
+      BLOOM_THRESHOLD: 0.6,
+      SUNRAYS: true,
+      SUNRAYS_RESOLUTION: 196,
+      SUNRAYS_WEIGHT: 1.0,
+    });
+
+    // --- UTILITY: Simulate Fluid Pulses ---
+    // We simulate mouse events to inject fluid programmatically along the SVG paths.
+    function triggerSplat(x, y) {
+      const event = new MouseEvent('mousemove', {
+        clientX: x,
+        clientY: y,
+        bubbles: true,
+        cancelable: true
+      });
+      canvas.dispatchEvent(event);
+    }
+
+    function animatePulseAlongPath(startX, startY, endX, endY, duration, callback) {
+      const startTime = performance.now();
+      
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function (easeOutQuad)
+        const easeProgress = progress * (2 - progress);
+        
+        const currentX = startX + (endX - startX) * easeProgress;
+        const currentY = startY + (endY - startY) * easeProgress;
+        
+        triggerSplat(currentX, currentY);
+        
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else if (callback) {
+          callback();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // Convert SVG ViewBox coordinates to Screen Pixels
+    function getScreenCoords(svgX, svgY) {
+      const svg = document.getElementById('topography');
+      const rect = svg.getBoundingClientRect();
+      // SVG is 1000x600 viewBox, preserveAspectRatio="xMidYMid slice"
+      // Calculating exact pixel maps for a 'slice' scaling is complex, 
+      // so for this visual effect, we approximate based on percentage of screen.
+      const scaleX = rect.width / 1000;
+      const scaleY = rect.height / 600;
+      const scale = Math.max(scaleX, scaleY); // Because of 'slice'
+      
+      const offsetX = (rect.width - 1000 * scale) / 2;
+      const offsetY = (rect.height - 600 * scale) / 2;
+
+      return {
+        x: svgX * scale + offsetX,
+        y: svgY * scale + offsetY
+      };
+    }
+
+    // --- SCROLL & NARRATIVE LOGIC ---
+    const sections = document.querySelectorAll('section');
+    const topography = document.getElementById('topography');
+    const terminal = document.getElementById('agent-terminal');
+    let currentScene = 1;
+    let pulseInterval;
+
+    // Intersection Observer to trigger animations based on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const panel = entry.target.querySelector('.glass-panel');
+        if (entry.isIntersecting) {
+          panel.classList.add('visible');
+          const sceneId = entry.target.id;
+          handleSceneChange(sceneId);
+        } else {
+          panel.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0.5 });
+
+    sections.forEach(section => observer.observe(section));
+
+    function handleSceneChange(sceneId) {
+      clearInterval(pulseInterval); // Stop random pulses from previous scenes
+
+      if (sceneId === 'scene-1') {
+        // The Void: Free chaos
+        topography.style.opacity = '0';
+        canvas.style.pointerEvents = 'auto'; // User can play freely
+        terminal.classList.remove('visible');
+      } 
+      
+      else if (sceneId === 'scene-2') {
+        // Crystallization: Architecture appears
+        topography.style.opacity = '1';
+        canvas.style.pointerEvents = 'none'; // Restrict user interaction to show governance
+        terminal.classList.remove('visible');
+        
+        // Gentle pulses at nodes to show they are "alive"
+        pulseInterval = setInterval(() => {
+          const nodes = [
+            getScreenCoords(200, 300),
+            getScreenCoords(400, 150),
+            getScreenCoords(400, 450),
+            getScreenCoords(700, 300)
+          ];
+          const randomNode = nodes[Math.floor(Math.random() * nodes.length)];
+          triggerSplat(randomNode.x, randomNode.y);
+        }, 800);
+      }
+      
+      else if (sceneId === 'scene-3') {
+        // The Pulse: Runtime logic tracing
+        topography.style.opacity = '1';
+        terminal.classList.remove('visible');
+        
+        // Run a simulated test trace every 3 seconds
+        function runTrace() {
+          const start = getScreenCoords(200, 300);
+          const auth = getScreenCoords(400, 150);
+          const core = getScreenCoords(700, 300);
+
+          // Visual highlight on SVG
+          document.getElementById('pipe-1').classList.add('pipe-active');
+          document.getElementById('node-auth').classList.add('node-active');
+
+          // Fluid pulse Path 1
+          animatePulseAlongPath(start.x, start.y, auth.x, auth.y, 600, () => {
+            setTimeout(() => {
+              document.getElementById('pipe-3').classList.add('pipe-active');
+              document.getElementById('node-core').classList.add('node-active');
+              
+              // Fluid pulse Path 2
+              animatePulseAlongPath(auth.x, auth.y, core.x, core.y, 800, () => {
+                // Reset highlights after trace
+                setTimeout(() => {
+                  document.querySelectorAll('.pipe-active, .node-active').forEach(el => {
+                    el.classList.remove('pipe-active', 'node-active');
+                  });
+                }, 1000);
+              });
+            }, 200);
+          });
+        }
+        
+        runTrace();
+        pulseInterval = setInterval(runTrace, 4000);
+      }
+      
+      else if (sceneId === 'scene-4') {
+        // The Agent: Context-aware AI
+        topography.style.opacity = '1';
+        terminal.classList.add('visible');
+        
+        // Terminal Typing Sequence
+        setTimeout(() => document.getElementById('term-1').classList.add('typed'), 500);
+        setTimeout(() => document.getElementById('term-2').classList.add('typed'), 1500);
+        setTimeout(() => document.getElementById('term-3').classList.add('typed'), 2500);
+        setTimeout(() => {
+          document.getElementById('term-4').classList.add('typed');
+          
+          // Reveal Holographic Node & Pipe
+          document.querySelectorAll('.hologram').forEach(el => el.style.opacity = '1');
+          
+          // Run dry-run pulse to the new node
+          setTimeout(() => {
+            const core = getScreenCoords(700, 300);
+            const holo = getScreenCoords(900, 150);
+            
+            function runHoloPulse() {
+              animatePulseAlongPath(core.x, core.y, holo.x, holo.y, 800);
+            }
+            
+            runHoloPulse();
+            pulseInterval = setInterval(runHoloPulse, 2000);
+            
+          }, 1000);
+          
+        }, 3500);
+      }
+    }
+  </script>
+</body>
+</html>

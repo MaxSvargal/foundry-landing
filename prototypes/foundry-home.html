@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foundry — The governed build environment for complex domain platforms</title>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo"><span></span>foundry</a>
+    <ul class="nav-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">The graph</a></li>
+      <li><a href="#">The copilot</a></li>
+      <li><a href="#">Domains</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#" class="nav-cta">Get started</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Governed build environment</p>
+      <h1 class="hero-h1">
+        Your codebase<br>
+        is the spec.<br>
+        <em>It never lies.</em>
+      </h1>
+      <p class="hero-sub">
+        Foundry is the governed development environment for complex domain platforms on Elixir and Ash. The code declares the domain. The spec captures the intent. The copilot holds both. Nothing drifts.
+      </p>
+      <div class="hero-actions">
+        <a href="#" class="btn-primary">Start building</a>
+        <a href="#" class="btn-ghost">
+          See how it works
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- HERO GRAPH SVG -->
+    <div class="hero-graph">
+      <svg class="hero-svg-graph" viewBox="0 0 420 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- edges -->
+        <line x1="210" y1="72" x2="90" y2="148" stroke="#c8d8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="210" y1="72" x2="210" y2="148" stroke="#c8d8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="210" y1="72" x2="330" y2="148" stroke="#c8d8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="90" y1="192" x2="90" y2="300" stroke="#d8c8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="330" y1="192" x2="330" y2="300" stroke="#c8c8e0" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="90" y1="340" x2="210" y2="420" stroke="#d8d0b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <line x1="330" y1="340" x2="210" y2="420" stroke="#d8d0b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <!-- edge labels -->
+        <text x="128" y="110" font-family="DM Mono,monospace" font-size="9" fill="#b0b0a8" letter-spacing=".04em">has_many</text>
+        <text x="34" y="255" font-family="DM Mono,monospace" font-size="9" fill="#c8b0a8" letter-spacing=".04em">RG-UK-014</text>
+        <text x="340" y="255" font-family="DM Mono,monospace" font-size="9" fill="#a8a8c8" letter-spacing=".04em">reactor</text>
+
+        <!-- domain node -->
+        <rect x="148" y="28" width="124" height="48" rx="10" fill="#edf4f0" stroke="#4a8f66" stroke-width="1.5"/>
+        <text x="166" y="48" font-family="DM Mono,monospace" font-size="9" fill="#4a8f66" letter-spacing=".06em" text-transform="uppercase">DOMAIN</text>
+        <text x="166" y="64" font-family="DM Mono,monospace" font-size="12" font-weight="500" fill="#2a4d3a">Finance</text>
+
+        <!-- resource nodes -->
+        <rect x="42" y="148" width="100" height="48" rx="10" fill="#e8edf5" stroke="#4a6fa8" stroke-width="1.5"/>
+        <text x="56" y="168" font-family="DM Mono,monospace" font-size="9" fill="#4a6fa8" letter-spacing=".06em">RESOURCE</text>
+        <text x="56" y="184" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#1e3a6e">Wallet</text>
+
+        <rect x="160" y="148" width="100" height="48" rx="10" fill="#e8edf5" stroke="#4a6fa8" stroke-width="1.5"/>
+        <text x="174" y="168" font-family="DM Mono,monospace" font-size="9" fill="#4a6fa8" letter-spacing=".06em">RESOURCE</text>
+        <text x="174" y="184" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#1e3a6e">Transfer</text>
+
+        <rect x="278" y="148" width="100" height="48" rx="10" fill="#e8edf5" stroke="#4a6fa8" stroke-width="1.5"/>
+        <text x="292" y="168" font-family="DM Mono,monospace" font-size="9" fill="#4a6fa8" letter-spacing=".06em">RESOURCE</text>
+        <text x="292" y="184" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#1e3a6e">Ledger</text>
+
+        <!-- compliance node -->
+        <rect x="28" y="300" width="124" height="48" rx="10" fill="#f5ede8" stroke="#c8401a" stroke-width="1.5"/>
+        <text x="44" y="320" font-family="DM Mono,monospace" font-size="9" fill="#c8401a" letter-spacing=".06em">COMPLIANCE</text>
+        <text x="44" y="336" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#7a2510">RG-UK-014</text>
+
+        <!-- reactor node -->
+        <rect x="268" y="300" width="124" height="48" rx="10" fill="#f0ebf5" stroke="#7a4a9e" stroke-width="1.5"/>
+        <text x="284" y="320" font-family="DM Mono,monospace" font-size="9" fill="#7a4a9e" letter-spacing=".06em">REACTOR</text>
+        <text x="284" y="336" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#4a1e6e">Withdrawal</text>
+
+        <!-- spec node -->
+        <rect x="148" y="420" width="124" height="48" rx="10" fill="#f5f2e8" stroke="#8a7a3a" stroke-width="1.5"/>
+        <text x="164" y="440" font-family="DM Mono,monospace" font-size="9" fill="#8a7a3a" letter-spacing=".06em">SPEC</text>
+        <text x="164" y="456" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#4a400e">ADR-005</text>
+
+        <!-- pulse on compliance -->
+        <circle cx="28" cy="300" r="5" fill="#4a8f66" opacity=".8">
+          <animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values=".8;0;.8" dur="2s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- badge -->
+        <rect x="322" y="32" width="76" height="20" rx="5" fill="#d4e8dc"/>
+        <text x="334" y="45" font-family="DM Mono,monospace" font-size="9" fill="#2a4d3a" letter-spacing=".04em">always live</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PAIN -->
+<section class="pain-section">
+  <div class="pain-inner">
+    <div>
+      <p class="section-label" style="color: rgba(245,243,238,.3);">The origin story</p>
+      <p class="pain-story">
+        Six months after launch, <strong>your original architect leaves.</strong> A new engineer adds a delete action to the ledger resource. The linter doesn't catch it — nobody wrote that rule. Three weeks later there's an incident.
+        <br><br>
+        The post-mortem says <strong>process failure.</strong><br>The real cause is entropy.
+      </p>
+    </div>
+    <div class="pain-points">
+      <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: rgba(245,243,238,.3); margin-bottom: .5rem;">This happens because</p>
+      <div class="pain-point">
+        <span class="pain-num">01</span>
+        <p class="pain-text"><strong>Constraints live in heads, not code.</strong> The reason this resource is sensitive exists in one person's memory and nowhere else.</p>
+      </div>
+      <div class="pain-point">
+        <span class="pain-num">02</span>
+        <p class="pain-text"><strong>Documentation drifts from reality.</strong> The diagram drawn in week one describes a system that no longer exists.</p>
+      </div>
+      <div class="pain-point">
+        <span class="pain-num">03</span>
+        <p class="pain-text"><strong>AI tools generate from training, not your domain.</strong> The copilot doesn't know your invariants. It knows what Ash looked like two years ago.</p>
+      </div>
+      <div class="pain-point">
+        <span class="pain-num">04</span>
+        <p class="pain-text"><strong>Change is invisible until production.</strong> Nobody knew that modifying this action would break three downstream compliance obligations.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THREE VALUES -->
+<section class="section">
+  <p class="section-label">How Foundry works</p>
+  <h2 class="section-h2">Three properties that make<br><em>entropy structurally impossible.</em></h2>
+  <div class="values-grid">
+    <div class="value-card">
+      <div class="value-icon">⬡</div>
+      <h3 class="value-h3">Code is the<br><em>specification</em></h3>
+      <p class="value-body">Ash DSL is declarative enough to read as specification. You declare domain facts — resources, relationships, policies, state machines. The compiler enforces them. What the compiler knows cannot drift.</p>
+      <span class="value-tag">zero-drift architecture</span>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">◈</div>
+      <h3 class="value-h3">Intent lives in<br><em>the spec-kit</em></h3>
+      <p class="value-body">What code cannot express — decisions, rationale, compliance obligations — lives in a structured spec-kit that the linter keeps honest. ADRs, runbooks, regulation files. Not documentation. Executable constraints.</p>
+      <span class="value-tag">linter-enforced</span>
+    </div>
+    <div class="value-card">
+      <div class="value-icon">⊕</div>
+      <h3 class="value-h3">The copilot knows<br><em>the full picture</em></h3>
+      <p class="value-body">Structured retrieval over live DSL introspection — not RAG over stale indexes. The copilot reads the compiler's output, not a cached copy of it. Full project context. Always current. No sync steps.</p>
+      <span class="value-tag">no rag, no drift</span>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- GRAPH COMPARISON -->
+<section class="compare-section">
+  <div class="compare-inner">
+    <p class="section-label">The graph advantage</p>
+    <h2 class="section-h2">Wrong connections are <em>visible.</em><br>Missing connections are lint errors.</h2>
+    <p style="font-size: 16px; color: var(--ink-muted); max-width: 560px; line-height: 1.65; font-weight: 300; margin-top: .75rem;">Most codebases are labyrinths you navigate by memory. Foundry codebases are maps. Because Ash DSL is declarative, the graph isn't inferred from the code — it <em>is</em> the code. The system map is a lossless rendering of your domain.</p>
+
+    <div class="compare-grid">
+      <div class="compare-pane pane-text">
+        <div class="compare-header">
+          <div class="dot"></div>
+          Without Foundry — reading files
+        </div>
+        <div class="compare-body">
+          <div class="code-lines">
+            <div class="code-line" style="width: 85%"></div>
+            <div class="code-line" style="width: 60%"></div>
+            <div class="code-line code-comment" style="width: 90%"></div>
+            <div class="code-line" style="width: 70%"></div>
+            <div class="code-line code-highlight" style="width: 80%"></div>
+            <div class="code-line" style="width: 45%"></div>
+            <div class="code-line" style="width: 75%"></div>
+            <div class="code-line code-comment" style="width: 55%"></div>
+            <div class="code-line" style="width: 88%"></div>
+            <div class="code-line" style="width: 40%"></div>
+            <div class="code-line code-highlight" style="width: 72%"></div>
+            <div class="code-line" style="width: 65%"></div>
+          </div>
+          <div class="compare-verdict verdict-bad">
+            ✕ &nbsp;Is this resource sensitive? Read 12 more files to find out.
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-pane pane-graph">
+        <div class="compare-header">
+          <div class="dot"></div>
+          With Foundry — reading the graph
+        </div>
+        <div class="compare-body">
+          <div class="mini-graph">
+            <svg width="100%" height="200" viewBox="0 0 320 200" fill="none">
+              <line x1="160" y1="44" x2="70" y2="108" stroke="#c0d8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <line x1="160" y1="44" x2="250" y2="108" stroke="#c0d8c0" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <line x1="70" y1="148" x2="160" y2="182" stroke="#d8c0b8" stroke-width="1.5" stroke-dasharray="4 3"/>
+              <line x1="250" y1="148" x2="160" y2="182" stroke="#b8b8d8" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+              <rect x="110" y="10" width="100" height="40" rx="8" fill="#edf4f0" stroke="#4a8f66" stroke-width="1.5"/>
+              <text x="124" y="26" font-family="DM Mono,monospace" font-size="8" fill="#4a8f66" letter-spacing=".05em">DOMAIN</text>
+              <text x="124" y="40" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#2a4d3a">Finance</text>
+
+              <rect x="20" y="108" width="100" height="40" rx="8" fill="#f5ede8" stroke="#c8401a" stroke-width="2"/>
+              <text x="34" y="124" font-family="DM Mono,monospace" font-size="8" fill="#c8401a" letter-spacing=".04em">SENSITIVE ●</text>
+              <text x="34" y="138" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#7a2510">Ledger</text>
+
+              <rect x="200" y="108" width="100" height="40" rx="8" fill="#e8edf5" stroke="#4a6fa8" stroke-width="1.5"/>
+              <text x="214" y="124" font-family="DM Mono,monospace" font-size="8" fill="#4a6fa8" letter-spacing=".04em">RESOURCE</text>
+              <text x="214" y="138" font-family="DM Mono,monospace" font-size="11" font-weight="500" fill="#1e3a6e">Wallet</text>
+
+              <rect x="110" y="168" width="100" height="30" rx="8" fill="#f0ebf5" stroke="#7a4a9e" stroke-width="1.5"/>
+              <text x="124" y="188" font-family="DM Mono,monospace" font-size="10" font-weight="500" fill="#4a1e6e">ADR-005 linked</text>
+
+              <circle cx="20" cy="108" r="5" fill="#c8401a" opacity=".8">
+                <animate attributeName="r" values="5;9;5" dur="2s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values=".8;0;.8" dur="2s" repeatCount="indefinite"/>
+              </circle>
+            </svg>
+          </div>
+          <div class="compare-verdict verdict-good">
+            ✓ &nbsp;Sensitive, compliance-linked, paper trail required. Instant.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEC TERMINAL -->
+<section>
+  <div class="spec-strip">
+    <div>
+      <p class="section-label">Spec-first, always</p>
+      <h2 class="section-h2">What code can't say,<br>the <em>spec-kit</em> does.</h2>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.65; font-weight: 300; margin: 1rem 0 1.5rem;">The Ash DSL captures what — resources, relationships, policies. The spec-kit captures why. ADRs explain decisions. Regulation files track obligations. Runbooks document operations. The linter enforces that all three stay honest.</p>
+      <p style="font-size: 14px; color: var(--ink-muted); line-height: 1.65; font-weight: 300;">When the spec-kit is complete, the copilot rarely needs to ask a question. Context resolves ambiguity. A clarifying question is a signal that the spec-kit has a gap — not a normal state of affairs.</p>
+    </div>
+    <div class="spec-terminal">
+      <div class="terminal-bar">
+        <div class="t-dot t-red"></div>
+        <div class="t-dot t-yellow"></div>
+        <div class="t-dot t-green"></div>
+        <span class="terminal-title">mix foundry.project.status</span>
+      </div>
+      <div class="terminal-body">
+        <span class="t-line t-comment"># project health · finance-platform</span>
+        <span class="t-line">&nbsp;</span>
+        <span class="t-line"><span class="t-key">resources</span>     <span class="t-val">24</span>  <span class="t-comment">· 3 sensitive</span></span>
+        <span class="t-line"><span class="t-key">reactors</span>      <span class="t-val">8</span>   <span class="t-comment">· all have runbooks</span></span>
+        <span class="t-line"><span class="t-key">compliance</span>    <span class="t-val">12</span>  <span class="t-comment">· 11 covered ✓</span></span>
+        <span class="t-line">&nbsp;</span>
+        <span class="t-line t-tag">─── lint results ──────────────────</span>
+        <span class="t-line"><span class="t-ok">✓</span>  INV-011 paper_trail on all sensitive</span>
+        <span class="t-line"><span class="t-ok">✓</span>  INV-012 archival on all sensitive</span>
+        <span class="t-line"><span class="t-warn">✗</span>  INV-010 missing: adapter_verify_failed</span>
+        <span class="t-line t-comment">       → see ADR-010 · add notifier</span>
+        <span class="t-line">&nbsp;</span>
+        <span class="t-line t-tag">─── proposals ─────────────────────</span>
+        <span class="t-line"><span class="t-key">pending</span>  <span class="t-val">2</span>  withdrawal-limit-rule</span>
+        <span class="t-line">         <span class="t-comment">kyc-override-gate</span></span>
+        <span class="t-line">&nbsp;</span>
+        <span class="t-line"><span class="t-ok">context.lock</span> <span class="t-comment">· in sync ✓</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- COPILOT -->
+<section class="copilot-section">
+  <div class="copilot-inner">
+    <div>
+      <p class="section-label" style="color: rgba(245,243,238,.3);">The copilot</p>
+      <h2 class="copilot-h2">The AI that knows<br>your domain <em>completely.</em></h2>
+      <p class="copilot-sub">Not RAG over a stale index. Not training data from two years ago. Structured retrieval over live DSL introspection — the copilot reads what the compiler knows, at the moment it needs to know it.</p>
+      <div class="copilot-differentiators">
+        <div class="diff-item">
+          <div class="diff-icon">⬡</div>
+          <div class="diff-text">
+            <strong>Full project context, always current</strong>
+            Stack versions, resource declarations, compliance links, invariants — injected into every session before generation begins. Structurally impossible to start without them.
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-icon">◈</div>
+          <div class="diff-text">
+            <strong>Generates on a branch, never in place</strong>
+            All changes go to a proposal branch. Compile must pass. Tests must run. The diff reaches the review panel. Your working tree is never touched.
+          </div>
+        </div>
+        <div class="diff-item">
+          <div class="diff-icon">⊕</div>
+          <div class="diff-text">
+            <strong>Scenarios before code</strong>
+            BDD scenarios derived from regulation files and invariants. The human reads plain-language assertions and confirms intent. Tests are generated, not written.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-mockup">
+      <div class="chat-header">
+        <div class="chat-online"></div>
+        foundry copilot · finance-platform
+      </div>
+      <div class="chat-body">
+        <div class="chat-msg">
+          <div class="chat-avatar av-user">you</div>
+          <div class="chat-bubble bubble-user">Add a spending limit rule to the withdrawal reactor. UK players, £500 daily cap.</div>
+        </div>
+        <div class="chat-msg">
+          <div class="chat-avatar av-ai">f</div>
+          <div class="chat-bubble bubble-ai">
+            Checking spec-kit for <code>WithdrawalReactor</code>… found <code>RG-UK-014</code> compliance link and <code>ADR-005</code>.<br><br>
+            This is a <code>:behavioral</code> change — domain lead approval required.<br><br>
+            Proposed plan:<br>
+            1. Draft ADR for spending limit logic<br>
+            2. Generate 3 BDD scenarios from RG-UK-014<br>
+            3. Add <code>SpendingLimitRule</code> to reactor<br>
+            4. Run <code>mix ash.codegen</code><br><br>
+            Confirm to proceed?
+          </div>
+        </div>
+        <div class="chat-msg">
+          <div class="chat-avatar av-user">you</div>
+          <div class="chat-bubble bubble-user">Yes, proceed.</div>
+        </div>
+        <div style="padding-left: 38px;">
+          <div class="chat-typing">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENCHMARKS -->
+<section class="bench-strip">
+  <div class="bench-inner">
+    <p class="bench-eyebrow">Research and benchmarks — methodology published openly</p>
+    <div class="bench-stats">
+      <div class="bench-stat">
+        <div class="stat-num"><em>3–5×</em></div>
+        <div class="stat-label">faster engineer onboarding onto complex codebases</div>
+        <div class="stat-source">code comprehension study · 2024</div>
+      </div>
+      <div class="bench-stat">
+        <div class="stat-num">60<em>%</em></div>
+        <div class="stat-label">of development time spent understanding existing code</div>
+        <div class="stat-source">dagenais et al. · icse 2010</div>
+      </div>
+      <div class="bench-stat">
+        <div class="stat-num"><em>0</em></div>
+        <div class="stat-label">drift between system map and production — guaranteed by construction</div>
+        <div class="stat-source">structural property · not a benchmark</div>
+      </div>
+      <div class="bench-stat">
+        <div class="stat-num">100<em>%</em></div>
+        <div class="stat-label">of invariant tests generated from declarations, not written manually</div>
+        <div class="stat-source">foundry dogfood data · 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DOMAINS -->
+<section class="domains-section">
+  <p class="section-label">Domain coverage</p>
+  <h2 class="section-h2">Built for platforms where<br><em>rules matter enormously.</em></h2>
+  <div class="domains-grid">
+    <div class="domain-card">
+      <span class="domain-icon">⬡</span>
+      <div class="domain-name">Fintech & Payments</div>
+      <div class="domain-desc">Ledger integrity, transfer governance, regulatory compliance, audit trails.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">◈</span>
+      <div class="domain-name">iGaming & Betting</div>
+      <div class="domain-desc">License compliance, responsible gambling controls, KYC, wallet governance.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">⊕</span>
+      <div class="domain-name">Healthcare</div>
+      <div class="domain-desc">PHI governance, clinical protocol enforcement, audit-ready records.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">△</span>
+      <div class="domain-name">Insurance & Legal</div>
+      <div class="domain-desc">Rules-intensive domains with complex approval chains and policy versioning.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">○</span>
+      <div class="domain-name">Supply Chain</div>
+      <div class="domain-desc">Regulatory rules, adapter governance, chain of custody, multi-party coordination.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">□</span>
+      <div class="domain-name">SaaS Platforms</div>
+      <div class="domain-desc">Multi-tenancy, entitlements, pricing complexity, lifecycle governance.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">◇</span>
+      <div class="domain-name">Enterprise Internal</div>
+      <div class="domain-desc">Internal platforms that outlive their architects. Governed evolution.</div>
+    </div>
+    <div class="domain-card">
+      <span class="domain-icon">⬟</span>
+      <div class="domain-name">Any regulated domain</div>
+      <div class="domain-desc">If rules matter, change has consequences, and the system must be maintainable — Foundry fits.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ENTROPY CHART -->
+<section>
+  <div class="entropy-section">
+    <div>
+      <p class="section-label">The anti-entropy thesis</p>
+      <h2 class="section-h2">Every platform decays.<br><em>Foundry is the exception.</em></h2>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.65; font-weight: 300; margin: 1rem 0 1.5rem;">Software entropy is not a metaphor. Constraints drift from implementation. Documentation diverges from reality. Knowledge leaves with people. The longer a system runs, the harder it becomes to change safely.</p>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.65; font-weight: 300;">Foundry encodes constraints as executable linter rules. Decisions as ADRs the linter validates. Compliance obligations as spec-kit entries with test coverage requirements. Entropy has no entry point — not even through AI generation — because the copilot operates within the same constraints.</p>
+    </div>
+    <div class="entropy-chart">
+      <svg width="100%" height="100%" viewBox="0 0 360 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- axes -->
+        <line x1="40" y1="20" x2="40" y2="220" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+        <line x1="40" y1="220" x2="340" y2="220" stroke="rgba(0,0,0,0.15)" stroke-width="1"/>
+
+        <!-- axis labels -->
+        <text x="180" y="248" font-family="DM Mono,monospace" font-size="9" fill="#999990" text-anchor="middle" letter-spacing=".06em">TIME →</text>
+        <text x="16" y="124" font-family="DM Mono,monospace" font-size="9" fill="#999990" text-anchor="middle" letter-spacing=".06em" transform="rotate(-90 16 124)">CHANGE RISK →</text>
+
+        <!-- without foundry curve (exponential decay) -->
+        <path d="M40 60 C80 65 120 90 160 130 C200 165 240 190 300 210" stroke="#c8401a" stroke-width="2" fill="none" opacity=".7"/>
+
+        <!-- with foundry curve (controlled) -->
+        <path d="M40 60 C80 62 160 68 300 75" stroke="#4a8f66" stroke-width="2" fill="none"/>
+
+        <!-- fills -->
+        <path d="M40 60 C80 65 120 90 160 130 C200 165 240 190 300 210 L300 75 C160 68 80 62 40 60 Z" fill="rgba(200,64,26,.06)"/>
+
+        <!-- labels -->
+        <rect x="250" y="200" width="80" height="16" rx="4" fill="#f5ede8"/>
+        <text x="290" y="212" font-family="DM Mono,monospace" font-size="9" fill="#c8401a" text-anchor="middle" letter-spacing=".04em">without foundry</text>
+
+        <rect x="250" y="62" width="72" height="16" rx="4" fill="#edf4f0"/>
+        <text x="286" y="74" font-family="DM Mono,monospace" font-size="9" fill="#4a8f66" text-anchor="middle" letter-spacing=".04em">with foundry</text>
+
+        <!-- tick marks -->
+        <text x="40" y="235" font-family="DM Mono,monospace" font-size="8" fill="#c0c0b8" text-anchor="middle">0</text>
+        <text x="120" y="235" font-family="DM Mono,monospace" font-size="8" fill="#c0c0b8" text-anchor="middle">6mo</text>
+        <text x="210" y="235" font-family="DM Mono,monospace" font-size="8" fill="#c0c0b8" text-anchor="middle">1yr</text>
+        <text x="300" y="235" font-family="DM Mono,monospace" font-size="8" fill="#c0c0b8" text-anchor="middle">2yr</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <p class="section-label" style="text-align: center;">Ready to build</p>
+  <h2 class="cta-h2">
+    The code declares<br>the domain.<br>
+    <em>Nothing else drifts.</em>
+  </h2>
+  <p class="cta-sub">Start with a governed Elixir/Ash project in minutes. The copilot holds the full picture. The linter holds the line. The system map tells the truth — always.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-primary">Start building</a>
+    <a href="#" class="btn-ghost">
+      Read the research
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+  <p class="cta-mono">mix archive.install hex foundry</p>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <a href="#" class="footer-logo"><span></span>foundry</a>
+    <ul class="footer-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">The graph</a></li>
+      <li><a href="#">Copilot</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">GitHub</a></li>
+    </ul>
+    <p class="footer-legal">© 2026 Foundry</p>
+  </div>
+</footer>
+
+</body>
+</html>

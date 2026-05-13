@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Your Codebase is the Spec</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800&display=swap');
+
+    :root {
+      --bg-dark: #050408;
+      --bg-light: #ffffff;
+      --accent: #6366f1; /* Indigo-500 */
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: white;
+      transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Fixed background canvas */
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      /* We enable pointer events so the library can listen, 
+         but we'll proxy events from the window to be sure */
+      pointer-events: auto; 
+    }
+
+    /* Transition effect for light mode */
+    body.light-mode {
+      background-color: var(--bg-light);
+      color: #000;
+    }
+    body.light-mode #fluid-canvas {
+      filter: invert(1) contrast(1.2) brightness(1.2);
+    }
+
+    /* UI Layering */
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; /* Mouse passes through to canvas */
+    }
+
+    /* Re-enable interaction for buttons and links */
+    .interactive {
+      pointer-events: auto !important;
+    }
+
+    .hero-title {
+      font-size: clamp(3.5rem, 12vw, 10rem);
+      line-height: 0.85;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+    }
+
+    .word-rotator {
+      display: inline-flex;
+      flex-direction: column;
+      height: 1.1em;
+      vertical-align: top;
+      overflow: hidden;
+      color: var(--accent);
+    }
+
+    .word-item {
+      height: 1.1em;
+      transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+    }
+
+    .marquee-container {
+      mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+    }
+
+    @keyframes scroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: flex;
+      width: max-content;
+      animation: scroll 30s linear infinite;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      pointer-events: auto; /* Let cards be interactive */
+    }
+    body.light-mode .glass-card {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fluid-canvas"></canvas>
+
+  <main class="ui-layer">
+    
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex flex-col justify-center px-6 lg:px-16 pt-20">
+      <div class="max-w-[1400px] mx-auto w-full">
+        <h1 class="hero-title mb-12">
+          Your codebase<br>
+          that 
+          <span class="word-rotator" id="rotator">
+            <span class="word-item">governs</span>
+            <span class="word-item">enforces</span>
+            <span class="word-item">scales</span>
+            <span class="word-item">endures</span>
+          </span>
+        </h1>
+
+        <div class="grid lg:grid-cols-2 gap-12 items-end">
+          <p class="text-xl lg:text-2xl text-white/60 body-text leading-relaxed max-w-xl transition-colors duration-500">
+            The governed development environment for complex domain platforms on Elixir and Ash. 
+            <span class="block mt-2 text-white body-bold transition-colors duration-500">Your codebase is the spec. It never lies.</span>
+          </p>
+
+          <div class="flex flex-wrap gap-4">
+            <button class="interactive bg-white text-black hover:bg-indigo-500 hover:text-white px-8 py-4 rounded-full font-bold transition-all flex items-center gap-2 group">
+              Check Demo 
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </button>
+            <button class="interactive border border-white/20 hover:bg-white/10 px-8 py-4 rounded-full font-bold transition-all">
+              Look on GitHub
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Marquee -->
+      <div class="mt-32 w-full marquee-container overflow-hidden py-8">
+        <div class="animate-marquee gap-24">
+          <!-- Stat Items -->
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">2M</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">Websockets / Node<br><b>Phoenix</b></span>
+          </div>
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">150→5</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">Server reduction<br><b>Bleacher Report</b></span>
+          </div>
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">$2M/yr</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">Infra savings<br><b>Pinterest</b></span>
+          </div>
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">$150/mo</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">from $16k Lambda<br><b>The BEAM</b></span>
+          </div>
+          <!-- Duplicate for Loop -->
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">2M</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">Websockets / Node<br><b>Phoenix</b></span>
+          </div>
+          <div class="flex items-baseline gap-4">
+            <span class="text-5xl font-bold">150→5</span>
+            <span class="text-xs uppercase tracking-tighter opacity-50">Server reduction<br><b>Bleacher Report</b></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Section (White Background Transition) -->
+    <section class="min-h-screen py-32 px-6 lg:px-16">
+      <div class="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
+        <div class="glass-card p-12 rounded-[2rem] col-span-2">
+          <h2 class="text-5xl font-bold mb-8 tracking-tight">The problem nobody talks about honestly</h2>
+          <p class="text-xl opacity-70 leading-relaxed mb-6">
+            Starting is no longer the hard part. An AI tool scaffolds a working application in an afternoon. The first demo runs. Everyone is optimistic.
+          </p>
+          <p class="text-xl opacity-70 leading-relaxed">
+            Then the system grows. Six months later, your original architect leaves. Entropy sets in. <strong>Foundry solves the structure, not the symptoms.</strong>
+          </p>
+        </div>
+        
+        <div class="flex flex-col gap-6">
+          <div class="glass-card p-8 rounded-[2rem] flex-1 border-l-4 border-l-indigo-500">
+            <span class="text-xs font-mono uppercase opacity-50 mb-2 block">Foundry Logic 01</span>
+            <h4 class="text-xl font-bold">Code is the specification.</h4>
+          </div>
+          <div class="glass-card p-8 rounded-[2rem] flex-1 border-l-4 border-l-indigo-500">
+            <span class="text-xs font-mono uppercase opacity-50 mb-2 block">Foundry Logic 02</span>
+            <h4 class="text-xl font-bold">Intent lives in the spec-kit.</h4>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Simulation Logic -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    // 1. Initialize Fluid Simulation
+    const canvas = document.querySelector('#fluid-canvas');
+    const fluidParams = {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      DENSITY_DISSIPATION: 0.97,
+      VELOCITY_DISSIPATION: 0.98,
+      PRESSURE: 0.8,
+      CURL: 20,
+      SPLAT_RADIUS: 0.35,
+      SPLAT_FORCE: 6000,
+      SHADING: true,
+      COLORFUL: true,
+      COLOR_UPDATE_SPEED: 8,
+      TRANSPARENT: true,
+      BLOOM: true,
+      BLOOM_ITERATIONS: 8,
+      BLOOM_INTENSITY: 0.6,
+      SUNRAYS: true,
+    };
+
+    WebGLFluid(canvas, fluidParams);
+
+    // 2. FIX: Event Proxy
+    // We listen to the window and manually dispatch events to the canvas
+    // This allows the effect to work even when hovering over text/buttons.
+    window.addEventListener('mousemove', (e) => {
+      // Create a fake mouse event to pass to the fluid canvas
+      const proxyEvent = new MouseEvent('mousemove', {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        bubbles: true
+      });
+      canvas.dispatchEvent(proxyEvent);
+    });
+
+    window.addEventListener('mousedown', (e) => {
+      const proxyEvent = new MouseEvent('mousedown', {
+        clientX: e.clientX,
+        clientY: e.clientY,
+        bubbles: true
+      });
+      canvas.dispatchEvent(proxyEvent);
+    });
+
+    // 3. Word Rotator Logic
+    const rotator = document.getElementById('rotator');
+    let currentWord = 0;
+    const wordCount = 4;
+
+    setInterval(() => {
+      currentWord = (currentWord + 1) % wordCount;
+      const items = document.querySelectorAll('.word-item');
+      items.forEach(item => {
+        item.style.transform = `translateY(-${currentWord * 100}%)`;
+      });
+    }, 2500);
+
+    // 4. Scroll Logic (Inversion)
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const triggerPoint = window.innerHeight * 0.4;
+      
+      if (scrollY > triggerPoint) {
+        document.body.classList.add('light-mode');
+        // Transition colors for text to ensure visibility
+        document.querySelectorAll('.body-text').forEach(el => el.classList.replace('text-white/60', 'text-black/60'));
+        document.querySelectorAll('.body-bold').forEach(el => el.classList.replace('text-white', 'text-black'));
+      } else {
+        document.body.classList.remove('light-mode');
+        document.querySelectorAll('.body-text').forEach(el => el.classList.replace('text-black/60', 'text-white/60'));
+        document.querySelectorAll('.body-bold').forEach(el => el.classList.replace('text-black', 'text-white'));
+      }
+    });
+  </script>
+</body>
+</html>

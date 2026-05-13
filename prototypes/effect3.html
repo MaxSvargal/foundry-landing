@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frame.io Interactive Smoke Gradient</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      /* Dark, cinematic Frame.io style background gradient */
+      background: radial-gradient(circle at 50% 50%, #140d2b 0%, #050408 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* WebGL fluid simulation sits perfectly over the background */
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+
+    /* Text content sits on top of the smoke, but lets clicks/hovers pass through */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      text-align: center;
+      pointer-events: none; /* Crucial: Allows mouse moves to register on the canvas behind it */
+    }
+
+    h1 {
+      font-size: 4rem;
+      margin: 0;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-shadow: 0px 4px 24px rgba(0,0,0,0.6);
+    }
+    
+    p {
+      font-size: 1.2rem;
+      opacity: 0.7;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fluid Canvas -->
+  <canvas></canvas>
+
+  <!-- Interactive Overlay -->
+  <div class="hero-content">
+    <h1>Fluid Simulation</h1>
+    <p>Move your cursor to generate rich smoke trails</p>
+  </div>
+
+  <!-- Load the WebGL Fluid Simulation Engine from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  
+  <script>
+    // Initialize the engine on the canvas element
+    WebGLFluid(document.querySelector('canvas'), {
+      TRIGGER: 'hover',            // Reacts immediately on mouse hover
+      IMMEDIATE: true,             // Starts simulation immediately
+      AUTO: false,                 // Set to false so smoke ONLY appears when you move your mouse
+      
+      // Simulation Resolution & Performance
+      SIM_RESOLUTION: 128,         // Grid resolution. 128 is crisp and highly performant
+      DYE_RESOLUTION: 1024,        // Quality of the smoke render
+      
+      // Smoke Physics (Modify these to change the feel!)
+      DENSITY_DISSIPATION: 0.97,   // How fast the smoke fades (0.97 is a slow, lingering evaporate)
+      VELOCITY_DISSIPATION: 0.98,  // How long the swirls keep spinning after the mouse moves
+      PRESSURE: 0.8,               // Internal fluid pressure
+      CURL: 30,                    // Turbulent vortex curling (higher = more detailed smoke curls)
+      
+      // Mouse Input Settings
+      SPLAT_RADIUS: 0.25,          // Size of the smoke puff created by your cursor
+      SPLAT_FORCE: 6000,           // Speed/force injected into the simulation
+      
+      // Volumetric & Rendering Settings (These make it look "rich")
+      SHADING: true,               // Adds pseudo-3D volumetric lighting/shadows to the smoke
+      COLORFUL: true,              // Automatically cycles through premium neon palettes
+      COLOR_UPDATE_SPEED: 8,       // Speed at which colors shift
+      
+      // Transparency & Background blending
+      TRANSPARENT: true,           // Makes the canvas transparent so the CSS background shines through
+      
+      // Beautiful Glow & Light Ray effects
+      BLOOM: true,                 // Adds neon glow/emissive lighting
+      BLOOM_ITERATIONS: 8,
+      BLOOM_RESOLUTION: 256,
+      BLOOM_INTENSITY: 0.8,
+      BLOOM_THRESHOLD: 0.6,
+      
+      SUNRAYS: true,               // Volumetric light rays passing through the smoke
+      SUNRAYS_RESOLUTION: 196,
+      SUNRAYS_WEIGHT: 1.0,
+    });
+  </script>
+</body>
+</html>

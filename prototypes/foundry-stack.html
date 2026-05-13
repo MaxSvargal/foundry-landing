@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why this stack — Foundry</title>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="foundry-home.html" class="nav-logo"><div class="nav-dot"></div>foundry</a>
+    <div class="nav-breadcrumb">
+      <span>docs</span> / why this stack
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">The graph</a></li>
+      <li><a href="#">Domains</a></li>
+      <li><a href="#" class="nav-cta">Get started</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div style="max-width: var(--max); margin: 0 auto; padding: 0 2rem;">
+  <div class="page-hero">
+    <div>
+      <p class="hero-eyebrow">The stack decision</p>
+      <h1 class="page-h1">
+        Why <em>BEAM.</em><br>
+        Why <em>Elixir.</em><br>
+        Why <s>not Java</s>.
+      </h1>
+      <p class="hero-intro">
+        Java works. Go works. Python works. This is not an argument that they don't. It's an argument that for the specific problem Foundry solves — governed, long-lived, regulated domain platforms — one stack is structurally better, and the gap compounds over time.
+      </p>
+    </div>
+    <div>
+      <nav class="hero-toc" aria-label="Page contents">
+        <div class="toc-header">On this page</div>
+        <ul class="toc-list">
+          <li><a href="#beam"><span class="toc-num">01</span>BEAM and OTP — the runtime</a></li>
+          <li><a href="#elixir"><span class="toc-num">02</span>Elixir — the language</a></li>
+          <li><a href="#ash"><span class="toc-num">03</span>Ash — the domain layer</a></li>
+          <li><a href="#stories"><span class="toc-num">04</span>Companies who made the move</a></li>
+          <li><a href="#alternatives"><span class="toc-num">05</span>Honest comparison with alternatives</a></li>
+          <li><a href="#foundry"><span class="toc-num">06</span>What Foundry adds on top</a></li>
+          <li><a href="#why"><span class="toc-num">07</span>Why Foundry requires this stack</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- BEAM -->
+<section class="beam-section" id="beam">
+  <div class="beam-inner">
+    <p class="beam-label">01 — The runtime</p>
+    <h2 class="beam-h2">BEAM was built for systems<br>that <em>cannot fail.</em></h2>
+    <p class="beam-lead">Ericsson designed the BEAM virtual machine for telephone exchanges in 1986. The design constraint was unforgiving: millions of concurrent connections, hardware failures, software crashes, zero tolerance for cascading failure. Those constraints produced a runtime with properties no other mainstream VM shares.</p>
+    <div class="beam-grid">
+      <div class="beam-card">
+        <div class="beam-card-num">01 — Concurrency</div>
+        <h3 class="beam-card-title">Two kilobytes.<br><em>Millions of processes.</em></h3>
+        <p class="beam-card-body">Every concurrent operation runs in its own isolated process — 2KB initial heap, preemptively scheduled, garbage collected independently. A crash in one process cannot corrupt another. You don't design around this. It's the execution model. No thread pools to tune. No async/await ceremony. Concurrency is the default, not a feature you add.</p>
+        <span class="beam-card-stat">100k concurrent users · same hardware</span>
+      </div>
+      <div class="beam-card">
+        <div class="beam-card-num">02 — Fault isolation</div>
+        <h3 class="beam-card-title">Supervisors restart.<br><em>Systems continue.</em></h3>
+        <p class="beam-card-body">OTP supervision trees arrange processes in hierarchies. When a process crashes, its supervisor restarts it according to a declared strategy — one_for_one, one_for_all, rest_for_one. The rest of the system never knew. This isn't error handling. It's fault architecture. The difference between catching exceptions and designing so that exceptions don't matter.</p>
+        <span class="beam-card-stat">nine nines availability · Ericsson AXD301</span>
+      </div>
+      <div class="beam-card">
+        <div class="beam-card-num">03 — Consistent latency</div>
+        <h3 class="beam-card-title">Preemptive scheduling.<br><em>No GC pauses.</em></h3>
+        <p class="beam-card-body">The scheduler gives every process a fair turn regardless of what it's doing. No process blocks the scheduler. No stop-the-world garbage collection. P99 latency stays close to P50. For financial platforms where a slow response is a compliance event — a withdrawal that times out, a KYC check that stalls — consistent latency matters more than peak throughput.</p>
+        <span class="beam-card-stat">P99 ≈ P50 · measured in production</span>
+      </div>
+      <div class="beam-card">
+        <div class="beam-card-num">04 — Native distribution</div>
+        <h3 class="beam-card-title">Cluster by default.<br><em>No infrastructure tax.</em></h3>
+        <p class="beam-card-body">BEAM nodes form clusters automatically via libcluster. Processes communicate across nodes transparently. Phoenix PubSub broadcasts across the cluster without Redis. Horde provides distributed process registry and supervisor — processes migrate between nodes on failure without the user noticing. Horizontal scaling is an operational decision. Not an architectural one made at design time.</p>
+        <span class="beam-card-stat">libcluster + horde · zero additional infrastructure</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ELIXIR -->
+<section class="section" id="elixir">
+  <p class="section-label">02 — The language</p>
+  <h2 class="section-h2">Compile-time metaprogramming<br>that produces <em>real code.</em></h2>
+  <p class="section-lead">Elixir's macro system operates on the AST at compile time. Not string substitution. Not runtime reflection. Macros produce real, optimized function calls — the code you declare compiles to the code you would have written by hand, structured correctly, never missing a case.</p>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 2rem;">
+    <div style="padding: 1.5rem; background: var(--paper-warm); border: 1px solid rgba(0,0,0,.08); border-radius: 14px;">
+      <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .75rem;">Macro system</p>
+      <p style="font-family: var(--serif); font-size: 1.1rem; font-weight: 300; margin-bottom: .65rem; letter-spacing: -0.01em;">Declarations that <em>compile to optimized code</em></p>
+      <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.65; font-weight: 300;">This is how Spark DSL works — and how Foundry's entire governance layer is expressed. A resource declaration that reads like a specification compiles to efficient, type-checked Elixir. The human reads intent. The compiler runs implementation.</p>
+    </div>
+    <div style="padding: 1.5rem; background: var(--paper-warm); border: 1px solid rgba(0,0,0,.08); border-radius: 14px;">
+      <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .75rem;">Pattern matching</p>
+      <p style="font-family: var(--serif); font-size: 1.1rem; font-weight: 300; margin-bottom: .65rem; letter-spacing: -0.01em;">Code that reads like <em>the domain it models</em></p>
+      <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.65; font-weight: 300;">A transfer step reads like a business process. A validation reads like a business rule. The language reduces the distance between what a domain expert describes and what the code says. Code that reads like its domain diverges from intent more slowly.</p>
+    </div>
+    <div style="padding: 1.5rem; background: var(--paper-warm); border: 1px solid rgba(0,0,0,.08); border-radius: 14px;">
+      <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .75rem;">Tooling ecosystem</p>
+      <p style="font-family: var(--serif); font-size: 1.1rem; font-weight: 300; margin-bottom: .65rem; letter-spacing: -0.01em;">One ecosystem. <em>Consistent conventions.</em></p>
+      <p style="font-size: 13px; color: var(--ink-muted); line-height: 1.65; font-weight: 300;">Mix, ExUnit, ExDoc, Dialyzer, Credo. One build tool, one test framework, one documentation system, one type checker, one linter. No build tool archaeology six months into a project. No framework churn. The conventions hold.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ASH -->
+<section id="ash" style="padding: 5rem 2rem;">
+  <div style="max-width: var(--max); margin: 0 auto;">
+    <p class="section-label">03 — The domain layer</p>
+    <h2 class="section-h2">One declaration.<br><em>Every concern derived from it.</em></h2>
+    <p class="section-lead">The conventional ORM approach gives you database access. Everything else — authorization, validation, API serialization, audit trail, pagination, filtering — you build yourself. Custom, inconsistent across the codebase, accumulating debt from the first sprint. Ash collapses all of this into a single resource declaration.</p>
+  </div>
+  <div class="ash-section" style="padding: 0 2rem; margin-top: 2.5rem;">
+    <div class="ash-code">
+      <div class="code-bar">
+        <div class="c-dot c-red"></div>
+        <div class="c-dot c-yellow"></div>
+        <div class="c-dot c-green"></div>
+        <span class="code-file">lib/my_app/finance/ledger_entry.ex</span>
+      </div>
+      <div class="code-body">
+<pre><span class="c-keyword">defmodule</span> <span class="c-module">MyApp.Finance.LedgerEntry</span> <span class="c-keyword">do</span>
+  <span class="c-keyword">use</span> <span class="c-module">Ash.Resource</span>,
+    domain: <span class="c-module">MyApp.Finance</span>,
+    data_layer: <span class="c-module">AshPostgres.DataLayer</span>,
+    extensions: [
+      <span class="c-module">AshPaperTrail.Resource</span>,   <span class="code-annotation">audit trail</span>
+      <span class="c-module">AshArchival.Resource</span>,     <span class="code-annotation">soft delete</span>
+      <span class="c-module">Foundry.Analytics.Extension</span>
+    ]
+
+<span class="c-tag"># ── attributes ──────────────────────────────</span>
+  attributes <span class="c-keyword">do</span>
+    attribute <span class="c-attr">:amount</span>, <span class="c-module">MyApp.Money</span>, allow_nil?: <span class="c-keyword">false</span>
+    attribute <span class="c-attr">:type</span>, <span class="c-attr">:atom</span>,
+      constraints: [one_of: [<span class="c-attr">:credit</span>, <span class="c-attr">:debit</span>]]
+    attribute <span class="c-attr">:posted_at</span>, <span class="c-attr">:utc_datetime_usec</span>
+  <span class="c-keyword">end</span>
+
+<span class="c-tag"># ── relationships ───────────────────────────</span>
+  relationships <span class="c-keyword">do</span>
+    belongs_to <span class="c-attr">:wallet</span>, <span class="c-module">MyApp.Finance.Wallet</span>
+  <span class="c-keyword">end</span>
+
+<span class="c-tag"># ── actions ─────────────────────────────────</span>
+  actions <span class="c-keyword">do</span>
+    defaults [<span class="c-attr">:read</span>]
+    create <span class="c-attr">:post</span> <span class="c-keyword">do</span>
+      accept [<span class="c-attr">:amount</span>, <span class="c-attr">:type</span>, <span class="c-attr">:wallet_id</span>]
+      change set_attribute(<span class="c-attr">:posted_at</span>, <span class="c-string">&DateTime.utc_now/0</span>)
+    <span class="c-keyword">end</span>
+  <span class="c-keyword">end</span>
+
+<span class="c-tag"># ── policies ────────────────────────────────</span>
+  policies <span class="c-keyword">do</span>
+    policy action(<span class="c-attr">:post</span>) <span class="c-keyword">do</span>
+      authorize_if actor_attribute_equals(
+        <span class="c-attr">:role</span>, <span class="c-attr">:ledger_operator</span>
+      )
+    <span class="c-keyword">end</span>
+  <span class="c-keyword">end</span>
+
+<span class="c-tag"># ── compliance ──────────────────────────────</span>
+  compliance <span class="c-keyword">do</span>
+    links [<span class="c-string">"RG-UK-014"</span>]
+  <span class="c-keyword">end</span>
+<span class="c-keyword">end</span></pre>
+      </div>
+    </div>
+    <div class="ash-content">
+      <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 1.25rem;">This single declaration produces</p>
+      <div class="ash-derives">
+        <div class="derive-item">
+          <div class="derive-icon">DB</div>
+          <div class="derive-text"><strong>Validated PostgreSQL persistence</strong>All attribute validations enforced at the framework level before any database write. Consistent across every action.</div>
+        </div>
+        <div class="derive-item">
+          <div class="derive-icon">🔒</div>
+          <div class="derive-text"><strong>Authorization at attribute and action level</strong>Ash policies enforce who can call which action with which parameters. No separate security layer to maintain or drift from.</div>
+        </div>
+        <div class="derive-item">
+          <div class="derive-icon">API</div>
+          <div class="derive-text"><strong>REST and GraphQL API surfaces</strong>ash_json_api and ash_graphql generate complete, documented API surfaces from the resource declaration. No controller code.</div>
+        </div>
+        <div class="derive-item">
+          <div class="derive-icon">📋</div>
+          <div class="derive-text"><strong>Automatic audit trail via paper trail</strong>Every change to this resource is versioned. Point-in-time queries are available. The audit trail cannot be bypassed — it's structural.</div>
+        </div>
+        <div class="derive-item">
+          <div class="derive-icon">🗂</div>
+          <div class="derive-text"><strong>Soft delete via archival</strong>Hard deletion is structurally prevented. Archived records carry timestamps. Retention queries work across the full history.</div>
+        </div>
+        <div class="derive-item">
+          <div class="derive-icon">⬡</div>
+          <div class="derive-text"><strong>Foundry system map node</strong>mix foundry.context reads this declaration directly. The system map node is lossless — not reconstructed, not approximated. The same source the compiler uses.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- COMPANY STORIES -->
+<section class="stories-section" id="stories">
+  <div class="stories-inner">
+    <p class="section-label">04 — Evidence from production</p>
+    <h2 class="section-h2">Teams who moved to Elixir<br><em>didn't move back.</em></h2>
+    <p class="section-lead" style="margin-bottom: 0;">These aren't benchmarks run in controlled environments. They're production systems, real traffic, real teams, real consequences. The results are consistent enough to be a pattern.</p>
+    <div class="stories-grid">
+
+      <!-- WHATSAPP FEATURED -->
+      <div class="story-card story-featured">
+        <div style="display: flex; flex-direction: column;">
+          <div class="story-header">
+            <div>
+              <div class="story-company">WhatsApp</div>
+              <div style="font-size: 13px; color: rgba(245,243,238,.4); margin-top: 4px; font-weight: 300;">Erlang/BEAM · acquired by Facebook 2014</div>
+            </div>
+            <span class="story-badge badge-green">benchmark</span>
+          </div>
+          <div class="story-body">
+            <div class="story-context">messaging infrastructure · erlang on beam</div>
+            <p class="story-text">Before the Facebook acquisition, WhatsApp ran on Erlang — the language BEAM was originally designed for. The ratio of engineers to users was extraordinary: a team of fifty engineers maintaining infrastructure for five hundred million users. This wasn't an accident of hiring or tooling. It was a structural consequence of the BEAM runtime's concurrency model. Two million concurrent connections per server meant dramatically less infrastructure than any conventional stack would require at the same scale.</p>
+            <div class="story-result">
+              <div class="result-item">
+                <span class="result-num" style="color: var(--accent-light);">2M</span>
+                <span class="result-label" style="color: rgba(245,243,238,.55);">concurrent connections per server</span>
+              </div>
+            </div>
+          </div>
+          <div class="story-quote" style="margin-top: auto;">The secret of WhatsApp's success is that they never built what Erlang gives them for free.
+            <span style="display: block; margin-top: .5rem; font-size: 12px; font-style: normal; font-family: var(--mono); color: rgba(255,255,255,.2); letter-spacing: .04em;">— Observed by multiple engineers post-acquisition</span>
+          </div>
+        </div>
+        <div class="story-featured-right">
+          <div class="featured-stat">
+            <div class="featured-stat-num"><em>50</em></div>
+            <div class="featured-stat-label">engineers serving 500 million users at acquisition</div>
+            <div class="featured-stat-source">BEAM concurrency model · not achievable on thread-per-request</div>
+          </div>
+          <div class="featured-divider"></div>
+          <div class="featured-stat">
+            <div class="featured-stat-num"><em>2M</em></div>
+            <div class="featured-stat-label">concurrent connections per server</div>
+            <div class="featured-stat-source">production measurement · pre-acquisition infrastructure</div>
+          </div>
+          <div class="featured-divider"></div>
+          <div class="featured-stat">
+            <div class="featured-stat-num"><em>0</em></div>
+            <div class="featured-stat-label">rewrites after acquisition — Facebook kept Erlang</div>
+            <div class="featured-stat-source">structural validation · the right tool stays</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BLEACHER REPORT -->
+      <div class="story-card">
+        <div class="story-header">
+          <div>
+            <div class="story-company">Bleacher Report</div>
+            <div style="font-size: 12px; color: var(--ink-faint); margin-top: 3px;">Ruby on Rails → Elixir/Phoenix</div>
+          </div>
+          <span class="story-badge badge-green">infrastructure cost</span>
+        </div>
+        <div class="story-body">
+          <div class="story-context">sports media · high-spike traffic · 2017</div>
+          <p class="story-text">Running a Rails monolith across 150 servers to handle sports event traffic spikes. The architecture was conventional: aggressive horizontal scaling to compensate for thread-per-request overhead. Major sporting events — Super Bowl, World Cup, NBA Finals — produced traffic spikes that required the entire fleet. After rewriting in Elixir and Phoenix, the same traffic ran from five servers. The BEAM concurrency model handled spike load that required 150 Rails servers because lightweight processes scale concurrency without OS thread overhead.</p>
+          <div class="story-result">
+            <div class="result-item">
+              <span class="result-num">150→5</span>
+              <span class="result-label">servers for equivalent peak traffic</span>
+            </div>
+            <div class="result-item">
+              <span class="result-num">~95%</span>
+              <span class="result-label">infrastructure cost reduction</span>
+            </div>
+          </div>
+        </div>
+        <div class="story-quote">The rewrite wasn't planned as a cost-cutting exercise. The cost savings were a consequence of the concurrency model.</div>
+      </div>
+
+      <!-- DISCORD -->
+      <div class="story-card">
+        <div class="story-header">
+          <div>
+            <div class="story-company">Discord</div>
+            <div style="font-size: 12px; color: var(--ink-faint); margin-top: 3px;">Go → Elixir for read states service</div>
+          </div>
+          <span class="story-badge badge-blue">operational simplicity</span>
+        </div>
+        <div class="story-body">
+          <div class="story-context">5M concurrent users · stateful connections</div>
+          <p class="story-text">Discord ran their read states service — tracking which messages each user had read — on Cassandra and Go. At scale the Cassandra cluster degraded under pressure in ways requiring constant operational intervention. Fan-out on high-follower servers caused latency spikes that affected the entire service. The rewrite to Elixir handled the same load with dramatically simpler operational requirements. The BEAM concurrency model handled fan-out that required architectural gymnastics in Go. Their engineers noted the Elixir code was smaller, more correct, and handled edge cases the Go service had treated as operational problems.</p>
+          <div class="story-result">
+            <div class="result-item">
+              <span class="result-num">5M</span>
+              <span class="result-label">concurrent users — simpler operations</span>
+            </div>
+            <div class="result-item">
+              <span class="result-num">↓ ops</span>
+              <span class="result-label">manual intervention eliminated</span>
+            </div>
+          </div>
+        </div>
+        <div class="story-quote">We moved from Go to Elixir for performance. We stayed for operational simplicity we didn't expect to find.</div>
+      </div>
+
+      <!-- BET365 -->
+      <div class="story-card">
+        <div class="story-header">
+          <div>
+            <div class="story-company">Bet365</div>
+            <div style="font-size: 12px; color: var(--ink-faint); margin-top: 3px;">Erlang/Elixir · regulated financial transactions</div>
+          </div>
+          <span class="story-badge badge-amber">regulated domain</span>
+        </div>
+        <div class="story-body">
+          <div class="story-context">iGaming · financial transactions · real-time odds</div>
+          <p class="story-text">One of the world's largest online gambling platforms runs its core platform on Erlang and Elixir. Financial transactions, real-time odds updates, concurrent user sessions during major sporting events — all on BEAM. The regulated domain requirements — consistency, audit trail, fault tolerance, transaction correctness — are exactly the properties BEAM was designed for in 1986. The choice isn't coincidental. When a failed transaction must be recorded rather than silently lost, when consistency matters more than eventual consistency, BEAM's design constraints align with regulated domain requirements more closely than any other mainstream runtime.</p>
+          <div class="story-result">
+            <div class="result-item">
+              <span class="result-num">millions</span>
+              <span class="result-label">of financial transactions daily</span>
+            </div>
+            <div class="result-item">
+              <span class="result-num">real-time</span>
+              <span class="result-label">odds across concurrent sessions</span>
+            </div>
+          </div>
+        </div>
+        <div class="story-quote">The failure modes BEAM was designed to prevent are precisely the failure modes that matter in a regulated financial domain.</div>
+      </div>
+
+      <!-- PINTEREST -->
+      <div class="story-card">
+        <div class="story-header">
+          <div>
+            <div class="story-company">Pinterest</div>
+            <div style="font-size: 12px; color: var(--ink-faint); margin-top: 3px;">Go → Elixir for notification infrastructure</div>
+          </div>
+          <span class="story-badge badge-blue">code simplicity</span>
+        </div>
+        <div class="story-body">
+          <div class="story-context">billions of notifications · backpressure management</div>
+          <p class="story-text">Pinterest's notification system was built on Go and handled billions of notifications. The system worked but required careful management of goroutine pools, buffer sizes, and backpressure — high operational surface area for what was fundamentally a message routing problem. The Elixir rewrite used OTP's built-in process model to handle the same concurrency with significantly less operational complexity. The supervision tree handled failures that previously required custom recovery logic. The code was smaller. The operational requirements were lower. The failure modes were fewer.</p>
+          <div class="story-result">
+            <div class="result-item">
+              <span class="result-num">smaller</span>
+              <span class="result-label">codebase for equivalent capability</span>
+            </div>
+            <div class="result-item">
+              <span class="result-num">↓ ops</span>
+              <span class="result-label">custom recovery logic eliminated</span>
+            </div>
+          </div>
+        </div>
+        <div class="story-quote">OTP gives you the failure recovery logic for free. In Go we wrote it ourselves. We got it wrong more than once.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ALTERNATIVES -->
+<section class="alt-section" id="alternatives">
+  <div class="alt-inner">
+    <p class="section-label">05 — Honest comparison</p>
+    <h2 class="section-h2">Why not <em>the alternative</em><br>you're thinking about.</h2>
+    <div class="alt-intro">
+      <div>
+        <p class="section-lead" style="margin-bottom: 1rem;">Every comparison here is honest. If the alternative is a reasonable choice for your situation, we say so. The goal isn't to make other stacks look bad — it's to explain why Foundry specifically requires this one.</p>
+      </div>
+      <div class="alt-honest">
+        <strong>The honest disclaimer</strong>
+        If you have a Java team, Java expertise, and Java vendor relationships, starting a new platform in Java is a defensible decision today. Java works. The largest financial systems in the world run on Java and will continue to for decades. This comparison is about new platform construction, not existing system migration.
+      </div>
+    </div>
+
+    <div class="alt-stack">
+      <div class="alt-row header">
+        <div class="alt-cell">Stack</div>
+        <div class="alt-cell">Concurrency</div>
+        <div class="alt-cell">Domain modeling</div>
+        <div class="alt-cell">Fault isolation</div>
+        <div class="alt-cell">Time to market</div>
+        <div class="alt-cell">Tech debt floor</div>
+      </div>
+      <div class="alt-row highlight">
+        <div class="alt-cell"><div class="alt-name">BEAM / Elixir / Ash <span>Foundry's stack</span></div></div>
+        <div class="alt-cell"><span class="score-great">Native, excellent</span></div>
+        <div class="alt-cell"><span class="score-great">Declarative, unified</span></div>
+        <div class="alt-cell"><span class="score-great">OTP supervision</span></div>
+        <div class="alt-cell"><span class="score-great">Fastest for domain platforms</span></div>
+        <div class="alt-cell"><span class="score-great">Lowest</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Java / Spring Boot <span>JVM · Project Loom</span></div></div>
+        <div class="alt-cell"><span class="score-good">Good (Loom maturing)</span></div>
+        <div class="alt-cell"><span class="score-good">Layered, verbose</span></div>
+        <div class="alt-cell"><span class="score-good">Manual, structured</span></div>
+        <div class="alt-cell"><span class="score-good">Moderate</span></div>
+        <div class="alt-cell"><span class="score-good">Moderate</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Kotlin / Spring <span>JVM · coroutines</span></div></div>
+        <div class="alt-cell"><span class="score-good">Good (coroutines)</span></div>
+        <div class="alt-cell"><span class="score-good">Better than Java</span></div>
+        <div class="alt-cell"><span class="score-good">Manual, structured</span></div>
+        <div class="alt-cell"><span class="score-good">Moderate</span></div>
+        <div class="alt-cell"><span class="score-good">Moderate</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Go <span>goroutines · services</span></div></div>
+        <div class="alt-cell"><span class="score-good">Good (goroutines)</span></div>
+        <div class="alt-cell"><span class="score-weak">Weak, verbose</span></div>
+        <div class="alt-cell"><span class="score-good">Manual patterns</span></div>
+        <div class="alt-cell"><span class="score-good">Fast for services</span></div>
+        <div class="alt-cell"><span class="score-good">Moderate</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Rust <span>systems · zero GC</span></div></div>
+        <div class="alt-cell"><span class="score-great">Excellent</span></div>
+        <div class="alt-cell"><span class="score-weak">No framework</span></div>
+        <div class="alt-cell"><span class="score-good">Type system helps</span></div>
+        <div class="alt-cell"><span class="score-weak">Slow</span></div>
+        <div class="alt-cell"><span class="score-na">wrong tradeoff</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Python / Django <span>GIL · data/ML</span></div></div>
+        <div class="alt-cell"><span class="score-weak">Poor (GIL)</span></div>
+        <div class="alt-cell"><span class="score-good">ORM only</span></div>
+        <div class="alt-cell"><span class="score-weak">Application-level</span></div>
+        <div class="alt-cell"><span class="score-great">Fast early stage</span></div>
+        <div class="alt-cell"><span class="score-weak">High at scale</span></div>
+      </div>
+      <div class="alt-row">
+        <div class="alt-cell"><div class="alt-name">Node / TypeScript <span>event loop · I/O</span></div></div>
+        <div class="alt-cell"><span class="score-good">Good for I/O</span></div>
+        <div class="alt-cell"><span class="score-weak">No framework</span></div>
+        <div class="alt-cell"><span class="score-weak">Application-level</span></div>
+        <div class="alt-cell"><span class="score-great">Fast early stage</span></div>
+        <div class="alt-cell"><span class="score-weak">High at scale</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEEP DIVES -->
+<section class="deep-section">
+  <div style="max-width: var(--max); margin: 0 auto;">
+    <p class="section-label">The honest case for each alternative</p>
+    <div class="deep-grid">
+      <div class="deep-card">
+        <div class="deep-lang">JAVA / SPRING BOOT <span class="deep-verdict verdict-neutral">defensible</span></div>
+        <h3 class="deep-h3">The largest financial systems in the world run on <em>Java.</em></h3>
+        <p class="deep-body">Enormous talent pool. Comprehensive Spring ecosystem. JVM tuned over thirty years. Project Loom closes the concurrency gap significantly. GraalVM native compilation eliminates startup time. If you have a Java team and Java vendor relationships, starting here is a reasonable choice.</p>
+        <div class="deep-gap">The gap: domain modeling is four separate layers — persistence, authorization, API, audit. All custom, all inconsistent, all accumulating debt. There is no Ash for Java. The system map Foundry produces requires a single declarative source — Spring annotations scatter domain facts across multiple files.</div>
+      </div>
+      <div class="deep-card">
+        <div class="deep-lang">GO <span class="deep-verdict verdict-warn">wrong tool</span></div>
+        <h3 class="deep-h3">Excellent for infrastructure. <em>Wrong for domain platforms.</em></h3>
+        <p class="deep-body">Go was designed for networked infrastructure services — DNS servers, proxies, orchestrators. It excels there. Kubernetes, Docker, Terraform are Go. The concurrency model is good. The deployment story is excellent. Single binary, fast compilation, low memory.</p>
+        <div class="deep-gap">The gap: domain modeling in Go is structurally verbose. No generics with expressive power. No pattern matching. No compile-time metaprogramming. Expressing a complex domain rule requires more code than the rule warrants. Discord moved Go code to Elixir specifically because BEAM handled their concurrency problem better. Go is the right choice for infrastructure tooling. It is the wrong choice for complex domain platforms.</div>
+      </div>
+      <div class="deep-card">
+        <div class="deep-lang">RUST <span class="deep-verdict verdict-warn">wrong tradeoff</span></div>
+        <h3 class="deep-h3">Memory safety without GC. <em>Irrelevant for domain logic.</em></h3>
+        <p class="deep-body">Rust's memory safety guarantees are transformative for systems programming. WebAssembly, embedded systems, browser engines. The type system is the most sophisticated of any mainstream language. The borrow checker prevents entire classes of bugs at compile time.</p>
+        <div class="deep-gap">The tradeoff is wrong for domain platforms. The bugs Rust prevents — use after free, buffer overflows, data races in shared memory — don't happen in GC languages. Domain platforms fail because a business rule was wrong, a state machine transition was missing, a compliance obligation wasn't linked to a test. Rust doesn't prevent those. GC already handles memory. You pay the borrow checker's productivity cost without getting the benefit.</div>
+      </div>
+      <div class="deep-card">
+        <div class="deep-lang">PYTHON / DJANGO <span class="deep-verdict verdict-warn">scale wall</span></div>
+        <h3 class="deep-h3">Fastest to prototype. <em>Expensive to scale.</em></h3>
+        <p class="deep-body">Python's productivity advantage at early stage is real. Django is mature with thirty years of security patches. The data science ecosystem is Python and if your platform needs deep ML integration, Python interoperability matters. FastAPI is excellent for async services. The talent pool is the largest of any language.</p>
+        <div class="deep-gap">The GIL means threads don't run in parallel. Real concurrency requires multiple processes — multiple memory spaces, IPC overhead. At any meaningful scale, Python needs significant infrastructure investment to compensate for what BEAM provides natively. Django's ORM is persistence only — authorization, API, audit trail are separate constructs. Technical debt accumulates faster because the framework doesn't enforce consistency.</div>
+      </div>
+      <div class="deep-card">
+        <div class="deep-lang">NODE / TYPESCRIPT <span class="deep-verdict verdict-warn">scale wall</span></div>
+        <h3 class="deep-h3">Largest talent pool. <em>Highest long-term maintenance.</em></h3>
+        <p class="deep-body">JavaScript/TypeScript is the most widely known language in the world. The talent pool is enormous. TypeScript's type system has matured significantly. For teams with strong JavaScript experience and I/O-bound workloads, Node.js is productive and deployable. The async model handles concurrency well for its intended use case.</p>
+        <div class="deep-gap">The single-threaded event loop means CPU-bound domain logic blocks the event loop. Type safety erodes at system boundaries — JSON parsing, external API calls — in ways that require explicit handling. The npm ecosystem's size is also its liability: package selection, version conflicts, supply chain security. There is no Ash equivalent. NestJS adds structure but it's a long way from declaring a resource once and deriving all concerns from it.</div>
+      </div>
+      <div class="deep-card">
+        <div class="deep-lang">KOTLIN / SPRING <span class="deep-verdict verdict-neutral">better Java</span></div>
+        <h3 class="deep-h3">Genuinely better than Java <em>for domain modeling.</em></h3>
+        <p class="deep-body">Data classes eliminate Java's verbosity. Sealed classes enable proper algebraic data types. Extension functions produce more expressive domain code. Coroutines are more ergonomic than Java threading. Arrow adds functional patterns. If someone said "we're building on Kotlin with Spring Boot and Arrow" the technical argument against it is weaker than against Java.</p>
+        <div class="deep-pro">Closest to the right direction among JVM options. The domain modeling is more expressive. The coroutines model closes some of the concurrency gap. Still the same fundamental issue: no single declarative source. The system map remains an approximation. No Ash equivalent exists for Kotlin.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FOUNDRY AMPLIFICATION -->
+<section class="amp-section" id="foundry">
+  <div class="amp-inner">
+    <p class="beam-label">06 — What Foundry adds</p>
+    <h2 class="amp-h2">The stack removes infrastructure complexity.<br><em>Foundry removes domain complexity.</em></h2>
+    <p class="amp-lead">BEAM and Ash give you a runtime and framework where hard technical problems are structurally absent or well-solved. What they don't give you is governance of the domain itself — how complex platforms are built, evolved, and maintained as teams change and requirements shift. Foundry adds three optimization layers on top.</p>
+    <div class="amp-grid">
+      <div class="amp-card">
+        <div class="amp-card-label">Layer 01 — Compile-time</div>
+        <h3 class="amp-card-title">Domain governance at<br><em>the compiler level</em></h3>
+        <p class="amp-card-body">The Ash DSL is validated by the compiler. Foundry extends this with SparkLint — Foundry's invariant rules that validate domain correctness beyond syntax. A sensitive resource without paper trail is a lint error. A compliance-linked action without test coverage is a lint error. The compiler prevents syntactic mistakes. Foundry prevents semantic ones.</p>
+        <div class="amp-card-example">
+          <span class="hi">✗ INV-011</span> LedgerEntry missing paper_trail<br>
+          <span style="color: rgba(255,255,255,.2);">→ see ADR-005 · add AshPaperTrail</span><br>
+          <span style="color: rgba(255,255,255,.2);">→ motivated by RG-UK-014</span>
+        </div>
+      </div>
+      <div class="amp-card">
+        <div class="amp-card-label">Layer 02 — Generation</div>
+        <h3 class="amp-card-title">AI that knows your domain<br><em>completely</em></h3>
+        <p class="amp-card-body">Conventional AI tools generate plausible code from training data. Foundry's copilot receives full project context — stack versions, resource declarations, compliance links, relevant ADRs — before every session. It generates correct Ash code for your exact version, constrained by your invariants, classified by your change model. Generation is faster because there's no ambiguity. Correct because constraints are explicit.</p>
+        <div class="amp-card-example">
+          <span class="hi">context loaded</span> · ash 3.4.2<br>
+          <span class="warn">classified</span> · :behavioral change<br>
+          <span style="color: rgba(255,255,255,.2);">approval required · domain lead</span>
+        </div>
+      </div>
+      <div class="amp-card">
+        <div class="amp-card-label">Layer 03 — Preservation</div>
+        <h3 class="amp-card-title">Institutional knowledge as<br><em>executable constraints</em></h3>
+        <p class="amp-card-body">The most expensive problem in platform engineering is knowledge decay — constraints in engineers' heads, decisions made for reasons nobody remembers. Foundry encodes this as ADRs the linter references, spec-kit documents the copilot reads, and invariant rules that fire at the exact moment a violation is about to be introduced. The knowledge doesn't decay because it's executable.</p>
+        <div class="amp-card-example">
+          <span class="hi">INV-012</span> sensitive resource · hard delete blocked<br>
+          <span style="color: rgba(255,255,255,.2);">reason: ADR-005 · audit retention</span><br>
+          <span style="color: rgba(255,255,255,.2);">regulation: RG-UK-014 §4.2</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY FOUNDRY REQUIRES THIS STACK -->
+<section class="section" id="why">
+  <p class="section-label">07 — The structural argument</p>
+  <h2 class="section-h2">Why Foundry <em>requires</em><br>this stack specifically.</h2>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2rem;">
+    <div>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.5rem;">Foundry's core thesis — the codebase is the specification, the system map is a lossless rendering of the domain, the copilot reads live declarations rather than approximating them — is only possible because Ash resources are a single declarative source of truth.</p>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.75; font-weight: 300; margin-bottom: 1.5rem;">In a Spring Boot application, the domain model is scattered. Annotations on entity classes. Separate service beans. Separate repository interfaces. Separate security configuration. Separate API controllers. A system map of a Spring Boot application is a reconstruction from multiple sources that can and do drift from each other. It's an approximation, not a rendering.</p>
+      <p style="font-size: 16px; color: var(--ink-muted); line-height: 1.75; font-weight: 300;">In an Ash application, a resource is the source of truth for all concerns. The system map is a direct rendering of declarations that the compiler validates. It cannot be wrong because it's generated from the same source the compiler uses. That property — lossless, always current, compiler-validated — only exists because of how Ash's DSL is constructed using Elixir's macro system.</p>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 1rem;">
+      <div style="padding: 1.25rem 1.5rem; background: var(--paper-warm); border: 1px solid rgba(0,0,0,.08); border-radius: 12px;">
+        <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: .5rem;">Spring Boot</p>
+        <p style="font-size: 14px; color: var(--ink-muted); line-height: 1.6;">Domain facts scattered across @Entity, @Service, @Repository, @Controller, @PreAuthorize annotations. System map is a reconstruction — approximate by construction. Cannot be made lossless without rewriting how Spring works.</p>
+      </div>
+      <div style="padding: 1.25rem 1.5rem; background: #edf4f0; border: 1px solid rgba(42,77,58,.15); border-radius: 12px;">
+        <p style="font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: .5rem;">Ash resource</p>
+        <p style="font-size: 14px; color: var(--accent); line-height: 1.6; font-weight: 300;">All domain facts in one declaration. The system map reads this declaration directly — the same source the compiler validates. Lossless by construction. Cannot drift because there's nothing to drift from.</p>
+      </div>
+      <div style="padding: 1.25rem 1.5rem; background: var(--paper-warm); border: 1px solid rgba(0,0,0,.08); border-radius: 12px;">
+        <p style="font-size: 14px; color: var(--ink-muted); line-height: 1.6; font-style: italic; font-family: var(--serif); font-weight: 300;">If Ash existed for Java, Foundry could target Java. It doesn't. And building something like Ash for Java would be a multi-year project — Java's type system and reflection model don't support compile-time DSL construction the way Elixir's macro system does.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto-section">
+  <h2 class="manifesto-h2">We didn't choose this stack<br>because Java doesn't work.<br><em>We chose it because this works better.</em></h2>
+  <p class="manifesto-body">BEAM's concurrency, OTP's fault isolation, Elixir's compile-time metaprogramming, and Ash's declarative domain model combine into a platform where the hardest problems of complex system construction are structurally absent. Foundry builds on that foundation to eliminate the domain complexity that the stack alone doesn't address. The result is platforms that scale without drama, evolve without entropy, and outlast the teams that built them.</p>
+  <p class="manifesto-body">Bleacher Report proved the infrastructure economics. Discord proved the operational simplicity. WhatsApp proved the scale ceiling. Bet365 proves it daily in a regulated financial domain. The pattern is consistent enough to be a decision, not a bet.</p>
+  <a href="#" class="btn-primary">Start building on the right stack</a>
+  <p class="manifesto-mono">mix archive.install hex foundry</p>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <a href="foundry-home.html" class="footer-logo"><span></span>foundry</a>
+    <ul class="footer-links">
+      <li><a href="#">How it works</a></li>
+      <li><a href="#">The graph</a></li>
+      <li><a href="#">Research</a></li>
+      <li><a href="#">Docs</a></li>
+      <li><a href="#">GitHub</a></li>
+    </ul>
+    <p class="footer-legal">© 2026 Foundry</p>
+  </div>
+</footer>
+
+</body>
+</html>

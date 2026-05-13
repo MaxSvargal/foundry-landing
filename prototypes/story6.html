@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Your Codebase is the Spec</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap');
+
+    :root {
+      --bg: #050408;
+      --fg: #ffffff;
+      --accent: #6366f1;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--fg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-x: hidden;
+    }
+
+    /* THE CANVAS: Stays in background */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      display: block;
+    }
+
+    /* THE GRID: 12x8 like your React version */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.15;
+      background-image: 
+        linear-gradient(to right, currentColor 1px, transparent 1px),
+        linear-gradient(to bottom, currentColor 1px, transparent 1px);
+      background-size: 8.33% 12.5%;
+    }
+
+    /* UI LAYER: Important for passing mouse through to canvas */
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; /* Let mouse touch the canvas behind */
+    }
+
+    /* ELEMENTS: Re-enable mouse for buttons and cards */
+    .interactive {
+      pointer-events: auto;
+    }
+
+    /* LIGHT MODE: White reversion on scroll */
+    body.light-mode {
+      --bg: #ffffff;
+      --fg: #000000;
+    }
+    body.light-mode canvas {
+      filter: invert(1) contrast(1.1) brightness(1.2);
+    }
+
+    .hero-text {
+      font-size: clamp(3rem, 11vw, 9rem);
+      line-height: 0.85;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .word-rotator {
+      display: inline-block;
+      min-width: 1.2em;
+      color: var(--accent);
+    }
+
+    .animate-char {
+      display: inline-block;
+      animation: charIn 0.4s ease forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
+
+    .marquee-content {
+      display: flex;
+      gap: 6rem;
+      animation: scroll 40s linear infinite;
+    }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .content-card {
+      background: rgba(128, 128, 128, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(128, 128, 128, 0.1);
+      border-radius: 3.5rem;
+      padding: 4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Visualization -->
+  <canvas id="fluid-canvas"></canvas>
+  <div class="grid-lines"></div>
+
+  <!-- Hero Section -->
+  <main class="ui-layer">
+    <section class="min-h-screen flex flex-col justify-center px-6 lg:px-20">
+      <div class="max-w-[1440px] mx-auto w-full">
+        <h1 class="hero-text">
+          Your codebase <br>
+          that <span class="word-rotator" id="rotate-word">governs</span>
+        </h1>
+        
+        <div class="mt-16 grid lg:grid-cols-2 gap-16 items-end">
+          <div class="opacity-70 max-w-xl">
+            <p class="text-2xl lg:text-3xl leading-tight font-light mb-4">
+              The governed development environment for complex domain platforms.
+            </p>
+            <p class="text-2xl lg:text-3xl leading-tight font-bold">
+              Your codebase is the spec. It never lies.
+            </p>
+          </div>
+          
+          <div class="flex gap-4">
+            <button class="interactive bg-white text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-2xl">
+              Check demo →
+            </button>
+            <button class="interactive border border-current px-10 py-5 rounded-full font-bold text-lg hover:bg-white/10 transition-all">
+              GitHub
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Marquee -->
+      <div class="absolute bottom-16 left-0 w-full overflow-hidden opacity-50">
+        <div class="marquee-content whitespace-nowrap">
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold">vs $16k Lambda</span></div>
+          <!-- Loop Repeat -->
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold">vs $16k Lambda</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deep Focus Section -->
+    <section class="min-h-screen py-40 px-6 lg:px-20 flex items-center">
+      <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-3 gap-10">
+        <div class="interactive lg:col-span-2 content-card">
+          <h2 class="text-6xl font-black mb-8 tracking-tighter">Your codebase is the spec.</h2>
+          <p class="text-2xl opacity-70 leading-relaxed mb-6">
+            Foundry generates graph maps from code using static analysis. 
+            The agent sees the entire system map in context.
+          </p>
+          <p class="text-2xl opacity-70 leading-relaxed font-bold">
+            Working not with grepped code, but with a full declarative model.
+          </p>
+        </div>
+        <div class="flex flex-col gap-10">
+          <div class="interactive content-card !p-12 flex-1">
+            <h3 class="text-indigo-500 font-bold mb-2 uppercase text-xs tracking-widest">Static Analysis</h3>
+            <p class="text-2xl font-bold">The code is the topography.</p>
+          </div>
+          <div class="interactive content-card !p-12 flex-1 bg-indigo-600 text-white">
+            <h3 class="text-white/60 font-bold mb-2 uppercase text-xs tracking-widest">Governance</h3>
+            <p class="text-2xl font-bold">Reality, enforced by compiler.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    const canvas = document.getElementById('fluid-canvas');
+
+    // 1. Initialize Fluid
+    WebGLFluid(canvas, {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      DENSITY_DISSIPATION: 0.98,
+      VELOCITY_DISSIPATION: 0.99,
+      CURL: 12,
+      SPLAT_RADIUS: 0.3,
+      COLORFUL: true,
+      SHADING: true,
+      TRANSPARENT: true,
+      BLOOM: true,
+      BLOOM_INTENSITY: 0.3,
+    });
+
+    // 2. THE FIX: Recursion-safe Event Bridge
+    function proxyEvent(e) {
+      // If the event was already created by this function, ignore it
+      if (e.isProxy) return;
+
+      const { clientX, clientY } = e.touches ? e.touches[0] : e;
+      
+      // Create a NEW event
+      const event = new MouseEvent(e.type, {
+        clientX: clientX,
+        clientY: clientY,
+        bubbles: false, // DO NOT BUBBLE (prevents recursion)
+        cancelable: true,
+        view: window
+      });
+
+      // Mark it as a proxy event
+      event.isProxy = true;
+
+      // Dispatch directly to the canvas
+      canvas.dispatchEvent(event);
+    }
+
+    // Capture global movements
+    window.addEventListener('mousemove', proxyEvent);
+    window.addEventListener('mousedown', proxyEvent);
+    window.addEventListener('mouseup', proxyEvent);
+    window.addEventListener('touchstart', proxyEvent, { passive: true });
+    window.addEventListener('touchmove', proxyEvent, { passive: true });
+
+    // 3. Word Rotation Logic
+    const words = ["governs", "enforces", "scales", "endures"];
+    let wordIdx = 0;
+    const rotateEl = document.getElementById('rotate-word');
+    
+    function updateWord() {
+      wordIdx = (wordIdx + 1) % words.length;
+      const word = words[wordIdx];
+      rotateEl.innerHTML = '';
+      word.split('').forEach((char, i) => {
+        const span = document.createElement('span');
+        span.textContent = char;
+        span.className = 'animate-char';
+        span.style.animationDelay = `${i * 45}ms`;
+        rotateEl.appendChild(span);
+      });
+    }
+    updateWord();
+    setInterval(updateWord, 3000);
+
+    // 4. Scroll Inversion Logic
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > window.innerHeight * 0.4) {
+        document.body.classList.add('light-mode');
+      } else {
+        document.body.classList.remove('light-mode');
+      }
+    });
+  </script>
+</body>
+</html>

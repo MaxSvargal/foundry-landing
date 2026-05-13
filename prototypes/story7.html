@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Your Codebase is the Spec</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap');
+
+    :root {
+      --bg-dark: #050408;
+      --bg-light: #ffffff;
+      --fg-dark: #ffffff;
+      --fg-light: #000000;
+      --accent: #6366f1;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      color: var(--fg-dark);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      transition: background-color 0.8s cubic-bezier(0.4, 0, 0.2, 1), color 0.8s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* =========================================
+       CANVAS & VISUAL EFFECTS
+       ========================================= */
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1; /* Sits above background, below grid/UI */
+      pointer-events: none;
+      transition: filter 1s ease, opacity 1s ease, mix-blend-mode 1s ease;
+      will-change: filter, opacity;
+    }
+
+    /* Light Mode: Pushes effect to the "background" as an inky blueprint */
+    body.light-mode {
+      background-color: var(--bg-light);
+      color: var(--fg-light);
+    }
+    
+    body.light-mode #fluid-canvas {
+      filter: invert(1) hue-rotate(180deg) contrast(1.2);
+      mix-blend-mode: multiply; /* Blends the inverted ink perfectly into the white bg */
+      opacity: 0.4; /* Softens the manual mouse effect */
+    }
+
+    /* 12x8 Architectural Grid */
+    .grid-lines {
+      position: fixed;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0.1;
+      background-image: 
+        linear-gradient(to right, currentColor 1px, transparent 1px),
+        linear-gradient(to bottom, currentColor 1px, transparent 1px);
+      background-size: 8.33% 12.5%;
+      transition: opacity 0.8s ease;
+    }
+
+    body.light-mode .grid-lines {
+      opacity: 0.05; /* More subtle in light mode */
+    }
+
+    /* =========================================
+       UI LAYERS & TYPOGRAPHY
+       ========================================= */
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; /* Crucial: Lets mouse pass through to the proxy */
+    }
+
+    .interactive {
+      pointer-events: auto; /* Re-enables clicks for buttons/cards */
+    }
+
+    .hero-text {
+      font-size: clamp(3.5rem, 11vw, 9.5rem);
+      line-height: 0.88;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .word-rotator {
+      display: inline-flex;
+      min-width: 1.2em;
+      color: var(--accent);
+    }
+
+    .animate-char {
+      display: inline-block;
+      animation: charIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
+
+    /* =========================================
+       COMPONENTS
+       ========================================= */
+    .marquee-content {
+      display: flex;
+      gap: 6rem;
+      animation: scroll 45s linear infinite;
+      will-change: transform;
+    }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    .glass-card {
+      background: rgba(128, 128, 128, 0.03);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(128, 128, 128, 0.1);
+      border-radius: 2.5rem;
+      transition: border-color 0.3s ease, background 0.3s ease;
+    }
+    
+    body.light-mode .glass-card {
+      background: rgba(0, 0, 0, 0.02);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Visualization -->
+  <canvas id="fluid-canvas"></canvas>
+  <div class="grid-lines"></div>
+
+  <!-- Main UI -->
+  <main class="ui-layer">
+    
+    <!-- Hero Section -->
+    <section class="min-h-screen flex flex-col justify-center px-6 lg:px-20 relative">
+      <div class="max-w-[1440px] mx-auto w-full animate-fade-in">
+        <h1 class="hero-text">
+          Your codebase <br>
+          that <span class="word-rotator" id="rotate-word">governs</span>
+        </h1>
+        
+        <div class="mt-16 grid lg:grid-cols-2 gap-12 items-end">
+          <div class="opacity-80 max-w-xl">
+            <p class="text-2xl lg:text-3xl leading-tight font-medium mb-3">
+              The governed development environment for complex domain platforms.
+            </p>
+            <p class="text-2xl lg:text-3xl leading-tight font-black">
+              Your codebase is the spec. It never lies.
+            </p>
+          </div>
+          
+          <div class="flex flex-wrap gap-5">
+            <button class="interactive bg-white text-black px-10 py-5 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+              Check demo →
+            </button>
+            <button class="interactive border border-current px-10 py-5 rounded-full font-bold text-lg hover:bg-white hover:text-black transition-colors">
+              Look on GitHub
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Marquee -->
+      <div class="absolute bottom-12 left-0 w-full overflow-hidden opacity-40">
+        <div class="marquee-content whitespace-nowrap">
+          <!-- Item Set 1 -->
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+          <!-- Item Set 2 (For seamless loop) -->
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
+          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Deep Focus Section -->
+    <section class="min-h-screen py-40 px-6 lg:px-20 flex items-center">
+      <div class="max-w-7xl mx-auto w-full grid lg:grid-cols-3 gap-8">
+        
+        <div class="interactive lg:col-span-2 glass-card p-12 lg:p-16">
+          <h2 class="text-5xl lg:text-7xl font-black mb-8 tracking-tighter">Code is the spec.</h2>
+          <p class="text-2xl opacity-70 leading-relaxed mb-6">
+            Foundry generates graph maps from code using static analysis. 
+            The agent sees the entire system map in context.
+          </p>
+          <p class="text-2xl opacity-70 leading-relaxed font-bold">
+            Working not with grepped code, but with a full declarative model.
+          </p>
+        </div>
+        
+        <div class="flex flex-col gap-8">
+          <div class="interactive glass-card p-10 flex-1 hover:border-indigo-500/30">
+            <h3 class="text-indigo-500 font-black mb-3 uppercase text-xs tracking-widest">Static Analysis</h3>
+            <p class="text-2xl font-bold">The code is the topography.</p>
+          </div>
+          <div class="interactive glass-card p-10 flex-1 bg-indigo-600 border-none text-white shadow-2xl hover:bg-indigo-500">
+            <h3 class="text-white/70 font-black mb-3 uppercase text-xs tracking-widest">Governance</h3>
+            <p class="text-2xl font-bold">Reality, enforced by compiler.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById('fluid-canvas');
+
+      // 1. Initialize Fluid with Original effect3.html Settings
+      WebGLFluid(canvas, {
+        TRIGGER: 'hover',
+        IMMEDIATE: true,             // Powerful foreground splash on load
+        AUTO: false,                 
+        SIM_RESOLUTION: 128,         
+        DYE_RESOLUTION: 1024,        
+        DENSITY_DISSIPATION: 0.97,   
+        VELOCITY_DISSIPATION: 0.98,  
+        PRESSURE: 0.8,               
+        CURL: 30,                    
+        SPLAT_RADIUS: 0.25,          
+        SPLAT_FORCE: 6000,           
+        SHADING: true,               
+        COLORFUL: true,              
+        COLOR_UPDATE_SPEED: 8,       
+        TRANSPARENT: true,           
+        BLOOM: true,                 
+        BLOOM_ITERATIONS: 8,
+        BLOOM_RESOLUTION: 256,
+        BLOOM_INTENSITY: 0.8,
+        BLOOM_THRESHOLD: 0.6,
+        SUNRAYS: true,               
+        SUNRAYS_RESOLUTION: 196,
+        SUNRAYS_WEIGHT: 1.0,
+      });
+
+      // 2. Optimized Event Bridge (Recursion-Safe)
+      let isThrottled = false;
+      
+      function proxyEvent(e) {
+        if (e.isProxy) return; // Prevent infinite loop
+
+        // Throttle slightly for performance, but fast enough for smooth curves
+        if (isThrottled) return;
+        isThrottled = true;
+        requestAnimationFrame(() => { isThrottled = false; });
+
+        let clientX, clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        } else {
+          clientX = e.clientX;
+          clientY = e.clientY;
+        }
+
+        if (clientX === undefined || clientY === undefined) return;
+
+        const event = new MouseEvent(e.type, {
+          clientX,
+          clientY,
+          bubbles: false, // Critical: Stops the event from bubbling up to window
+          cancelable: true,
+          view: window
+        });
+        
+        event.isProxy = true; 
+        canvas.dispatchEvent(event);
+      }
+
+      // Attach global listeners
+      const eventTypes = ['mousemove', 'mousedown', 'mouseup', 'touchstart', 'touchmove'];
+      eventTypes.forEach(type => {
+        window.addEventListener(type, proxyEvent, { passive: true });
+      });
+
+      // 3. Word Rotator Animation
+      const words = ["governs", "enforces", "scales", "endures"];
+      let wordIdx = 0;
+      const rotateEl = document.getElementById('rotate-word');
+      
+      function updateWord() {
+        wordIdx = (wordIdx + 1) % words.length;
+        const word = words[wordIdx];
+        rotateEl.innerHTML = '';
+        
+        word.split('').forEach((char, i) => {
+          const span = document.createElement('span');
+          span.textContent = char;
+          span.className = 'animate-char';
+          span.style.animationDelay = `${i * 35}ms`; // Snappy stagger
+          rotateEl.appendChild(span);
+        });
+      }
+      
+      updateWord();
+      setInterval(updateWord, 3000);
+
+      // 4. Scroll Inversion Logic (Optimized)
+      let ticking = false;
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            const threshold = window.innerHeight * 0.4;
+            document.body.classList.toggle('light-mode', window.scrollY > threshold);
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }, { passive: true });
+    });
+  </script>
+</body>
+</html>

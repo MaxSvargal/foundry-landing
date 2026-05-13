@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Story-Driven Fluid Narrative</title>
+  <style>
+    :root {
+      --bg-color: #030108; 
+    }
+
+    body, html {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      /* Disable user interaction so they watch the story */
+      pointer-events: none; 
+      user-select: none;
+    }
+
+    /* WebGL Canvas & Compositing */
+    .smoke-compositor {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      mix-blend-mode: screen;
+      z-index: 1;
+    }
+
+    #fluid-canvas {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      filter: grayscale(100%) contrast(1.3) brightness(1.2);
+    }
+
+    /* Ethereal Cinematic Color Map */
+    .color-map {
+      position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+      /* A dramatic Gold, Pink, and Deep Cyan palette */
+      background: linear-gradient(120deg, #10b981 0%, #3b82f6 30%, #ec4899 70%, #f59e0b 100%);
+      mix-blend-mode: multiply;
+    }
+
+    /* Typography / Subtitles */
+    .story-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      width: 80%;
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin: 0;
+      color: white;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 2s ease, transform 3s cubic-bezier(0.2, 1, 0.3, 1);
+      text-shadow: 0px 4px 30px rgba(0,0,0,0.8);
+    }
+
+    /* Active class for fading text in */
+    h1.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="smoke-compositor">
+    <canvas id="fluid-canvas"></canvas>
+    <div class="color-map"></div>
+  </div>
+
+  <div class="story-text">
+    <h1 id="subtitle"></h1>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  
+  <script>
+    // 1. Initialize the Fluid Physics 
+    WebGLFluid(document.querySelector('#fluid-canvas'), {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      SIM_RESOLUTION: 256,
+      DYE_RESOLUTION: 1024,
+      DENSITY_DISSIPATION: 0.995, // Lingers for a long time
+      VELOCITY_DISSIPATION: 0.99, // Keeps moving smoothly
+      PRESSURE: 0.2,
+      CURL: 2,                    // Very graceful, non-chaotic movement
+      SPLAT_RADIUS: 0.5,
+      SPLAT_FORCE: 2500,
+      SHADING: true,
+      TRANSPARENT: false,
+      BLOOM: true,
+      BLOOM_ITERATIONS: 3,
+      BLOOM_RESOLUTION: 256,
+      BLOOM_INTENSITY: 0.4,
+      BLOOM_THRESHOLD: 0.5,
+    });
+
+    // 2. The "Puppeteer" Engine
+    // This mathematically simulates a human dragging a cursor across the screen
+    function swipe(startX, startY, endX, endY, durationMs) {
+      return new Promise(resolve => {
+        const canvas = document.querySelector('#fluid-canvas');
+        const startTime = performance.now();
+        
+        function animate(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / durationMs, 1);
+          
+          // Easing function for organic acceleration/deceleration
+          const ease = 1 - Math.pow(1 - progress, 3); 
+          
+          // Convert normalized coordinates (0 to 1) to actual pixel screen coordinates
+          const currentX = startX + (endX - startX) * ease;
+          const currentY = startY + (endY - startY) * ease;
+          
+          // Dispatch fake mouse movement to trick the WebGL engine
+          canvas.dispatchEvent(new MouseEvent('mousemove', {
+            clientX: currentX * window.innerWidth,
+            clientY: currentY * window.innerHeight,
+            bubbles: true
+          }));
+          
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            resolve(); // Swipe finished
+          }
+        }
+        requestAnimationFrame(animate);
+      });
+    }
+
+    // Helper for timing
+    const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+    // Helper for text UI
+    async function showText(text, durationMs) {
+      const el = document.getElementById('subtitle');
+      el.classList.remove('visible');
+      await sleep(1500); // Wait for fade out
+      el.innerText = text;
+      el.classList.add('visible');
+      if (durationMs) {
+        await sleep(durationMs);
+        el.classList.remove('visible');
+      }
+    }
+
+    // 3. The Story Choreography (The Timeline)
+    async function playStory() {
+      // Act 1: The Void
+      await sleep(1000);
+      showText("In the quiet...", 4000);
+      await sleep(2000);
+      // Gentle push from bottom left to center
+      await swipe(0.2, 0.9, 0.4, 0.5, 3000); 
+
+      // Act 2: Convergence
+      await sleep(3000);
+      showText("A spark emerges.", 4000);
+      // Push from top right
+      await swipe(0.8, 0.1, 0.6, 0.4, 2500); 
+      await sleep(1000);
+      // Push from bottom right
+      await swipe(0.9, 0.9, 0.5, 0.5, 3000); 
+
+      // Act 3: The Climax (Chaos)
+      await sleep(4000);
+      showText("Forces collide.", 4000);
+      // Trigger multiple rapid forces simultaneously using Promise.all
+      await Promise.all([
+        swipe(0.1, 0.5, 0.5, 0.5, 1500),
+        swipe(0.9, 0.5, 0.5, 0.5, 1500),
+        swipe(0.5, 0.1, 0.5, 0.5, 1500),
+        swipe(0.5, 0.9, 0.5, 0.5, 1500)
+      ]);
+      
+      // Secondary explosive spin (Supernova effect in the middle)
+      await swipe(0.4, 0.4, 0.6, 0.6, 800);
+      await swipe(0.6, 0.4, 0.4, 0.6, 800);
+      await swipe(0.5, 0.3, 0.5, 0.7, 800);
+
+      // Act 4: Resolution
+      await sleep(3000);
+      showText("Creating something beautiful.", 6000);
+      
+      // Let the beautiful smoke slowly drift, fading the text out forever.
+      await sleep(6000);
+      document.getElementById('subtitle').classList.remove('visible');
+    }
+
+    // Start the movie!
+    playStory();
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry - Topography of Intent</title>
+  <style>
+    :root {
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --glass-bg: rgba(20, 13, 43, 0.3);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --accent: #00f0ff;
+      --accent-gold: #ffd700;
+    }
+
+    /* SCROLLING FIX: min-height 100vh and overflow-y auto */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      background: #050408;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text-main);
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+
+    /* The fluid canvas stays fixed in the background */
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      /* Allows the canvas to receive mouse movements */
+      pointer-events: auto; 
+    }
+
+    /* The Glass Topography (SVG) */
+    #glass-city {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 2;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      /* Creates a subtle distortion over the fluid */
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+    }
+
+    /* SVG Styling for the "Glass" look */
+    .glass-tube-outer {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.1);
+      stroke-width: 16;
+      stroke-linecap: round;
+    }
+    .glass-tube-inner {
+      fill: none;
+      stroke: rgba(5, 4, 8, 0.6);
+      stroke-width: 12;
+      stroke-linecap: round;
+      transition: stroke 0.3s ease;
+    }
+    .glass-tube-inner.active {
+      stroke: rgba(0, 240, 255, 0.8);
+      filter: drop-shadow(0 0 10px var(--accent));
+    }
+    .glass-node {
+      fill: rgba(20, 13, 43, 0.8);
+      stroke: rgba(255, 255, 255, 0.3);
+      stroke-width: 2;
+      transition: all 0.3s ease;
+    }
+    .glass-node.active {
+      stroke: var(--accent);
+      fill: rgba(0, 240, 255, 0.2);
+      filter: drop-shadow(0 0 15px var(--accent));
+    }
+    .holo-element {
+      opacity: 0;
+      stroke-dasharray: 8 8;
+      transition: opacity 1s ease;
+    }
+    .holo-element.visible {
+      opacity: 1;
+    }
+
+    /* Scrollable Content Wrapper */
+    #scroll-wrapper {
+      position: relative;
+      z-index: 3;
+      /* Crucial: lets mouse events pass through the empty space to the canvas */
+      pointer-events: none; 
+    }
+
+    section {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    /* The Text Panels */
+    .glass-panel {
+      /* Re-enable pointer events for the text boxes so you can select text/click buttons */
+      pointer-events: auto; 
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 700px;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 1s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-panel.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      margin: 0 0 1rem 0;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      text-shadow: 0px 4px 24px rgba(0,0,0,0.8);
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin: 0 0 1rem 0;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Agent Terminal UI */
+    #agent-terminal {
+      position: fixed;
+      bottom: 40px;
+      left: 40px;
+      width: 420px;
+      background: rgba(10, 5, 20, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.95rem;
+      color: #a0a0a0;
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    }
+
+    #agent-terminal.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .terminal-line {
+      margin-bottom: 10px;
+      opacity: 0;
+      line-height: 1.4;
+    }
+
+    .terminal-line.typed {
+      opacity: 1;
+    }
+
+    .highlight-gold { color: var(--accent-gold); }
+    .highlight-cyan { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- WebGL Fluid Canvas -->
+  <canvas id="fluid-canvas"></canvas>
+
+  <!-- SVG Topography Layer -->
+  <svg id="glass-city"></svg>
+
+  <!-- Scrollable Narrative -->
+  <div id="scroll-wrapper">
+    
+    <!-- Scene 1: The Void -->
+    <section id="scene-1">
+      <div class="glass-panel">
+        <h1>FOUNDRY</h1>
+        <p>Move your cursor. Code is generated effortlessly.<br>But without structure, energy dissipates into the void.</p>
+      </div>
+    </section>
+
+    <!-- Scene 2: Crystallization -->
+    <section id="scene-2">
+      <div class="glass-panel">
+        <h2>The codebase is not text.<br>It is a topography.</h2>
+        <p>Static analysis captures your intent. The chaotic fluid crystallizes into a governed architecture. You don't read the matrix; you watch the city breathe.</p>
+      </div>
+    </section>
+
+    <!-- Scene 3: The Pulse -->
+    <section id="scene-3">
+      <div class="glass-panel" style="margin-left: auto; margin-right: 10vw;">
+        <h2>Watch your logic run.</h2>
+        <p>Never read a stack trace again. Visual logic review traces live execution paths directly through your declarative model.</p>
+      </div>
+    </section>
+
+    <!-- Scene 4: The Agent -->
+    <section id="scene-4">
+      <div class="glass-panel" style="margin-left: auto; margin-right: 10vw;">
+        <h2>An agent that sees<br>the whole city.</h2>
+        <p>It doesn't grep text. It simulates physics inside your live architecture, proposing and validating changes before they merge.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Agent UI -->
+  <div id="agent-terminal">
+    <div class="terminal-line" id="term-1">> User: Route VIP UK withdrawals through secondary compliance.</div>
+    <div class="terminal-line highlight-cyan" id="term-2">> Agent: Scanning topography...</div>
+    <div class="terminal-line" id="term-3">> Agent: Found UK District & Compliance Gates.</div>
+    <div class="terminal-line highlight-gold" id="term-4">> Agent: Proposing structural change. Simulating dry-run...</div>
+  </div>
+
+  <!-- Load WebGL Fluid Simulation -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  
+  <script>
+    // 1. Initialize Fluid Simulation
+    const canvas = document.getElementById('fluid-canvas');
+    WebGLFluid(canvas, {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      SIM_RESOLUTION: 128,
+      DYE_RESOLUTION: 1024,
+      DENSITY_DISSIPATION: 0.95, // Faster dissipation for an "energy" look
+      VELOCITY_DISSIPATION: 0.98,
+      PRESSURE: 0.8,
+      CURL: 30,
+      SPLAT_RADIUS: 0.25,
+      SPLAT_FORCE: 6000,
+      SHADING: true,
+      COLORFUL: true,
+      COLOR_UPDATE_SPEED: 10,
+      TRANSPARENT: true,
+      BLOOM: true,
+      BLOOM_ITERATIONS: 8,
+      BLOOM_RESOLUTION: 256,
+      BLOOM_INTENSITY: 0.8,
+      BLOOM_THRESHOLD: 0.6,
+      SUNRAYS: true,
+      SUNRAYS_RESOLUTION: 196,
+      SUNRAYS_WEIGHT: 1.0,
+    });
+
+    // 2. Generate the SVG Topography Dynamically
+    // We use percentages of the screen (vw/vh) so it always fits perfectly.
+    const nodesData = {
+      entry:  { x: 0.15, y: 0.5, label: 'Entry' },
+      auth:   { x: 0.35, y: 0.3, label: 'Auth Gate' },
+      ledger: { x: 0.35, y: 0.7, label: 'Ledger' },
+      domain: { x: 0.65, y: 0.5, label: 'Domain Core' },
+      comp:   { x: 0.85, y: 0.3, label: 'Compliance', holo: true }
+    };
+
+    const pathsData =[
+      { from: 'entry', to: 'auth', id: 'path-auth' },
+      { from: 'entry', to: 'ledger', id: 'path-ledger' },
+      { from: 'auth', to: 'domain', id: 'path-domain-1' },
+      { from: 'ledger', to: 'domain', id: 'path-domain-2' },
+      { from: 'domain', to: 'comp', id: 'path-holo', holo: true }
+    ];
+
+    const svg = document.getElementById('glass-city');
+
+    function drawTopography() {
+      svg.innerHTML = ''; // Clear existing
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // Draw Paths First (so they sit behind nodes)
+      pathsData.forEach(p => {
+        const start = nodesData[p.from];
+        const end = nodesData[p.to];
+        const x1 = start.x * w, y1 = start.y * h;
+        const x2 = end.x * w, y2 = end.y * h;
+
+        const holoClass = p.holo ? 'holo-element' : '';
+        const holoStroke = p.holo ? 'stroke="var(--accent-gold)"' : '';
+
+        // Outer Glass Reflection
+        svg.innerHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="glass-tube-outer ${holoClass}" />`;
+        // Inner Hollow Tube
+        svg.innerHTML += `<line id="${p.id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="glass-tube-inner ${holoClass}" ${holoStroke} />`;
+      });
+
+      // Draw Nodes
+      Object.keys(nodesData).forEach(key => {
+        const n = nodesData[key];
+        const cx = n.x * w, cy = n.y * h;
+        const holoClass = n.holo ? 'holo-element' : '';
+        const strokeColor = n.holo ? 'var(--accent-gold)' : 'rgba(255,255,255,0.3)';
+        
+        svg.innerHTML += `
+          <circle id="node-${key}" cx="${cx}" cy="${cy}" r="35" class="glass-node ${holoClass}" style="stroke: ${strokeColor};" />
+          <text x="${cx}" y="${cy + 55}" fill="white" font-size="14" font-weight="600" text-anchor="middle" opacity="0.8" class="${holoClass}">${n.label}</text>
+        `;
+      });
+    }
+
+    // Initial draw and redraw on resize
+    drawTopography();
+    window.addEventListener('resize', drawTopography);
+
+    // 3. Fluid Injection Utilities
+    // Triggers a splash in the WebGL canvas at specific coordinates
+    function triggerSplat(x, y) {
+      const event = new MouseEvent('mousemove', { clientX: x, clientY: y });
+      canvas.dispatchEvent(event);
+    }
+
+    // Animates a fluid pulse moving along a path
+    function animatePulseAlongPath(startKey, endKey, duration, callback) {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const startX = nodesData[startKey].x * w;
+      const startY = nodesData[startKey].y * h;
+      const endX = nodesData[endKey].x * w;
+      const endY = nodesData[endKey].y * h;
+      
+      const startTime = performance.now();
+      
+      function step(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing (easeOutQuad)
+        const easeProgress = progress * (2 - progress);
+        
+        const currentX = startX + (endX - startX) * easeProgress;
+        const currentY = startY + (endY - startY) * easeProgress;
+        
+        triggerSplat(currentX, currentY);
+        
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else if (callback) {
+          callback();
+        }
+      }
+      requestAnimationFrame(step);
+    }
+
+    // 4. Scroll & Narrative Logic
+    const sections = document.querySelectorAll('section');
+    const terminal = document.getElementById('agent-terminal');
+    let pulseInterval;
+    let activeScene = '';
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const panel = entry.target.querySelector('.glass-panel');
+        if (entry.isIntersecting) {
+          panel.classList.add('visible');
+          handleSceneChange(entry.target.id);
+        } else {
+          panel.classList.remove('visible');
+        }
+      });
+    }, { threshold: 0.5 });
+
+    sections.forEach(section => observer.observe(section));
+
+    function handleSceneChange(sceneId) {
+      if (activeScene === sceneId) return;
+      activeScene = sceneId;
+      clearInterval(pulseInterval);
+
+      if (sceneId === 'scene-1') {
+        // The Void
+        svg.style.opacity = '0';
+        terminal.classList.remove('visible');
+      } 
+      
+      else if (sceneId === 'scene-2') {
+        // Crystallization
+        svg.style.opacity = '1';
+        terminal.classList.remove('visible');
+        
+        // Random gentle pulses at nodes
+        pulseInterval = setInterval(() => {
+          const keys = ['entry', 'auth', 'ledger', 'domain'];
+          const randomKey = keys[Math.floor(Math.random() * keys.length)];
+          const n = nodesData[randomKey];
+          triggerSplat(n.x * window.innerWidth, n.y * window.innerHeight);
+        }, 1000);
+      }
+      
+      else if (sceneId === 'scene-3') {
+        // The Pulse (Runtime Tracing)
+        svg.style.opacity = '1';
+        terminal.classList.remove('visible');
+        
+        function runTrace() {
+          // Highlight Path 1
+          document.getElementById('path-auth').classList.add('active');
+          document.getElementById('node-auth').classList.add('active');
+
+          animatePulseAlongPath('entry', 'auth', 600, () => {
+            setTimeout(() => {
+              // Highlight Path 2
+              document.getElementById('path-domain-1').classList.add('active');
+              document.getElementById('node-domain').classList.add('active');
+              
+              animatePulseAlongPath('auth', 'domain', 800, () => {
+                // Cleanup highlights
+                setTimeout(() => {
+                  document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+                }, 800);
+              });
+            }, 200);
+          });
+        }
+        
+        runTrace();
+        pulseInterval = setInterval(runTrace, 3500);
+      }
+      
+      else if (sceneId === 'scene-4') {
+        // The Agent
+        svg.style.opacity = '1';
+        terminal.classList.add('visible');
+        
+        // Reset terminal typing
+        document.querySelectorAll('.terminal-line').forEach(el => el.classList.remove('typed'));
+        
+        // Type sequence
+        setTimeout(() => document.getElementById('term-1').classList.add('typed'), 500);
+        setTimeout(() => document.getElementById('term-2').classList.add('typed'), 1500);
+        setTimeout(() => document.getElementById('term-3').classList.add('typed'), 2500);
+        setTimeout(() => {
+          document.getElementById('term-4').classList.add('typed');
+          
+          // Reveal Holographic Elements
+          document.querySelectorAll('.holo-element').forEach(el => el.classList.add('visible'));
+          
+          // Run dry-run pulse
+          setTimeout(() => {
+            function runHoloPulse() {
+              animatePulseAlongPath('domain', 'comp', 800);
+            }
+            runHoloPulse();
+            pulseInterval = setInterval(runHoloPulse, 2000);
+          }, 800);
+          
+        }, 3500);
+      }
+    }
+  </script>
+</body>
+</html>

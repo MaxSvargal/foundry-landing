@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinematic Organic Fluid</title>
+  <style>
+    :root {
+      /* The base background color of the website */
+      --bg-color: #07040f; 
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-color);
+      /* Subtle dark vignette background behind everything */
+      background: radial-gradient(circle at 50% 50%, #120a2b 0%, var(--bg-color) 100%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 
+      =========================================
+      THE COMPOSITING TRICK
+      =========================================
+      This container handles the blending. It takes the colored smoke (which is sitting 
+      on a pitch-black background inside this div) and uses "screen" to drop the black, 
+      seamlessly adding only the glowing smoke onto the website's dark background.
+    */
+    .smoke-compositor {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      mix-blend-mode: screen;
+      z-index: 1;
+      transform: translateZ(0); /* Hardware acceleration */
+    }
+
+    /* 
+      1. The WebGL Canvas natively generates rainbow colors.
+      We use CSS filter to strip the color (grayscale) and boost the contrast.
+      Now we have a perfect, high-res physics map of pure white mist.
+    */
+    #fluid-canvas {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      filter: grayscale(100%) contrast(1.2);
+    }
+
+    /* 
+      2. The Color Map overlay maps your exact brand palette directly onto the white mist.
+      "Multiply" mode means Black Canvas * Gradient = Black. 
+      White Mist * Gradient = Beautifully Colored Gradient Mist!
+    */
+    .color-map {
+      position: absolute;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; /* Let the mouse reach the canvas behind it */
+      background: linear-gradient(135deg, #4f46e5 0%, #c026d3 50%, #2563eb 100%);
+      mix-blend-mode: multiply;
+      transform: translateZ(0);
+    }
+
+    /* 
+      =========================================
+      UI / TEXT OVERLAY
+      =========================================
+    */
+    .hero-content {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-align: center;
+      pointer-events: none; /* Crucial: Lets you interact with the fluid through the text */
+    }
+
+    h1 {
+      font-size: 5rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      margin: 0;
+      /* Premium metallic text styling */
+      background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    p {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 1.25rem;
+      margin-top: 10px;
+      font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Compositing Layer -->
+  <div class="smoke-compositor">
+    <canvas id="fluid-canvas"></canvas>
+    <div class="color-map"></div>
+  </div>
+
+  <!-- UI Layer -->
+  <div class="hero-content">
+    <h1>Organic Fluid</h1>
+    <p>Cinematic, Heavy Vapor Simulation</p>
+  </div>
+
+  <!-- WebGL Fluid Physics Engine -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  
+  <script>
+    // Initialize the WebGL Physics
+    WebGLFluid(document.querySelector('#fluid-canvas'), {
+      TRIGGER: 'hover',
+      IMMEDIATE: true,
+      AUTO: false,
+      
+      // 1. High-Fidelity Grids
+      SIM_RESOLUTION: 256,       // High-resolution physics grid for smooth, organic curves
+      DYE_RESOLUTION: 1024,      // Crisp rendering
+      
+      // 2. Realistic Physics (The "Heavy Ink" setup)
+      DENSITY_DISSIPATION: 0.998, // Evaporates incredibly slowly. Mist lingers in the air.
+      VELOCITY_DISSIPATION: 0.995, // Momentum is maintained. Swirls keep drifting elegantly.
+      PRESSURE: 0.15,            // Low pressure = gentle fluid flow, less elastic bouncing
+      PRESSURE_ITERATIONS: 25,   // Higher mathematical iterations = highly realistic incompressible fluid
+      CURL: 3,                   // Very low curl. Generates sweeping majestic vortices instead of chaotic fizz
+      
+      // 3. User Interaction
+      SPLAT_RADIUS: 0.8,         // Huge, soft interaction point
+      SPLAT_FORCE: 1500,         // Gentle push, so it drifts naturally instead of shooting out violently
+      
+      // 4. Shading & Volumetrics
+      SHADING: true,             // Enables 3D volumetric shadows inside the fluid
+      COLORFUL: true,            // Generates variable brightness (CSS handles the actual coloring)
+      TRANSPARENT: false,        // MUST BE FALSE. We need a pitch black background for the CSS multiply trick
+      
+      // 5. Lighting
+      BLOOM: true,               // Soft organic glow
+      BLOOM_ITERATIONS: 3,
+      BLOOM_RESOLUTION: 256,
+      BLOOM_INTENSITY: 0.2,      // Kept very subtle to avoid "arcade game" look
+      BLOOM_THRESHOLD: 0.6,
+      SUNRAYS: false             // Disabled. Fake god-rays break the organic realism.
+    });
+  </script>
+</body>
+</html>

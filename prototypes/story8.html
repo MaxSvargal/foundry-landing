@@ -118,30 +118,29 @@
        COMPONENTS
        ========================================= */
     /* Buttons */
+    /* Take a Tour: Always White-ish Background */
     .btn-primary {
-      background-color: var(--fg-dark);
-      color: var(--bg-dark);
-      box-shadow: 0 0 40px rgba(255,255,255,0.1);
-      transition: all 0.3s ease;
-    }
-    body.light-mode .btn-primary {
-      background-color: var(--fg-light);
-      color: var(--bg-light);
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+      background-color: #ffffff;
+      color: #000000;
+      border: 1px solid #ffffff;
+      transition: all 0.4s ease-in-out;
     }
 
+    /* Source Code: Ghost to Black */
     .btn-secondary {
-      border: 1px solid var(--fg-dark);
-      color: var(--fg-dark);
-      transition: all 0.3s ease;
+      background-color: transparent;
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: all 0.34s ease-in-out;
+    }
+    .btn-secondary.is-near, .btn-secondary:hover {
+      background-color: #000000; /* Force black background */
+      border-color: transparent;
+      color: #ffffff;
     }
     body.light-mode .btn-secondary {
       border-color: var(--fg-light);
       color: var(--fg-light);
-    }
-    .btn-secondary:hover {
-      background-color: var(--fg-dark);
-      color: var(--bg-dark);
     }
     body.light-mode .btn-secondary:hover {
       background-color: var(--fg-light);
@@ -221,11 +220,11 @@
             </p>
           </div>
           
-          <div class="flex flex-wrap gap-5 justify-center lg:justify-end">
-            <button class="interactive btn-primary px-10 py-5 rounded-full font-bold text-lg hover:scale-105">
+          <div class="button-group-container flex flex-wrap gap-6 justify-center lg:justify-end items-center interactive">
+            <button class="btn-primary px-10 py-5 rounded-full font-bold text-lg shadow-xl">
               Take a Tour →
             </button>
-            <button class="interactive btn-secondary px-10 py-5 rounded-full font-bold text-lg">
+            <button class="btn-secondary px-10 py-5 rounded-full font-bold text-lg">
               Source Code
             </button>
           </div>
@@ -234,16 +233,6 @@
 
       <!-- Stats Marquee -->
       <div class="marquee-container">
-        <!-- <div class="marquee-content whitespace-nowrap">
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">2M</span><span class="text-xs uppercase font-bold tracking-widest">Websockets</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">150→5</span><span class="text-xs uppercase font-bold tracking-widest">Servers</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$2M/yr</span><span class="text-xs uppercase font-bold tracking-widest">Savings</span></div>
-          <div class="flex items-baseline gap-4"><span class="text-6xl font-black">$150/mo</span><span class="text-xs uppercase font-bold tracking-widest">vs $16k Lambda</span></div>
-        </div> -->
         <!-- Masking container -->
         <div class="overflow-hidden whitespace-nowrap py-10">
           
