@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Loading...</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-dark: #050408;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      overflow: hidden; /* Hide scrollbars for the loading screen */
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      /* CSS Filter trick: Turns the multi-colored fluid into vibrant, glowing orange/fire */
+      filter: sepia(100%) hue-rotate(-15deg) saturate(800%) brightness(150%);
+      opacity: 0.9;
+    }
+
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; 
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Fluid Visualization -->
+  <canvas id="fluid-canvas"></canvas>
+
+  <!-- Centered Logo -->
+  <main class="ui-layer w-screen h-screen flex items-center justify-center">
+    <!-- animate-pulse adds a nice subtle breathing effect for a loading screen -->
+    <img id="logo" src="http://localhost:3000/foundry-logo.png" alt="Foundry Logo" class="w-auto h-32 md:h-48 drop-shadow-2xl animate-pulse">
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById('fluid-canvas');
+      const logo = document.getElementById('logo');
+
+      // 1. Initialize Fluid with modified parameters for a continuous active stream
+      WebGLFluid(canvas, {
+        TRIGGER: 'hover',
+        IMMEDIATE: true,             
+        AUTO: false,                 
+        SIM_RESOLUTION: 128,         
+        DYE_RESOLUTION: 1024,        
+        DENSITY_DISSIPATION: 0.94,   // Dissipates faster to look like particles/fire
+        VELOCITY_DISSIPATION: 0.96,  
+        PRESSURE: 0.8,               
+        CURL: 30,                    
+        SPLAT_RADIUS: 0.15,          // Smaller, more concentrated splats
+        SPLAT_FORCE: 5000,           
+        SHADING: true,               
+        COLORFUL: true,              
+        COLOR_UPDATE_SPEED: 4,       
+        TRANSPARENT: true,           
+        BLOOM: true,                 
+        BLOOM_ITERATIONS: 8,
+        BLOOM_RESOLUTION: 256,
+        BLOOM_INTENSITY: 0.8,
+        BLOOM_THRESHOLD: 0.6,
+        SUNRAYS: true,               
+        SUNRAYS_RESOLUTION: 196,
+        SUNRAYS_WEIGHT: 1.0,
+      });
+
+      // 2. Programmatically spawn fluid under the logo (simulating an active thruster/fire)
+      let time = 0;
+      
+      setInterval(() => {
+        if (!logo) return;
+        const rect = logo.getBoundingClientRect();
+        if (rect.width === 0) return; // Wait until layout is fully ready
+        
+        time += 0.15;
+        
+        // Create a smooth sweeping motion along the bottom edge of the logo
+        const centerX = rect.left + rect.width / 2;
+        const spread = rect.width * 0.35;
+        const startX = centerX + Math.sin(time) * spread + Math.sin(time * 1.7) * (spread * 0.5);
+        const startY = rect.bottom - 10; // Slightly inside the bottom edge
+
+        // Dispatch first event to register position
+        canvas.dispatchEvent(new MouseEvent('mousemove', { 
+          clientX: startX, 
+          clientY: startY,
+          bubbles: true
+        }));
+        
+        // Dispatch second event shortly after to create downward velocity
+        setTimeout(() => {
+          canvas.dispatchEvent(new MouseEvent('mousemove', { 
+            clientX: startX + (Math.random() - 0.5) * 10, 
+            clientY: startY + 25, // Pushes fluid downwards
+            bubbles: true
+          }));
+        }, 20);
+      }, 40); // Updates at ~25fps for a smooth continuous flow
+    });
+  </script>
+</body>
+</html>

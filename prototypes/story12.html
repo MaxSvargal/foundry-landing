@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Loading</title>
+  <!-- STYLING FIX: Restored the original, stable Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-dark: #050408;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      overflow: hidden;
+    }
+
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      
+      /* Start hidden to completely remove the initial random effect */
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+      
+      /* Let the patched dye color drive the fire hue; this just adds brightness and punch. */
+      filter: saturate(190%) brightness(150%) contrast(108%);
+    }
+
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; 
+    }
+
+    #logo {
+      /* SOLID LOGO - NO OPACITY */
+      opacity: 1 !important;
+      display: block;
+      filter: drop-shadow(0 0 25px rgba(0, 0, 0, 0.9));
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fluid-canvas"></canvas>
+
+  <main class="ui-layer w-screen h-screen flex items-center justify-center">
+    <img id="logo" src="http://localhost:3000/foundry-logo.png" alt="Foundry Logo" class="w-auto h-32 md:h-44">
+  </main>
+
+  <script>
+    async function loadPatchedWebGLFluid() {
+      if (window.WebGLFluid) return;
+
+      const response = await fetch('https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0/dist/webgl-fluid.umd.js');
+      let source = await response.text();
+
+      source = source.replace('o.color=it()', 'o.color=p.SPLAT_COLOR||it()');
+      source = source.replace('N.forEach(s=>{s.color=it()})', 'N.forEach(s=>{s.color=p.SPLAT_COLOR||it()})');
+      source = source.replace(
+        'const a=it();a.r*=10,a.g*=10,a.b*=10;',
+        'const a=p.SPLAT_COLOR?{...p.SPLAT_COLOR}:it();if(!p.SPLAT_COLOR){a.r*=10,a.g*=10,a.b*=10;}'
+      );
+
+      window.eval(source);
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadPatchedWebGLFluid();
+
+      const canvas = document.getElementById('fluid-canvas');
+      const logo = document.getElementById('logo');
+
+      WebGLFluid(canvas, {
+        TRIGGER: 'hover',
+        IMMEDIATE: false,
+        AUTO: false,
+        SIM_RESOLUTION: 128,
+        DYE_RESOLUTION: 1024,
+        DENSITY_DISSIPATION: 0.97,
+        VELOCITY_DISSIPATION: 0.96,
+        PRESSURE: 0.8,
+        CURL: 10,
+        SPLAT_RADIUS: 0.04,
+        SPLAT_FORCE: 820,
+        SHADING: true,
+        SPLAT_COLOR: { r: 1.65, g: 0.34, b: 0.03 },
+        COLORFUL: false,
+        TRANSPARENT: true,
+        BLOOM: true,
+        BLOOM_ITERATIONS: 8,
+        BLOOM_RESOLUTION: 256,
+        BLOOM_INTENSITY: 0.18,
+        BLOOM_THRESHOLD: 0.7,
+        SUNRAYS: false,
+      });
+
+      // Hide the initial random effect by fading in the canvas only after it's ready
+      setTimeout(() => {
+        canvas.style.opacity = '1';
+      }, 100);
+
+      let time = 0;
+      let pointerPrimed = false;
+
+      function spawnFire() {
+        if (!logo) return;
+        const rect = logo.getBoundingClientRect();
+
+        if (rect.width === 0) {
+          return;
+        }
+
+        time += 0.13;
+
+        const centerX = rect.left + rect.width / 2;
+        const spread = rect.width * 0.08;
+        const startX = centerX + Math.sin(time) * spread + Math.sin(time * 1.7) * (spread * 0.15);
+        const startY = rect.top + rect.height * 0.8;
+        const endY = startY - 7;
+
+        if (!pointerPrimed) {
+          canvas.dispatchEvent(new MouseEvent('mousedown', {
+            clientX: startX,
+            clientY: startY,
+            bubbles: true
+          }));
+          pointerPrimed = true;
+        }
+
+        canvas.dispatchEvent(new MouseEvent('mousemove', {
+          clientX: startX,
+          clientY: startY,
+          bubbles: true
+        }));
+
+        canvas.dispatchEvent(new MouseEvent('mousemove', {
+          clientX: startX + (Math.random() - 0.5) * 0.6,
+          clientY: endY,
+          bubbles: true
+        }));
+      }
+
+      setInterval(spawnFire, 60);
+    });
+  </script>
+</body>
+</html>

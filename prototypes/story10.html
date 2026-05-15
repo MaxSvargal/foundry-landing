@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundry | Loading</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-dark: #050408;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg-dark);
+      overflow: hidden;
+    }
+
+    #fluid-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      
+      /* 
+         THE "NUCLEAR" COLOR FIX (Guaranteed Red-Orange):
+         1. brightness(0): Turns every color from the library into pure BLACK.
+         2. invert(1): Turns that black into pure WHITE.
+         3. sepia(1): Turns that white into a GOLD/YELLOW base.
+         4. saturate(10000%): Makes it incredibly vibrant.
+         5. hue-rotate(-50deg): Shifts that yellow into a deep, hot RED-ORANGE.
+      */
+      filter: brightness(0) invert(1) sepia(1) saturate(10000%) hue-rotate(-50deg) brightness(1.2);
+    }
+
+    .ui-layer {
+      position: relative;
+      z-index: 10;
+      pointer-events: none; 
+    }
+
+    #logo {
+      /* 100% SOLID LOGO - NO OPACITY EFFECTS */
+      opacity: 1 !important;
+      display: block;
+      filter: drop-shadow(0 0 40px rgba(0, 0, 0, 1));
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fluid-canvas"></canvas>
+
+  <main class="ui-layer w-screen h-screen flex items-center justify-center">
+    <img id="logo" src="http://localhost:3000/foundry-logo.png" alt="Foundry Logo" class="w-auto h-32 md:h-44">
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/webgl-fluid@0.3.0"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const canvas = document.getElementById('fluid-canvas');
+      const logo = document.getElementById('logo');
+
+      WebGLFluid(canvas, {
+        IMMEDIATE: true,             
+        AUTO: false,                 
+        SIM_RESOLUTION: 128,         
+        DYE_RESOLUTION: 512,        
+        DENSITY_DISSIPATION: 0.96,   // LOWER dissipation = More "pollution" (stays on screen longer)
+        VELOCITY_DISSIPATION: 0.98,  
+        PRESSURE: 0.8,               
+        CURL: 30,                    // More turbulence for a bigger feel
+        SPLAT_RADIUS: 0.15,          // BIGGER particles as requested
+        SPLAT_FORCE: 6000,           
+        SHADING: false,              // Disabled shading to keep colors flat and predictable
+        COLORFUL: false,             
+        TRANSPARENT: true,           
+        BLOOM: true,                 
+        BLOOM_ITERATIONS: 8,
+        BLOOM_INTENSITY: 1.5,
+        BLOOM_THRESHOLD: 0.2,
+      });
+
+      let lastTime = 0;
+      
+      function spawnRisingFire(time) {
+        if (!logo) return;
+        const rect = logo.getBoundingClientRect();
+        
+        if (rect.width === 0) {
+          requestAnimationFrame(spawnRisingFire);
+          return;
+        }
+
+        // Frequency: 40ms for a thick, dense effect
+        if (time - lastTime > 40) {
+          lastTime = time;
+
+          // POSITION: Start significantly below the logo
+          const centerX = rect.left + rect.width / 2;
+          const startX = centerX + (Math.random() - 0.5) * (rect.width * 1.2);
+          
+          // 120px below the logo bottom
+          const startY = rect.bottom + 120;
+
+          // TARGET: Rise past the top of the logo
+          const targetY = rect.top - 100; 
+          const targetX = startX + (Math.random() - 0.5) * 100;
+
+          // Upward stroke
+          canvas.dispatchEvent(new MouseEvent('mousedown', { clientX: startX, clientY: startY }));
+          
+          canvas.dispatchEvent(new MouseEvent('mousemove', { 
+            clientX: targetX, 
+            clientY: targetY 
+          }));
+          
+          canvas.dispatchEvent(new MouseEvent('mouseup'));
+        }
+
+        requestAnimationFrame(spawnRisingFire);
+      }
+      
+      requestAnimationFrame(spawnRisingFire);
+    });
+  </script>
+</body>
+</html>
