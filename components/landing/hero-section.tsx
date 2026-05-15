@@ -151,7 +151,7 @@ export function HeroSection() {
           >
             <p
               className={cn(
-                "mb-3 text-2xl font-medium leading-tight lg:text-3xl lg:leading-[1.18]",
+                "mb-3 text-2xl font-medium leading-tight xxl:text-3xl xxl:leading-[1.18]",
                 "text-white/96",
               )}
             >

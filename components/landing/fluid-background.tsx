@@ -71,9 +71,11 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
       if ("isProxy" in event && event.isProxy) return;
       if (mode === "off" || isThrottled || !canvasRef.current) return;
 
-      if (isMuted && event.type === "mousemove") {
+      const shouldThinMouseMoves = mode === "feature" || isMuted;
+
+      if (shouldThinMouseMoves && event.type === "mousemove") {
         moveSkipCounter += 1;
-        if (moveSkipCounter % 4 !== 0) return;
+        if (moveSkipCounter % (mode === "feature" ? 3 : 4) !== 0) return;
       }
 
       isThrottled = true;
@@ -100,26 +102,8 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
 
       proxied.isProxy = true;
       canvasRef.current.dispatchEvent(proxied);
-
-      if (mode === "feature" && (event.type === "mousemove" || event.type === "mousedown")) {
-        canvasRef.current.dispatchEvent(
-          new MouseEvent("mousemove", {
-            clientX: point.clientX,
-            clientY: point.clientY,
-            bubbles: false,
-            cancelable: true,
-            view: window,
-          }),
-        );
-      }
     };
-    const eventTypes: Array<keyof WindowEventMap> = [
-      "mousemove",
-      "mousedown",
-      "mouseup",
-      "touchstart",
-      "touchmove",
-    ];
+    const eventTypes: Array<keyof WindowEventMap> = ["mousemove", "mousedown", "touchstart", "touchmove"];
 
     eventTypes.forEach((type) => {
       window.addEventListener(type, proxyEvent as EventListener, { passive: true });
@@ -129,7 +113,6 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
       eventTypes.forEach((type) => {
         window.removeEventListener(type, proxyEvent as EventListener);
       });
-
     };
   }, [initializeFluid, isMuted, mode]);
 
