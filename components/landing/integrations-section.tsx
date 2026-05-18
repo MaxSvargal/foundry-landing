@@ -2,19 +2,37 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const integrations = [
-  { name: "Business Process Platforms", category: "Domain type" },
-  { name: "Financial Platforms", category: "Domain type" },
-  { name: "Healthcare & Clinical", category: "Domain type" },
-  { name: "Enterprise Internal Tools", category: "Domain type" },
-  { name: "Ash Framework", category: "Core" },
-  { name: "Phoenix LiveView", category: "Core" },
-  { name: "Oban", category: "Core" },
-  { name: "Postgres", category: "Core" },
-  { name: "BEAM / OTP", category: "Runtime" },
-  { name: "Spec-kit Linter", category: "Foundry" },
-  { name: "System Map", category: "Foundry" },
-  { name: "Governed Copilot", category: "Foundry" },
+const personas = [
+  {
+    role: "developer",
+    headline: "Stop reading code to understand systems.",
+    body: "Navigate by meaning, not by filename. Refactor with blast radius shown, not guessed.",
+    artifact: "foundry blast-radius <node>",
+  },
+  {
+    role: "staff engineer",
+    headline: "Architecture decisions that survive contact with the codebase.",
+    body: "Pin ADRs to nodes. Foundry tells you when a decision has been silently violated.",
+    artifact: "foundry decisions --stale",
+  },
+  {
+    role: "engineering manager",
+    headline: "See your system's health the way you see your business metrics.",
+    body: "Bus-factor, drift, fragility — derived from real artifacts, not self-reported sprint data.",
+    artifact: "foundry graph --health",
+  },
+  {
+    role: "product manager",
+    headline: "Finally looking at the same picture as your engineers.",
+    body: "The domain layer, in business language. Click :upgrade_subscription, read what it actually does.",
+    artifact: ":upgrade_subscription → ProrateAndCharge",
+  },
+  {
+    role: "auditor",
+    headline: "Your authorization model is the documentation auditors want.",
+    body: "Export the access matrix for any resource, at any commit, with provenance.",
+    artifact: "foundry audit --resource Ledger.Transfer",
+  },
 ];
 
 export function IntegrationsSection() {
@@ -26,77 +44,59 @@ export function IntegrationsSection() {
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section id="integrations" ref={sectionRef} className="relative py-24 lg:py-32 overflow-hidden">
+    <section
+      id="for-your-team"
+      ref={sectionRef}
+      className="bg-[#F5F1EA] py-24 lg:py-40"
+    >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Header */}
         <div
-          className={`text-center max-w-3xl mx-auto mb-16 lg:mb-24 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          className={`mb-20 lg:mb-28 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
-            <span className="w-8 h-px bg-foreground/30" />
-            What teams build with it
-            <span className="w-8 h-px bg-foreground/30" />
+          <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
+            For your team
           </span>
-          <h2 className="text-4xl lg:text-6xl font-display tracking-tight mb-6">
-            Built for
+          <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight">
+            One system.
             <br />
-            complex domains.
+            <span className="text-[#1B1B19]/35">Every perspective.</span>
           </h2>
-          <p className="text-xl text-muted-foreground">
-            The more regulated and complex your domain, the greater the advantage. 
-            This is where configuration-based tools break down.
-          </p>
         </div>
 
-      </div>
-      
-      {/* Full-width marquees outside container */}
-      <div className="w-full mb-6">
-        <div className="flex gap-6 marquee">
-          {[...Array(2)].map((_, setIndex) => (
-            <div key={setIndex} className="flex gap-6 shrink-0">
-              {integrations.map((integration) => (
-                <div
-                  key={`${integration.name}-${setIndex}`}
-                  className="shrink-0 px-8 py-6 border border-foreground/10 hover:border-foreground/30 hover:bg-foreground/[0.02] transition-all duration-300 group"
-                >
-                  <div className="text-lg font-medium group-hover:translate-x-1 transition-transform">
-                    {integration.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground">{integration.category}</div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Reverse marquee */}
-      <div className="w-full">
-        <div className="flex gap-6 marquee-reverse">
-          {[...Array(2)].map((_, setIndex) => (
-            <div key={setIndex} className="flex gap-6 shrink-0">
-              {[...integrations].reverse().map((integration) => (
-                <div
-                  key={`${integration.name}-reverse-${setIndex}`}
-                  className="shrink-0 px-8 py-6 border border-foreground/10 hover:border-foreground/30 hover:bg-foreground/[0.02] transition-all duration-300 group"
-                >
-                  <div className="text-lg font-medium group-hover:translate-x-1 transition-transform">
-                    {integration.name}
-                  </div>
-                  <div className="text-sm text-muted-foreground">{integration.category}</div>
-                </div>
-              ))}
+        {/* Persona grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-[#D8D2C8]">
+          {personas.map((persona, index) => (
+            <div
+              key={persona.role}
+              className={`bg-[#F5F1EA] p-8 lg:p-10 group transition-all duration-700 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+              } ${index === personas.length - 1 && personas.length % 2 !== 0 ? "md:col-span-2 lg:col-span-1" : ""}`}
+              style={{ transitionDelay: `${index * 80}ms` }}
+            >
+              <p className="font-mono text-xs text-[#A4471C] tracking-widest uppercase mb-5">
+                For the {persona.role}
+              </p>
+              <h3 className="text-lg lg:text-xl font-display font-semibold text-[#1B1B19] leading-snug mb-3">
+                {persona.headline}
+              </h3>
+              <p className="text-sm text-[#6B6860] leading-relaxed mb-6">
+                {persona.body}
+              </p>
+              <div className="border-t border-[#D8D2C8] pt-5">
+                <code className="font-mono text-xs text-[#1B1B19]/60 block">
+                  {persona.artifact}
+                </code>
+              </div>
             </div>
           ))}
         </div>

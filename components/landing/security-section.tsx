@@ -1,32 +1,38 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Shield, Lock, Eye, FileCheck } from "lucide-react";
 
-const securityFeatures = [
-  {
-    icon: Shield,
-    title: "Ash policies, compiler-enforced",
-    description: "Authorization logic is declared in the resource, validated at compile time. No policy can silently vanish.",
-  },
-  {
-    icon: Lock,
-    title: "Sensitivity classification",
-    description: "Resources carry :pii, :financial, and :phi classifications that the linter enforces across every action and relationship.",
-  },
-  {
-    icon: Eye,
-    title: "Compliance links",
-    description: "ADRs reference regulation files. When a rule is violated, the linter fires with the exact ADR that motivated it.",
-  },
-  {
-    icon: FileCheck,
-    title: "Audit-ready by construction",
-    description: "Auditors read the system map. It is a lossless rendering of what is running — generated from the same source the compiler validates.",
-  },
+const cliCommands = [
+  { cmd: "foundry init", desc: "Start from a template or an existing Ash project." },
+  { cmd: "foundry graph", desc: "Render the system map. Open in browser, or pipe to dot." },
+  { cmd: "foundry blast-radius <node>", desc: "What breaks if I change this?" },
+  { cmd: "foundry invariants check", desc: "Run all invariants across the model." },
+  { cmd: "foundry decisions", desc: "List ADRs. Show which are stale." },
+  { cmd: "foundry agent", desc: "Pair-program against the graph, not against text." },
 ];
 
-const certifications = ["Ash Framework", "Phoenix LiveView", "Oban", "BEAM / OTP", "Postgres"];
+const whatTeamsBuild = [
+  {
+    domain: "Business process platforms",
+    description:
+      "Approvals, escalations, parallel branches, exception handling — declared as deterministic workflows, visualizable at every step, evolvable without breaking what runs.",
+  },
+  {
+    domain: "Financial platforms",
+    description:
+      "Ledger integrity, transfer governance, regulatory compliance, audit trails, dual-approval on sensitive changes.",
+  },
+  {
+    domain: "Healthcare and clinical systems",
+    description:
+      "PHI governance, protocol enforcement, human-in-the-loop gates on decisions that cannot be autonomous, audit-ready records.",
+  },
+  {
+    domain: "Enterprise internal platforms",
+    description:
+      "The most underserved category in software. Internal tools built badly, maintained expensively, understood only by whoever first wrote them.",
+  },
+];
 
 export function SecuritySection() {
   const [isVisible, setIsVisible] = useState(false);
@@ -37,77 +43,100 @@ export function SecuritySection() {
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section id="security" ref={sectionRef} className="relative py-24 lg:py-32 bg-foreground/[0.02] overflow-hidden">
+    <section id="security" ref={sectionRef} className="bg-[#1B1B19] py-24 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
-          {/* Left: Content */}
+        {/* Header */}
+        <div
+          className={`mb-20 lg:mb-28 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
+            What you get on day one
+          </span>
+          <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight max-w-3xl">
+            A complete, production-grade platform — built to your domain exactly, owned entirely by you.
+          </h2>
+        </div>
+
+        {/* Two columns: what teams build + CLI */}
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 mb-20 lg:mb-28">
+          {/* Domain types */}
           <div
             className={`transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
-              <span className="w-8 h-px bg-foreground/30" />
-              Governance
-            </span>
-            <h2 className="text-4xl lg:text-6xl font-display tracking-tight mb-8">
-              Governed.
-              <br />
-              By construction.
-            </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-12">
-              Foundry is built for regulated domains — financial platforms, healthcare systems, 
-              enterprise internal tools. Compliance is not a layer you add. It is declared in the domain.
+            <p className="font-mono text-xs text-[#F5F1EA]/30 tracking-widest uppercase mb-8">
+              What teams build with it
             </p>
-
-            {/* Stack */}
-            <div className="flex flex-wrap gap-3">
-              {certifications.map((cert, index) => (
-                <span
-                  key={cert}
-                  className={`px-4 py-2 border border-foreground/10 text-sm font-mono transition-all duration-500 ${
+            <div className="space-y-0">
+              {whatTeamsBuild.map((item, index) => (
+                <div
+                  key={item.domain}
+                  className={`py-6 border-b border-[#F5F1EA]/10 transition-all duration-700 ${
                     isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                   }`}
-                  style={{ transitionDelay: `${index * 50 + 200}ms` }}
+                  style={{ transitionDelay: `${100 + index * 80}ms` }}
                 >
-                  {cert}
-                </span>
+                  <p className="font-mono text-xs text-[#A4471C] mb-2">{item.domain}</p>
+                  <p className="text-sm text-[#F5F1EA]/55 leading-relaxed">{item.description}</p>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* Right: Features */}
-          <div className="grid gap-6">
-            {securityFeatures.map((feature, index) => (
-              <div
-                key={feature.title}
-                className={`p-6 border border-foreground/10 hover:border-foreground/20 transition-all duration-500 group ${
-                  isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
-              >
-                <div className="flex items-start gap-4">
-                  <div className="shrink-0 w-10 h-10 flex items-center justify-center border border-foreground/10 group-hover:bg-foreground group-hover:text-background transition-colors duration-300">
-                    <feature.icon className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-medium mb-1 group-hover:translate-x-1 transition-transform duration-300">
-                      {feature.title}
-                    </h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                  </div>
+          {/* CLI commands */}
+          <div
+            className={`transition-all duration-700 delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            <p className="font-mono text-xs text-[#F5F1EA]/30 tracking-widest uppercase mb-8">
+              The CLI
+            </p>
+            <div className="space-y-0">
+              {cliCommands.map((item, index) => (
+                <div
+                  key={item.cmd}
+                  className={`py-5 border-b border-[#F5F1EA]/10 group transition-all duration-700 ${
+                    isVisible ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ transitionDelay: `${150 + index * 60}ms` }}
+                >
+                  <code className="font-mono text-sm text-[#F5F1EA] block mb-1">
+                    {item.cmd}
+                  </code>
+                  <p className="text-xs text-[#F5F1EA]/40 leading-relaxed">{item.desc}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            <p className="mt-8 text-sm text-[#F5F1EA]/40 leading-relaxed">
+              Open source CLI. The graph stays on your machine. The SaaS tier is opt-in, for teams who want hosted history, multi-user views, and one-click deploys.
+            </p>
           </div>
+        </div>
+
+        {/* Key guarantee */}
+        <div
+          className={`border border-[#F5F1EA]/10 p-8 lg:p-12 transition-all duration-700 delay-200 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <p className="text-lg lg:text-xl text-[#F5F1EA] leading-relaxed font-display font-semibold">
+            Everything Foundry shows you is derived from code you own.{" "}
+            <span className="text-[#F5F1EA]/40">
+              Delete Foundry tomorrow and your app keeps running.
+            </span>
+          </p>
         </div>
       </div>
     </section>

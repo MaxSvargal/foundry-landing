@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { name: "Why Foundry", href: "#features" },
+  { name: "Product", href: "#features" },
   { name: "How it works", href: "#how-it-works" },
-  { name: "The stack", href: "#infrastructure" },
+  { name: "For your team", href: "#for-your-team" },
   { name: "Pricing", href: "#pricing" },
 ];
 

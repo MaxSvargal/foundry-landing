@@ -2,18 +2,42 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const stackLayers = [
-  { name: "Phoenix LiveView", role: "Real-time UI", status: "native" },
-  { name: "Ash Framework", role: "Domain layer", status: "native" },
-  { name: "Oban", role: "Background jobs", status: "native" },
-  { name: "Postgres", role: "Persistence", status: "native" },
-  { name: "BEAM / OTP", role: "Runtime", status: "native" },
-  { name: "Foundry spec-kit", role: "Governed copilot", status: "foundry" },
+const infraFacts = [
+  {
+    company: "Phoenix",
+    stat: "2M WebSocket connections",
+    detail: "one EC2 instance, 2ms latency, ~1KB per connection, no GC pauses",
+  },
+  {
+    company: "Bleacher Report",
+    stat: "150 servers → 5",
+    detail: "equivalent peak traffic after moving to Elixir",
+  },
+  {
+    company: "Pinterest",
+    stat: "200 Python servers → 4 Elixir nodes",
+    detail: "saving over $2M/year",
+  },
+  {
+    company: "One engineering team",
+    stat: "$16,000/mo → $150/mo",
+    detail: "AWS Lambda → 3 Elixir nodes, 12M requests/hour",
+  },
+];
+
+const nativeCapabilities = [
+  "Background jobs",
+  "Pub/sub",
+  "Real-time channels",
+  "Distributed process state",
+  "Clustering",
+  "WebSocket connections",
+  "Fault tolerance",
+  "Hot code reloads",
 ];
 
 export function InfrastructureSection() {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeLocation, setActiveLocation] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -21,111 +45,102 @@ export function InfrastructureSection() {
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.1 }
+      { threshold: 0.05 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveLocation((prev) => (prev + 1) % stackLayers.length);
-    }, 2000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <section ref={sectionRef} className="relative py-24 lg:py-32 overflow-hidden">
+    <section ref={sectionRef} id="infrastructure" className="bg-[#F5F1EA] py-24 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
-          {/* Left: Content */}
+        {/* Header */}
+        <div
+          className={`mb-20 lg:mb-28 transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
+            Why Elixir and Ash
+          </span>
+          <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight max-w-3xl">
+            Foundry isn't a wrapper. It's a layer on top of a stack chosen deliberately.
+          </h2>
+        </div>
+
+        {/* Two-column: rationale + capabilities */}
+        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 mb-20 lg:mb-28">
           <div
             className={`transition-all duration-700 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
-              <span className="w-8 h-px bg-foreground/30" />
-              The stack
-            </span>
-            <h2 className="text-4xl lg:text-6xl font-display tracking-tight mb-8" id="infrastructure">
-              The infrastructure
-              <br />
-              decision you&apos;ll never
-              <br />
-              have to make.
-            </h2>
-            <p className="text-xl text-muted-foreground leading-relaxed mb-12">
-              The BEAM was built by Ericsson for telephone exchanges — systems that 
-              needed to run without failure under millions of concurrent connections. 
-              Foundry gives you this foundation from the first line you write.
-            </p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8">
-              <div>
-                <div className="text-4xl lg:text-5xl font-display mb-2">2M</div>
-                <div className="text-sm text-muted-foreground">WebSockets, one server</div>
-              </div>
-              <div>
-                <div className="text-4xl lg:text-5xl font-display mb-2">~1KB</div>
-                <div className="text-sm text-muted-foreground">Per connection</div>
-              </div>
-              <div>
-                <div className="text-4xl lg:text-5xl font-display mb-2">0</div>
-                <div className="text-sm text-muted-foreground">GC pauses</div>
-              </div>
+            <div className="space-y-6 text-[#6B6860] leading-relaxed">
+              <p>
+                <strong className="text-[#1B1B19] font-semibold">Ash</strong> is already declarative. Resources, actions, policies, and relationships are data, not code-shaped prose. That's why the graph is honest — there's no hidden imperative layer to misrepresent.
+              </p>
+              <p>
+                <strong className="text-[#1B1B19] font-semibold">Elixir on the BEAM</strong> was built by Ericsson for telephone exchanges — systems that needed to run without failure under millions of concurrent connections. That requirement shaped every design decision in the runtime.
+              </p>
+              <p>
+                Traditional stacks reach for external services — Redis for pub/sub, Kafka for message queuing, a separate job processor — because the runtime cannot handle these concerns natively. <strong className="text-[#1B1B19] font-semibold">The BEAM handles all of it inside the same runtime.</strong>
+              </p>
+              <p>
+                You don't need to be an Elixir expert to use Foundry. But the floor is high because the substrate is good.
+              </p>
             </div>
           </div>
 
-          {/* Right: Location list */}
           <div
-            className={`transition-all duration-700 delay-200 ${
-              isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"
+            className={`transition-all duration-700 delay-100 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <div className="border border-foreground/10">
-              {/* Header */}
-              <div className="px-6 py-4 border-b border-foreground/10 flex items-center justify-between">
-                <span className="text-sm font-mono text-muted-foreground">Foundry Stack</span>
-                <span className="flex items-center gap-2 text-xs font-mono text-green-600">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Pre-integrated
+            <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-5">
+              Native — not infrastructure you provision
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {nativeCapabilities.map((cap) => (
+                <span
+                  key={cap}
+                  className="px-3 py-1.5 border border-[#D8D2C8] text-sm text-[#1B1B19] font-mono"
+                >
+                  {cap}
                 </span>
-              </div>
-
-              {/* Stack layers */}
-              <div>
-                {stackLayers.map((layer, index) => (
-                  <div
-                    key={layer.name}
-                    className={`px-6 py-5 border-b border-foreground/5 last:border-b-0 flex items-center justify-between transition-all duration-300 ${
-                      activeLocation === index ? "bg-foreground/[0.02]" : ""
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <span 
-                        className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                          activeLocation === index ? "bg-foreground" : "bg-foreground/20"
-                        }`}
-                      />
-                      <div>
-                        <div className="font-medium">{layer.name}</div>
-                        <div className="text-sm text-muted-foreground">{layer.role}</div>
-                      </div>
-                    </div>
-                    <span className={`font-mono text-xs px-2 py-1 border ${
-                      layer.status === "foundry" 
-                        ? "border-foreground/40 text-foreground" 
-                        : "border-foreground/10 text-muted-foreground"
-                    }`}>
-                      {layer.status === "foundry" ? "foundry" : "native"}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              ))}
             </div>
+          </div>
+        </div>
+
+        {/* Infrastructure bills — not benchmarks */}
+        <div
+          className={`transition-all duration-700 delay-150 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <div className="flex items-center gap-4 mb-10">
+            <span className="font-mono text-xs text-[#6B6860] tracking-widest uppercase">
+              These are not benchmarks. They are infrastructure bills.
+            </span>
+            <div className="flex-1 h-px bg-[#D8D2C8]" />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-px bg-[#D8D2C8]">
+            {infraFacts.map((fact, index) => (
+              <div
+                key={fact.company}
+                className={`bg-[#F5F1EA] p-8 lg:p-10 transition-all duration-700 ${
+                  isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+                }`}
+                style={{ transitionDelay: `${200 + index * 80}ms` }}
+              >
+                <p className="font-mono text-xs text-[#6B6860] mb-3">{fact.company}</p>
+                <p className="text-2xl lg:text-3xl font-display font-semibold text-[#1B1B19] mb-2 leading-tight">
+                  {fact.stat}
+                </p>
+                <p className="text-sm text-[#6B6860]">{fact.detail}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

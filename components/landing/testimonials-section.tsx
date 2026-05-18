@@ -1,167 +1,157 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
-const testimonials = [
+const faqs = [
   {
-    quote: "Six months in, the architect left. Foundry meant the constraints didn't leave with them. A new engineer read the domain map in twenty minutes and made their first PR safely.",
-    author: "Engineering Lead",
-    role: "Fintech Platform",
-    company: "Series B",
-    metric: "Zero post-departure incidents",
+    q: "Is this a low-code tool?",
+    a: "No. The output is plain Ash code in your repo. If Foundry disappears, you still have an Elixir application. Low-code tools own the runtime. We don't.",
   },
   {
-    quote: "We moved from a configuration-based tool we were fighting against. Foundry let us declare our domain exactly as it is. The complexity stopped accumulating.",
-    author: "CTO",
-    role: "Healthcare Platform",
-    company: "Regulated domain",
-    metric: "Full PHI governance by construction",
+    q: "Does it work with my existing Elixir app?",
+    a: "If you're using Ash, yes, immediately. If you're on raw Phoenix/Ecto, Foundry can read the parts that map cleanly, but the graph gets richer as you migrate to Ash. We don't force the migration.",
   },
   {
-    quote: "The copilot reads our ADRs before proposing anything. It cited the exact compliance link when we added the spending limit rule. That has never happened with any other tool.",
-    author: "Domain Architect",
-    role: "Gaming & Compliance",
-    company: "UK-licensed operator",
-    metric: "RG-UK-014 enforced automatically",
+    q: "What about Python / TypeScript services we already have?",
+    a: "They appear in the graph as external resources with typed boundaries (OpenAPI, Protobuf, JSON Schema). Foundry won't pretend to understand their internals, but it will track the contract.",
   },
   {
-    quote: "We went from 150 servers to 5 nodes for equivalent peak traffic. The infrastructure bill is a different conversation now. Foundry gave us that foundation from day one.",
-    author: "VP Infrastructure",
-    role: "Sports Media Platform",
-    company: "High-traffic",
-    metric: "150 → 5 servers",
+    q: "Won't the LLM hallucinate Ash code?",
+    a: "The agent doesn't write raw DSL. It produces a graph diff that Foundry validates against the actual Ash schema. Invalid DSL never reaches your codebase. This is the single biggest reason Foundry exists.",
+  },
+  {
+    q: "How do you handle versioning?",
+    a: "Git. Code is the source of truth, the graph is derived deterministically. Standard PR workflows. Schema-level migration tools (mix ash.codegen, ash_postgres) handle the database side.",
+  },
+  {
+    q: "Can I host this myself?",
+    a: "The CLI and graph are local-first. The SaaS — hosted history, team views, deploy — is opt-in and we publish a self-hosted edition for teams who need it.",
+  },
+  {
+    q: "What's the catch?",
+    a: "You're trusting Ash and the BEAM. Both have been load-bearing in production for over a decade. Neither is going anywhere. That's the bet.",
   },
 ];
 
-export function TestimonialsSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsAnimating(true);
-      setTimeout(() => {
-        setActiveIndex((prev) => (prev + 1) % testimonials.length);
-        setIsAnimating(false);
-      }, 300);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const activeTestimonial = testimonials[activeIndex];
+function FaqItem({
+  faq,
+  index,
+  isVisible,
+}: {
+  faq: (typeof faqs)[0];
+  index: number;
+  isVisible: boolean;
+}) {
+  const [open, setOpen] = useState(false);
 
   return (
-    <section className="relative py-32 lg:py-40 border-t border-foreground/10 lg:pb-14">
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
-        {/* Section Label */}
-        <div className="flex items-center gap-4 mb-16">
-          <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase">
-            From teams using Foundry
-          </span>
-          <div className="flex-1 h-px bg-foreground/10" />
-          <span className="font-mono text-xs text-muted-foreground">
-            {String(activeIndex + 1).padStart(2, "0")} / {String(testimonials.length).padStart(2, "0")}
-          </span>
-        </div>
+    <div
+      className={`border-b border-[#D8D2C8] transition-all duration-700 ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
+      style={{ transitionDelay: `${index * 60}ms` }}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full text-left py-6 flex items-start justify-between gap-6 group"
+      >
+        <span className="text-base lg:text-lg font-display font-semibold text-[#1B1B19] leading-snug group-hover:text-[#A4471C] transition-colors duration-200">
+          {faq.q}
+        </span>
+        <span
+          className={`font-mono text-[#6B6860] text-sm shrink-0 mt-0.5 transition-transform duration-200 ${
+            open ? "rotate-45" : ""
+          }`}
+        >
+          +
+        </span>
+      </button>
+      {open && (
+        <p className="pb-6 text-[#6B6860] leading-relaxed">{faq.a}</p>
+      )}
+    </div>
+  );
+}
 
-        {/* Main Quote */}
-        <div className="grid lg:grid-cols-12 gap-12 lg:gap-20">
-          <div className="lg:col-span-8">
-            <blockquote
-              className={`transition-all duration-300 ${
-                isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-              }`}
-            >
-              <p className="font-display text-4xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tight text-foreground">
-                "{activeTestimonial.quote}"
-              </p>
-            </blockquote>
+export function TestimonialsSection() {
+  const [isVisible, setIsVisible] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
 
-            {/* Author */}
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) setIsVisible(true);
+      },
+      { threshold: 0.05 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      {/* FAQ Section */}
+      <section
+        ref={sectionRef}
+        className="bg-[#F5F1EA] py-24 lg:py-40"
+      >
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
             <div
-              className={`mt-12 flex items-center gap-6 transition-all duration-300 delay-100 ${
-                isAnimating ? "opacity-0" : "opacity-100"
+              className={`transition-all duration-700 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <div className="w-16 h-16 rounded-full bg-foreground/5 border border-foreground/10 flex items-center justify-center">
-                <span className="font-display text-2xl text-foreground">
-                  {activeTestimonial.author.charAt(0)}
-                </span>
-              </div>
-              <div>
-                <p className="text-lg font-medium text-foreground">{activeTestimonial.author}</p>
-                <p className="text-muted-foreground">
-                  {activeTestimonial.role}, {activeTestimonial.company}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Metric Highlight */}
-          <div className="lg:col-span-4 flex flex-col justify-center">
-            <div
-              className={`p-8 border border-foreground/10 transition-all duration-300 ${
-                isAnimating ? "opacity-0 scale-95" : "opacity-100 scale-100"
-              }`}
-            >
-              <span className="font-mono text-xs tracking-widest text-muted-foreground uppercase block mb-4">
-                Key Result
+              <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
+                FAQ
               </span>
-              <p className="font-display text-3xl md:text-4xl text-foreground">
-                {activeTestimonial.metric}
-              </p>
+              <h2 className="text-4xl lg:text-5xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight">
+                Handle the real objections,
+                <br />
+                <span className="text-[#1B1B19]/35">not the marketing ones.</span>
+              </h2>
             </div>
 
-            {/* Navigation Dots */}
-            <div className="flex gap-2 mt-8">
-              {testimonials.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => {
-                    setIsAnimating(true);
-                    setTimeout(() => {
-                      setActiveIndex(idx);
-                      setIsAnimating(false);
-                    }, 300);
-                  }}
-                  className={`h-2 transition-all duration-300 ${
-                    idx === activeIndex
-                      ? "w-8 bg-foreground"
-                      : "w-2 bg-foreground/20 hover:bg-foreground/40"
-                  }`}
+            <div>
+              {faqs.map((faq, index) => (
+                <FaqItem
+                  key={faq.q}
+                  faq={faq}
+                  index={index}
+                  isVisible={isVisible}
                 />
               ))}
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Company Logos Marquee Label */}
-        <div className="mt-24 pt-12 border-t border-foreground/10">
-          <p className="font-mono text-xs tracking-widest text-muted-foreground uppercase mb-8 text-center">
-            Built for regulated, complex, long-lived systems
-          </p>
-        </div>
-      </div>
-      
-      {/* Full-width marquee outside container */}
-      <div className="w-full">
-        <div className="flex gap-16 items-center marquee">
-          {[...Array(2)].map((_, setIdx) => (
-            <div key={setIdx} className="flex gap-16 items-center shrink-0">
-              {["Financial Platforms", "Healthcare Systems", "Business Process", "Enterprise Internal", "Regulated Domains", "Complex Domains", "Long-lived Systems", "Domain-driven"].map(
-                (company) => (
-                  <span
-                    key={`${setIdx}-${company}`}
-                    className="font-display text-xl md:text-2xl text-foreground/30 whitespace-nowrap hover:text-foreground transition-colors duration-300"
-                  >
-                    {company}
-                  </span>
-                )
-              )}
+      {/* A Quiet Moment — off-grid, bordered honesty section */}
+      <section className="bg-[#F5F1EA] pb-24 lg:pb-40">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+          <div className="border border-[#D8D2C8] p-10 lg:p-16 lg:ml-[8.333%] lg:mr-[8.333%]">
+            <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-6">
+              A quiet moment
+            </p>
+            <h3 className="text-2xl lg:text-3xl font-display font-semibold text-[#1B1B19] mb-6">
+              Foundry is not for everything.
+            </h3>
+            <div className="space-y-4 text-[#6B6860] leading-relaxed max-w-2xl">
+              <p>We won't pretend otherwise.</p>
+              <p>
+                It's not for hard-real-time systems. Not for embedded BEAM. Not for CPU-bound workloads that don't cross a NIF boundary. Not for teams who want to ship in Python or Java — that's a different tool.
+              </p>
+              <p>
+                It's also not magic. You still need taste, you still own your data model, and somewhere on your team you still want one person fluent in OTP for the day the 10% hits.
+              </p>
+              <p className="text-[#1B1B19]">
+                Or you can buy that fluency from us. We staff senior BEAM engineers on the support tier. That's part of the product.
+              </p>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

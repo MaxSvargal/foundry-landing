@@ -1,108 +1,87 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
-import { AnimatedWave } from "./animated-wave";
-
 const footerLinks = {
-  Foundry: [
+  Product: [
     { name: "Why Foundry", href: "#features" },
     { name: "How it works", href: "#how-it-works" },
-    { name: "The stack", href: "#infrastructure" },
+    { name: "For your team", href: "#for-your-team" },
     { name: "Pricing", href: "#pricing" },
   ],
   Resources: [
-    { name: "Spec-kit docs", href: "#developers" },
-    { name: "ADR reference", href: "#" },
+    { name: "Docs", href: "#" },
     { name: "GitHub", href: "#" },
     { name: "Changelog", href: "#" },
+    { name: "Security", href: "#" },
   ],
   Company: [
-    { name: "About", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Careers", href: "#", badge: "Hiring" },
+    { name: "Manifesto", href: "#" },
+    { name: "Hiring", href: "#", badge: "Hiring" },
     { name: "Contact", href: "#" },
-  ],
-  Legal: [
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
-    { name: "Governance", href: "#security" },
   ],
 };
 
-const socialLinks = [
-  { name: "Twitter", href: "#" },
-  { name: "GitHub", href: "#" },
-  { name: "LinkedIn", href: "#" },
-];
-
 export function FooterSection() {
   return (
-    <footer className="relative border-t border-foreground/10">
-      {/* Animated wave background */}
-      <div className="absolute inset-0 h-64 opacity-20 pointer-events-none overflow-hidden">
-        <AnimatedWave />
-      </div>
-      
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Main Footer */}
-        <div className="py-16 lg:py-24">
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
-            {/* Brand Column */}
-            <div className="col-span-2">
-              <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display">Foundry</span>
-                <span className="text-xs text-muted-foreground font-mono">beta</span>
+    <footer className="bg-[#F5F1EA] border-t border-[#D8D2C8]">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+        {/* Main footer */}
+        <div className="py-16 lg:py-20 grid grid-cols-2 md:grid-cols-5 gap-12">
+          {/* Brand */}
+          <div className="col-span-2">
+            <a href="#" className="inline-flex items-center gap-2 mb-5">
+              <span className="text-xl font-display font-semibold text-[#1B1B19]">foundry</span>
+              <span className="font-mono text-[10px] text-[#A4471C] tracking-widest uppercase">beta</span>
+            </a>
+            <p className="text-sm text-[#6B6860] leading-relaxed max-w-xs mb-8">
+              Built on Ash, Elixir, and the BEAM. Open source. Made by people who've shipped distributed systems and don't want to do it the hard way again.
+            </p>
+            <div className="flex gap-5">
+              <a href="#" className="text-sm text-[#6B6860] hover:text-[#1B1B19] transition-colors">
+                Twitter
               </a>
-
-              <p className="text-muted-foreground leading-relaxed mb-8 max-w-xs">
-                The governed development environment for complex domain platforms on Elixir and Ash. Your codebase is the spec.
-              </p>
-
-              {/* Social Links */}
-              <div className="flex gap-6">
-                {socialLinks.map((link) => (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 group"
-                  >
-                    {link.name}
-                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                  </a>
-                ))}
-              </div>
+              <a href="#" className="text-sm text-[#6B6860] hover:text-[#1B1B19] transition-colors">
+                GitHub
+              </a>
+              <a href="#" className="text-sm text-[#6B6860] hover:text-[#1B1B19] transition-colors">
+                LinkedIn
+              </a>
             </div>
-
-            {/* Link Columns */}
-            {Object.entries(footerLinks).map(([title, links]) => (
-              <div key={title}>
-                <h3 className="text-sm font-medium mb-6">{title}</h3>
-                <ul className="space-y-4">
-                  {links.map((link) => (
-                    <li key={link.name}>
-                      <a
-                        href={link.href}
-                        className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-2"
-                      >
-                        {link.name}
-                        {"badge" in link && link.badge && (
-                          <span className="text-xs px-2 py-0.5 bg-foreground text-background rounded-full">
-                            {link.badge}
-                          </span>
-                        )}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
           </div>
+
+          {/* Link columns */}
+          {Object.entries(footerLinks).map(([title, links]) => (
+            <div key={title}>
+              <h3 className="text-xs font-mono text-[#6B6860] tracking-widest uppercase mb-5">
+                {title}
+              </h3>
+              <ul className="space-y-3">
+                {links.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      className="text-sm text-[#1B1B19]/70 hover:text-[#1B1B19] transition-colors inline-flex items-center gap-2"
+                    >
+                      {link.name}
+                      {"badge" in link && link.badge && (
+                        <span className="font-mono text-[10px] text-[#A4471C] border border-[#A4471C]/40 px-1.5 py-0.5 tracking-wider">
+                          {link.badge}
+                        </span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        {/* Bottom Bar */}
-        <div className="py-8 border-t border-foreground/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            2026 Foundry. Your codebase is the spec. It never lies.
+        {/* Bottom bar */}
+        <div className="py-6 border-t border-[#D8D2C8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <p className="text-xs text-[#6B6860] font-mono">
+            © 2026 Foundry. Your codebase is the spec. It never lies.
+          </p>
+          <p className="text-xs text-[#6B6860]/60 font-mono">
+            Product · Docs · GitHub · Changelog · Security · Pricing
           </p>
         </div>
       </div>

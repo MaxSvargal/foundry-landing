@@ -1,99 +1,58 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { AnimatedTetrahedron } from "./animated-tetrahedron";
 
 export function CtaSection() {
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.2 }
+      { threshold: 0.15 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setMousePosition({
-      x: ((e.clientX - rect.left) / rect.width) * 100,
-      y: ((e.clientY - rect.top) / rect.height) * 100,
-    });
-  };
-
   return (
-    <section ref={sectionRef} className="relative py-24 lg:py-32 overflow-hidden">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+    <section ref={sectionRef} className="bg-[#F5F1EA] py-24 lg:py-40">
+      {/* Full-width closer — breaks the grid intentionally */}
+      <div className="px-6 lg:px-12">
         <div
-          className={`relative border border-foreground transition-all duration-1000 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          className={`border-t border-b border-[#D8D2C8] py-20 lg:py-32 transition-all duration-1000 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
-          onMouseMove={handleMouseMove}
         >
-          {/* Spotlight effect */}
-          <div 
-            className="absolute inset-0 opacity-10 pointer-events-none transition-opacity duration-300"
-            style={{
-              background: `radial-gradient(600px circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(0,0,0,0.15), transparent 40%)`
-            }}
-          />
-          
-          <div className="relative z-10 px-8 lg:px-16 py-16 lg:py-24">
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
-              {/* Left content */}
-              <div className="flex-1">
-                <h2 className="text-4xl lg:text-7xl font-display tracking-tight mb-8 leading-[0.95]">
-                  If you are building
-                  <br />
-                  something complex.
-                </h2>
-
-                <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-xl">
-                  Domain-heavy, long-lived, and regulated — and you want to build it in a way 
-                  your team, your AI, and your auditors can all understand real system behavior years later.
-                </p>
-
-                <div className="flex flex-col sm:flex-row items-start gap-4">
-                  <Button
-                    size="lg"
-                    className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group"
-                  >
-                    Check demo
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
-                  >
-                    Look on GitHub
-                  </Button>
-                </div>
-
-                <p className="text-sm text-muted-foreground mt-8 font-mono">
-                  Foundry is built with love.
-                </p>
-              </div>
-
-              {/* Right animation */}
-              <div className="hidden lg:flex items-center justify-center w-[500px] h-[500px] -mr-16">
-                <AnimatedTetrahedron />
-              </div>
+          <div className="max-w-[1400px] mx-auto">
+            <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-10">
+              The map is the territory now.
+            </p>
+            <h2 className="text-5xl lg:text-8xl xl:text-9xl font-display font-semibold text-[#1B1B19] leading-[0.95] tracking-tight mb-10 lg:mb-16">
+              Stop maintaining
+              <br />
+              two of them.
+            </h2>
+            <p className="text-lg lg:text-xl text-[#6B6860] leading-relaxed max-w-2xl mb-12 lg:mb-16">
+              If you are building something complex, domain-heavy, and long-lived — and you want to build it in a way your team, your AI, and your auditors can all understand three years from now — foundry is built for you.
+            </p>
+            <div className="flex flex-col sm:flex-row items-start gap-4">
+              <a
+                href="#"
+                className="inline-flex items-center gap-2 bg-[#1B1B19] text-[#F5F1EA] px-8 py-4 text-sm font-medium hover:bg-[#1B1B19]/85 transition-colors duration-200"
+              >
+                Install Foundry →
+              </a>
+              <a
+                href="#"
+                className="inline-flex items-center gap-2 border border-[#D8D2C8] text-[#1B1B19] px-8 py-4 text-sm font-medium hover:border-[#1B1B19]/40 transition-colors duration-200"
+              >
+                Read the technical paper
+              </a>
             </div>
           </div>
-
-          {/* Decorative corner */}
-          <div className="absolute top-0 right-0 w-32 h-32 border-b border-l border-foreground/10" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 border-t border-r border-foreground/10" />
         </div>
       </div>
     </section>
