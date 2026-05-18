@@ -92,13 +92,13 @@ export function HeroSection() {
       onPointerLeave={() => setIsFluidMuted(true)}
     >
       <FluidBackground mode={fluidMode} isMuted={fluidMode === "hero" && isFluidMuted} />
-      <div
+      {/* <div
         aria-hidden="true"
         className={cn(
           "pointer-events-none fixed inset-0 z-[2] bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] bg-[length:8.33%_12.5%] transition-opacity duration-[800ms] ease-out",
           fluidMode === "off" ? "opacity-[0.03]" : fluidMode === "feature" ? "opacity-[0.05]" : "opacity-10",
         )}
-      />
+      /> */}
 
       <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col justify-center px-6 pb-40 pt-32 sm:pt-36 lg:px-20 lg:pb-44 lg:pt-40">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-center">
@@ -156,16 +156,16 @@ export function HeroSection() {
               )}
             >
               Foundry is the governed development environment for complex domain
-              platforms. Turn your code and tests into a living, visualizable
-              spec, eliminating drift and keeping your team in sync.
-            </p>
+              platforms
+              </p>
             <p
               className={cn(
-                "text-xl italic leading-tight lg:text-2xl",
+                "text-xl italic leading-tight lg:text-xl",
                 "text-white/80",
               )}
             >
-              The codebase that never lies.
+              Turn your code and tests into a living visualization and queryable map of itself. Kept honest by invariants instead of folklore.Eliminating drift and keeping your team in sync
+              {/* Your code is the specification. The spec captures the intent. The copilot holds both. Nothing drifts. */}
             </p>
           </div>
 
