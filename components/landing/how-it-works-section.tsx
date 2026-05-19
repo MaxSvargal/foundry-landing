@@ -4,71 +4,76 @@ import { useEffect, useRef, useState } from "react";
 
 const steps = [
   {
-    number: "01",
-    title: "Declare your domain.",
-    description:
-      "Model your system in conversation. No new language to learn — just a clean, domain-focused DSL that's equally readable to humans and optimized for LLM reasoning. Elixir's immutability and pattern matching make every declaration locally verifiable: the LLM can't silently hallucinate a side effect that doesn't exist in the type. Your resource definitions, policies, and invariants become a living specification that the copilot can reason about in context, visualize from multiple angles, and keep in sync across every view.",
-    code: `defmodule Billing.Subscription do
-  use Ash.Resource
+    number: "I",
+    title: "Declare your domain exactly",
+    description: "Model resources, relationships, policies, and state machines in Ash DSL. The compiler enforces them. What the compiler knows cannot drift.",
+    code: `defmodule MyApp.Accounts.User do
+  use Ash.Resource,
+    domain: MyApp.Accounts,
+    data_layer: AshPostgres.DataLayer
 
-  actions do
-    update :upgrade do
-      change Billing.Changes.ProrateAndCharge
-      require_atomic? false
+  # sensitivity: :pii is a compiler-enforced
+  # constraint — not documentation
+  @sensitivity :pii
+
+  attributes do
+    uuid_primary_key :id
+    attribute :email, :ci_string, allow_nil?: false
+    attribute :role, MyApp.Accounts.Role
+  end
+
+  policies do
+    policy action_type(:read) do
+      authorize_if relates_to_actor_via(:self)
     end
   end
-
-  invariants do
-    invariant :balance_non_negative,
-      expr(balance >= 0)
-  end
 end`,
-    filename: "billing/subscription.ex",
   },
   {
-    number: "02",
-    title: "Foundry reflects it.",
-    description:
-      "Derive a live graph from your compiled system — every resource, action, policy, and invariant becomes a traceable node. See test execution step-by-step, with runtime traces that show exactly how your logic flows. Different team members see different layers: architects see blast radius and dependencies, compliance sees policy enforcement, engineers see behavioral traces. One true map, infinite perspectives.",
-    code: `# System map — derived from compiler output
-# Not a diagram. Not documentation.
-# The code, rendered as a graph.
+    number: "II",
+    title: "The spec-kit holds the intent",
+    description: "ADRs, runbooks, and compliance obligations live in structured spec-kit files the linter keeps honest. When a rule is violated, the linter fires with the exact ADR that motivated it.",
+    code: `# spec/adrs/ADR-005.md
+# status: accepted
+# compliance: [RG-UK-014]
+# affects: [WithdrawalReactor]
 
-Billing.Subscription
-  ├── actions
-  │   └── :upgrade → ProrateAndCharge
-  ├── invariants
-  │   └── :balance_non_negative
-  ├── policies
-  │   └── :read → actor_is_owner
-  └── relationships
-      ├── belongs_to :customer
-      └── has_many :invoices`,
-    filename: "foundry graph",
+## Decision
+Daily spending limits are enforced at the
+reactor boundary, not at the API layer.
+
+## Rationale
+Downstream compliance requires server-side
+enforcement that cannot be bypassed by
+client manipulation.
+
+## Constraints
+- UK players: £500 daily hard limit
+- Change classification: :behavioral
+- Requires domain lead approval`,
   },
   {
-    number: "03",
-    title: "Edit through the graph or code.",
-    description:
-      "The copilot holds your entire system map in context — compressed, explicit, and LLM-native. It sees the blast radius before you do, avoids reinventing logic by understanding what already exists, and operates on the graph abstraction rather than raw imperative code. Elixir's ExUnit tests pass on first try because pure functions have no mocks to hallucinate, and pattern matching makes assertions self-evident — AutoCodeBench measured 80.3% Pass@1 on Claude Opus 4, highest of any language tested. Changes are instructions the code transformation pipeline (Igniter + Sourceror) translates into precise AST modifications. Edit visually, edit semantically, or write code — the graph ensures consistency either way.",
+    number: "III",
+    title: "The copilot proposes, you review",
+    description: "The copilot reads live compiler output, your ADRs, and your compliance links. It proposes on a branch, classifies the change, and routes it to the right approver. It never touches your working tree.",
     code: `you: Add a spending limit rule to the
-     withdrawal reactor. UK players,
-     £500 daily.
+     withdrawal reactor. UK players, £500 daily.
 
 copilot: Checking spec-kit for
-         WithdrawalReactor…
-         found RG-UK-014 and ADR-005.
+         WithdrawalReactor… found RG-UK-014
+         and ADR-005.
 
-         :behavioral change —
+         This is a :behavioral change —
          domain lead approval required.
 
-         Plan: draft ADR → generate 3
-         BDD scenarios → add
-         SpendingLimitRule → open
-         review panel.
+         Plan:
+           draft ADR
+           → generate 3 BDD scenarios
+           → add SpendingLimitRule
+           → run mix ash.codegen
+           → open review panel
 
          Confirm?`,
-    filename: "copilot.log",
   },
 ];
 
@@ -82,8 +87,9 @@ export function HowItWorksSection() {
       ([entry]) => {
         if (entry.isIntersecting) setIsVisible(true);
       },
-      { threshold: 0.05 }
+      { threshold: 0.1 }
     );
+
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
@@ -91,7 +97,7 @@ export function HowItWorksSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 6000);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -99,57 +105,70 @@ export function HowItWorksSection() {
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="bg-[#1B1B19] py-24 lg:py-40"
+      className="relative py-24 lg:py-32 bg-foreground text-background overflow-hidden"
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
+      {/* Diagonal lines pattern */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 40px,
+            currentColor 40px,
+            currentColor 41px
+          )`
+        }} />
+      </div>
+
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Header */}
-        <div
-          className={`mb-20 lg:mb-28 transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <span className="font-mono text-lg text-[#A4471C] tracking-widest uppercase block mb-6">
-            How it works — three steps, no more
+        <div className="mb-16 lg:mb-24">
+          <span className="inline-flex items-center gap-3 text-sm font-mono text-background/50 mb-6">
+            <span className="w-8 h-px bg-background/30" />
+            How Foundry works
           </span>
-          <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight">
+          <h2
+            className={`text-4xl lg:text-6xl font-display tracking-tight transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             One source of truth.
             <br />
-            <span className="text-[#F5F1EA]/40">Everything derives from it.</span>
+            <span className="text-background/50">Everything derives from it.</span>
           </h2>
         </div>
 
-        {/* Content */}
+        {/* Main content */}
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
           {/* Steps */}
-          <div>
+          <div className="space-y-0">
             {steps.map((step, index) => (
               <button
                 key={step.number}
                 type="button"
                 onClick={() => setActiveStep(index)}
-                className={`w-full text-left py-8 border-b border-[#F5F1EA]/10 transition-all duration-400 group ${
-                  activeStep === index
-                    ? "opacity-100"
-                    : "opacity-35 hover:opacity-60"
+                className={`w-full text-left py-8 border-b border-background/10 transition-all duration-500 group ${
+                  activeStep === index ? "opacity-100" : "opacity-40 hover:opacity-70"
                 }`}
               >
                 <div className="flex items-start gap-6">
-                  <span className="font-mono text-xs text-[#A4471C] tracking-wider pt-1.5">
-                    {step.number}
-                  </span>
+                  <span className="font-display text-3xl text-background/30">{step.number}</span>
                   <div className="flex-1">
-                    <h3 className="text-xl lg:text-2xl font-display font-semibold text-[#F5F1EA] mb-3 leading-snug">
+                    <h3 className="text-2xl lg:text-3xl font-display mb-3 group-hover:translate-x-2 transition-transform duration-300">
                       {step.title}
                     </h3>
-                    <p className="text-[#F5F1EA]/55 leading-relaxed text-sm lg:text-base">
+                    <p className="text-background/60 leading-relaxed">
                       {step.description}
                     </p>
-
+                    
+                    {/* Progress indicator */}
                     {activeStep === index && (
-                      <div className="mt-5 h-px bg-[#F5F1EA]/10 overflow-hidden">
-                        <div
-                          className="h-full bg-[#A4471C]"
-                          style={{ animation: "howItWorksProgress 6s linear forwards" }}
+                      <div className="mt-4 h-px bg-background/20 overflow-hidden">
+                        <div 
+                          className="h-full bg-background w-0"
+                          style={{
+                            animation: 'progress 5s linear forwards'
+                          }}
                         />
                       </div>
                     )}
@@ -159,38 +178,49 @@ export function HowItWorksSection() {
             ))}
           </div>
 
-          {/* Code panel */}
+          {/* Code display */}
           <div className="lg:sticky lg:top-32 self-start">
-            <div className="border border-[#F5F1EA]/10">
-              {/* Window bar */}
-              <div className="px-5 py-3 border-b border-[#F5F1EA]/10 flex items-center justify-between">
-                <div className="flex gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#F5F1EA]/15" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#F5F1EA]/15" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#F5F1EA]/15" />
+            <div className="border border-background/10 overflow-hidden">
+              {/* Window header */}
+              <div className="px-6 py-4 border-b border-background/10 flex items-center justify-between">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-background/20" />
+                  <div className="w-3 h-3 rounded-full bg-background/20" />
+                  <div className="w-3 h-3 rounded-full bg-background/20" />
                 </div>
-                <span className="font-mono text-[11px] text-[#F5F1EA]/30">
-                  {steps[activeStep].filename}
+                <span className="text-xs font-mono text-background/40">
+                  {steps[activeStep].number === "I" ? "user.ex" : steps[activeStep].number === "II" ? "ADR-005.md" : "copilot.log"}
                 </span>
               </div>
 
-              {/* Code */}
-              <div className="p-6 lg:p-8 min-h-[280px] overflow-x-auto">
-                <pre className="font-mono text-xs lg:text-sm leading-relaxed text-[#F5F1EA]/65 whitespace-pre">
-                  {steps[activeStep].code}
+              {/* Code content */}
+              <div className="p-8 font-mono text-sm min-h-[280px]">
+                <pre className="text-background/70">
+                  {steps[activeStep].code.split('\n').map((line, lineIndex) => (
+                    <div 
+                      key={`${activeStep}-${lineIndex}`} 
+                      className="leading-loose code-line-reveal"
+                      style={{ 
+                        animationDelay: `${lineIndex * 80}ms`,
+                      }}
+                    >
+                      <span className="text-background/20 select-none w-8 inline-block">{lineIndex + 1}</span>
+                      <span className="inline-flex">
+                        {line.split('').map((char, charIndex) => (
+                          <span
+                            key={`${activeStep}-${lineIndex}-${charIndex}`}
+                            className="code-char-reveal"
+                            style={{
+                              animationDelay: `${lineIndex * 80 + charIndex * 15}ms`,
+                            }}
+                          >
+                            {char === ' ' ? '\u00A0' : char}
+                          </span>
+                        ))}
+                      </span>
+                    </div>
+                  ))}
                 </pre>
-              </div>
-
-              {/* Status bar */}
-              <div className="px-5 py-3 border-t border-[#F5F1EA]/10 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                <span className="font-mono text-[11px] text-[#F5F1EA]/30">
-                  {steps[activeStep].number === "01"
-                    ? "mix compile — 0 errors"
-                    : steps[activeStep].number === "02"
-                    ? "foundry graph — live"
-                    : "awaiting confirmation"}
-                </span>
               </div>
             </div>
           </div>
@@ -198,9 +228,35 @@ export function HowItWorksSection() {
       </div>
 
       <style jsx>{`
-        @keyframes howItWorksProgress {
+        @keyframes progress {
           from { width: 0%; }
           to { width: 100%; }
+        }
+        
+        .code-line-reveal {
+          opacity: 0;
+          transform: translateX(-8px);
+          animation: lineReveal 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        
+        @keyframes lineReveal {
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        .code-char-reveal {
+          opacity: 0;
+          filter: blur(8px);
+          animation: charReveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        
+        @keyframes charReveal {
+          to {
+            opacity: 1;
+            filter: blur(0);
+          }
         }
       `}</style>
     </section>

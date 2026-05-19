@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-type FluidMode = "hero" | "feature" | "off";
+type FluidMode = "hero" | "feature" | "how-it-works" | "off";
 
 interface FluidBackgroundProps {
   mode: FluidMode;
@@ -68,10 +68,10 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
     let moveSkipCounter = 0;
 
     const proxyEvent = (event: MouseEvent | TouchEvent) => {
-      if ("isProxy" in event && event.isProxy) return;
-      if (mode === "off" || isThrottled || !canvasRef.current) return;
+      if ("isProxy" in event && (event as Record<string, unknown>).isProxy) return;
+      if (isThrottled || !canvasRef.current) return;
 
-      const shouldThinMouseMoves = mode === "feature" || isMuted;
+      const shouldThinMouseMoves = mode === "feature" || mode === "how-it-works" || isMuted;
 
       if (shouldThinMouseMoves && event.type === "mousemove") {
         moveSkipCounter += 1;
@@ -83,18 +83,24 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
         isThrottled = false;
       });
 
-      const point =
-        "touches" in event && event.touches.length > 0
-          ? event.touches[0]
-          : "changedTouches" in event && event.changedTouches.length > 0
-            ? event.changedTouches[0]
-            : event;
+      let clientX: number;
+      let clientY: number;
 
-      if (point.clientX === undefined || point.clientY === undefined) return;
+      if ("touches" in event && event.touches.length > 0) {
+        clientX = event.touches[0].clientX;
+        clientY = event.touches[0].clientY;
+      } else if ("changedTouches" in event && event.changedTouches.length > 0) {
+        clientX = event.changedTouches[0].clientX;
+        clientY = event.changedTouches[0].clientY;
+      } else {
+        const mouseEvent = event as MouseEvent;
+        clientX = mouseEvent.clientX;
+        clientY = mouseEvent.clientY;
+      }
 
       const proxied = new MouseEvent(event.type, {
-        clientX: point.clientX,
-        clientY: point.clientY,
+        clientX,
+        clientY,
         bubbles: false,
         cancelable: true,
         view: window,
@@ -132,7 +138,9 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
             ? "opacity-0 [filter:blur(0px)]"
             : mode === "feature"
               ? "opacity-100 [filter:invert(0)_hue-rotate(-10deg)_contrast(1.08)_saturate(1.05)_blur(0px)]"
-              : "opacity-100 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]",
+              : mode === "how-it-works"
+                ? "opacity-80 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(0.8)_blur(0px)]"
+                : "opacity-100 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]",
         )}
       />
     </>

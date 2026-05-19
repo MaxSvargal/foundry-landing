@@ -14,13 +14,11 @@
 
 ## HERO
 
-#### The system of record for how your software actually works.
+#### Build, run, and understand complex platforms — without the complexity.
 
-Foundry is the governed development environment for complex domain platforms. Your code is the specification and the domain model. The spec captures the intent. The copilot holds both. Nothing drifts.
+A full-stack Elixir/Ash environment with a live system graph that knows your domain. Your AI copilot works from code, tests, traces, and decisions — not from guesses. Everything your team needs from day one. Eject any layer, any time.
 
-Foundry turns your codebase into a living, queryable map of itself — built on Elixir and Ash, navigated as a graph, kept honest by invariants instead of folklore.
-
-`[ Check Demo → ]` `[ See it on GitHub → ]`
+`[ Take a Tour → ]` `[ Source Code → ]`
 
 > _Visual:_ large monospace block showing a small graph of resources (3 nodes, 4 edges), animated to reveal in stages on load. Each node labelled with a domain term — `Subscription`, `Invoice`, `Customer`. No screenshots of UI chrome. The graph _is_ the hero image.
 
@@ -42,17 +40,17 @@ Google's 2025 DORA report put numbers to what every senior engineer already know
 
 **This happens because:**
 
-**01 — Constraints live in heads, not code.**
-The reason a resource is sensitive exists in one person's memory and nowhere else. When that person leaves, the constraint vanishes.
+**01 — Constraints become code.**
+Right now the reason a resource is sensitive exists in one person's memory and nowhere else. When that person leaves, the constraint vanishes. Foundry makes constraints executable — they live in code as specs, and the linter fires when they're violated.
 
-**02 — Documentation drifts from reality.**
-The diagram drawn in week one describes a system that no longer exists. Nobody notices until the new engineer makes the wrong assumption.
+**02 — The map is the code.**
+The diagram drawn in week one describes a system that no longer exists. In Foundry, the system map is not inferred from code — it _is_ the code. A lossless rendering generated from the same source the compiler validates. It cannot drift.
 
-**03 — AI tools generate from training, not your domain.**
-The copilot doesn't know your invariants. It knows what Elixir looked like in its training data. It guesses the rest — and its guesses degrade as the system grows.
+**03 — Your copilot reads your domain, not its training data.**
+The copilot doesn't know your invariants. It knows what Elixir looked like in its training data. Foundry's copilot reads your domain model live from the compiler, your ADRs, your compliance links, and your sensitivity classifications before proposing anything.
 
-**04 — Change is invisible until production.**
-Nobody knew that modifying this action would break three downstream compliance obligations. There was no way to know.
+**04 — Blast radius before merge, not after.**
+Nobody knew that modifying this action would break three downstream compliance obligations. Foundry proposes on a branch, classifies the change as `:structural`, `:behavioral`, or `:compliance`, and routes it to the right approver before anything merges.
 
 This is not a tooling problem. It is a structural one. Imperative code accumulates opacity. The larger it gets, the harder it becomes for any person — or any agent — to hold the entire system in mind.
 
@@ -66,7 +64,7 @@ Foundry collapses it to one.
 
 ### 01 — Declare your domain.
 
-Write resources and actions in Ash. `Subscription`, `Order`, `Invoice` — the things, and what can be done to them. No controllers, no schemas, no glue. What code cannot express — decisions, rationale, compliance obligations — lives in a structured spec-kit that the linter keeps honest. Not documentation. Executable constraints.
+Write resources and actions in Ash. `Subscription`, `Order`, `Invoice` — the things, and what can be done to them. What code cannot express — decisions, rationale, compliance obligations — lives in a structured spec-kit that the linter keeps honest. Not documentation. Executable constraints.
 
 ```elixir
 defmodule Billing.Subscription do
@@ -87,17 +85,30 @@ end
 
 ### 02 — Foundry reflects it.
 
-Every action, policy, relationship, and external boundary becomes a node. Every call, dependency, and data flow becomes an edge. Hover any node — see code, tests, traces, and the decision record that put it there. The map is not a diagram someone drew once. It is a live, interactive graph that tells the truth about what is running in production — always.
+Every action, policy, and relationship becomes a node. Hover any node — see code, tests, traces, and the decision that put it there. The map isn't drawn once. It's derived from the compiler, always.
 
-Because Ash DSL is declarative, the system map is not inferred from the code — it _is_ the code. Wrong connections are visible. Missing connections are lint errors. When a rule is violated, the linter fires with the exact ADR that motivated it.
+```
+# System map — derived from compiler output
+# Not a diagram. Not documentation.
+# The code, rendered as a graph.
+
+Billing.Subscription
+  ├── actions
+  │   └── :upgrade → ProrateAndCharge
+  ├── invariants
+  │   └── :balance_non_negative
+  ├── policies
+  │   └── :read → actor_is_owner
+  └── relationships
+      ├── belongs_to :customer
+      └── has_many :invoices
+```
 
 > _Visual:_ split panel. Left: code from step 01. Right: the same thing rendered as a graph. They animate in sync when you scroll.
 
 ### 03 — Edit through the graph or through code. Both round-trip.
 
-Ask the copilot for a change in plain language. It reads your domain model live from the compiler — every resource, every action, every relationship, every policy — plus your ADRs, compliance links, and invariants. It finds what already exists before proposing anything new.
-
-Then it proposes on a branch. It never touches your working tree. The diff goes to the review panel. The affected resources are highlighted on the system map. The change is classified — `:structural`, `:behavioral`, `:compliance` — and routed to the right approver.
+The copilot reads your live domain model before proposing anything. It finds what already exists. Proposes on a branch. Classifies the change. Routes it to the right approver. You confirm.
 
 ```
 you: Add a spending limit rule to the withdrawal reactor. UK players, £500 daily.
@@ -121,9 +132,26 @@ The generated code is the same Ash you'd have written. No runtime layer. No lock
 | Stays current           | only what you read | never                | yes, but you can't leave | yes, and you can leave |
 | Runs in production      | n/a                | n/a                  | their runtime            | plain BEAM             |
 | Understands your domain | no                 | sort of              | yes                      | yes                    |
+| AI first-try rate       | ~50%               | n/a                  | proprietary              | 80.3%                  |
 | You can grep it         | yes                | no                   | no                       | yes                    |
 
-The line that matters: **everything Foundry shows you is derived from code you own. Delete Foundry tomorrow and your app keeps running.**
+**Everything Foundry shows you is derived from code you own. Delete Foundry tomorrow and your app keeps running.**
+
+---
+
+## THE NUMBERS
+
+AI adoption is rising. So are bug rates. Elixir is the exception.
+
+| Metric | Value | Source |
+|---|---|---|
+| Increase in AI tool adoption | 90% | Google DORA 2025 |
+| Rise in bug rates correlated with that adoption | +9% | Google DORA 2025 |
+| Increase in code review time alongside AI adoption | +91% | Google DORA 2025 |
+| AI-assisted code churn | 2× | GitClear research |
+| LLM Pass@1 on Elixir — highest of any language | 80.3% | AutoCodeBench / Claude Opus 4 |
+
+> _Note:_ The first four numbers are the problem. The last one is why Foundry is built on Elixir.
 
 ---
 
@@ -133,18 +161,18 @@ Foundry isn't a wrapper. It's a layer on top of a stack chosen deliberately.
 
 **Ash** is already declarative. Resources, actions, policies, and relationships are data, not code-shaped prose. That's why the graph is honest — there's no hidden imperative layer to misrepresent.
 
-**Elixir on the BEAM** was built by Ericsson for telephone exchanges — systems that needed to run without failure under millions of concurrent connections. That requirement shaped every design decision in the runtime. The results in production are concrete:
+**Elixir on the BEAM** was built by Ericsson for telephone exchanges — systems that needed to run without failure under millions of concurrent connections. That requirement shaped every design decision in the runtime.
+
+Traditional stacks reach for external services — Redis for pub/sub, Kafka for message queuing, a separate job processor — because the runtime cannot handle these concerns natively. **The BEAM handles all of it inside the same runtime.** Background jobs, pub/sub, real-time channels, distributed process state, clustering — native. Not infrastructure you provision and manage. The default.
+
+These are not benchmarks. They are infrastructure bills.
 
 - Phoenix: **2 million WebSocket connections on a single server** — one EC2 instance, 2ms latency, no GC pauses, ~1KB per connection
 - Bleacher Report: **150 servers → 5** for equivalent peak traffic after moving to Elixir
 - Pinterest: **200 Python servers → 4 Elixir nodes**, saving over $2M/year
 - One engineering team: **$16,000/month AWS Lambda → $150/month on 3 Elixir nodes**, 12 million requests/hour
 
-These are not benchmarks. They are infrastructure bills.
-
-Traditional stacks reach for external services — Redis for pub/sub, Kafka for message queuing, a separate job processor — because the runtime cannot handle these concerns natively. **The BEAM handles all of it inside the same runtime.** Background jobs, pub/sub, real-time channels, distributed process state, clustering — native. Not infrastructure you provision and manage. The default.
-
-**The OTP discipline** means failure is a first-class concept, not a runtime surprise.
+The BEAM removes the infrastructure layer. Ash removes the boilerplate layer. Foundry removes the knowledge layer — compile-time domain constraints, context-complete AI generation, and accumulated domain rules that fire at the moment a violation is about to be introduced.
 
 You don't need to be an Elixir expert to use Foundry. But the floor is high because the substrate is good.
 

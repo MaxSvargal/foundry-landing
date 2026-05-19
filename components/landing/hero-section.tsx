@@ -26,7 +26,7 @@ const stats = [
 export function HeroSection() {
   const [isVisible, setIsVisible] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
-  const [fluidMode, setFluidMode] = useState<"hero" | "feature" | "off">("hero");
+  const [fluidMode, setFluidMode] = useState<"hero" | "feature" | "how-it-works" | "off">("hero");
   const [isFluidMuted, setIsFluidMuted] = useState(true);
 
   useEffect(() => {
@@ -43,20 +43,23 @@ export function HeroSection() {
 
   useEffect(() => {
     const featuresSection = document.getElementById("features");
-    const cutoffSection = document.getElementById("how-it-works");
+    const howItWorksSection = document.getElementById("how-it-works");
 
-    if (!featuresSection || !cutoffSection) return;
+    if (!featuresSection || !howItWorksSection) return;
 
     let ticking = false;
 
     const updateFluidMode = () => {
       const featuresTop = featuresSection.getBoundingClientRect().top;
-      const cutoffTop = cutoffSection.getBoundingClientRect().top;
+      const howItWorksTop = howItWorksSection.getBoundingClientRect().top;
       const featureThreshold = window.innerHeight * 0.82;
-      const cutoffThreshold = window.innerHeight * -0.12;
+      const howItWorksThreshold = window.innerHeight * 0.5;
+      const endThreshold = window.innerHeight * -0.5;
 
-      if (cutoffTop <= cutoffThreshold) {
+      if (howItWorksTop <= howItWorksThreshold) {
         setFluidMode("off");
+      } else if (howItWorksTop <= endThreshold) {
+        setFluidMode("how-it-works");
       } else if (featuresTop <= featureThreshold) {
         setFluidMode("feature");
       } else {
@@ -93,7 +96,7 @@ export function HeroSection() {
       }}
       onPointerLeave={() => setIsFluidMuted(true)}
     >
-      <FluidBackground mode={fluidMode} isMuted={fluidMode === "hero" && isFluidMuted} />
+      <FluidBackground mode={fluidMode} isMuted={(fluidMode === "hero" || fluidMode === "how-it-works") && isFluidMuted} />
       {/* <div
         aria-hidden="true"
         className={cn(
@@ -147,27 +150,34 @@ export function HeroSection() {
         <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-12">
           <div
             className={cn(
-              "max-w-xl transition-all duration-700 delay-200 [text-shadow:1px_0_2px_rgba(0,0,0,0.22)]",
+              "max-w-2xl transition-all duration-700 delay-200 [text-shadow:1px_0_2px_rgba(0,0,0,0.22)]",
               isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
             )}
           >
             <p
               className={cn(
-                "mb-3 text-2xl font-medium leading-tight xxl:text-3xl xxl:leading-[1.18]",
+                "mb-8 text-3xl font-medium leading-tight xxl:text-44xl xxl:leading-[1.18]",
                 "text-white/96",
               )}
             >
-              Foundry is the governed development environment for complex domain
-              platforms.
+              Build, run, and understand complex platforms — without the complexity.
+              
+              </p>
+                          <p
+              className={cn(
+                "mb-3 text-xl font-medium leading-6 xxl:text-2xl xxl:leading-8",
+                "text-[#f5f1ea]",
+              )}
+            >
+              A full-stack development environment with a live system graph that knows your domain. Your AI copilot works from code, tests, traces, and decisions — not from guesses. Everything your team needs from day one. 
               </p>
             <p
               className={cn(
-                "text-xl italic leading-tight lg:text-xl",
+                "mt-8 text-md italic leading-tight",
                 "text-white/80",
               )}
             >
-              Turn your code and tests into a living visualization and queryable map of itself. Eliminating drift and keeping your team in sync.
-              {/* Your code is the specification. The spec captures the intent. The copilot holds both. Nothing drifts. */}
+              Foundry built on Elixir/Ash ecosystem and Open Source. <br/>Eject code any time.
             </p>
           </div>
 
@@ -180,7 +190,7 @@ export function HeroSection() {
             <Button
               asChild
               size="lg"
-              className="h-auto rounded-full border border-white bg-white px-8 py-4 text-base font-bold text-black shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-white/92 hover:text-black sm:px-10 sm:py-5 sm:text-lg"
+              className="h-auto rounded-full border border-white bg-white px-8 py-4 text-base font-bold text-black shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[##f5f1ea] hover:text-black sm:px-10 sm:py-5 sm:text-lg"
             >
               <Link href="#">
                 Take a Tour

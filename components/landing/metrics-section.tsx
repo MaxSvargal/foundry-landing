@@ -118,16 +118,8 @@ export function MetricsSection() {
             <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight">
               AI adoption is rising.
               <br />
-              <span className="text-[#F5F1EA]/40">So are bug rates. The language explains why.</span>
+              <span className="text-[#F5F1EA]/40">So are bug rates. Elixir is the exception.</span>
             </h2>
-          </div>
-          <div>
-            <p className="text-[#F5F1EA]/55 leading-relaxed lg:text-lg">
-              Google's 2025 DORA report put numbers to what every senior engineer already knows. AI-assisted code churn doubled — not because the tools are careless, but because they write into a system they have never seen whole. AutoCodeBench found the other side of this equation: Elixir scores 80.3% Pass@1 on Claude Opus 4, versus roughly 50–53% for Python, Java, and C++. Immutability, pattern matching, and zero shared state give the model a surface it can reason about correctly.
-            </p>
-            <p className="mt-4 font-mono text-xs text-[#F5F1EA]/30 tracking-widest uppercase">
-              Source: Google DORA 2025, GitClear &amp; AutoCodeBench
-            </p>
           </div>
         </div>
 
