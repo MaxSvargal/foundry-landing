@@ -7,7 +7,7 @@ const problems = [
     number: "01",
     title: "Constraints live in heads, not code.",
     description:
-      "The reason a resource is sensitive exists in one person's memory and nowhere else. When that person leaves, the constraint vanishes. Foundry makes constraints executable — they live in the spec-kit and the linter fires when they're violated.",
+      "The reason a resource is sensitive exists in one person's memory and nowhere else. When that person leaves, the constraint vanishes. Foundry makes constraints executable — they live in code as specs and the linter fires when they're violated.",
   },
   {
     number: "02",
@@ -19,7 +19,7 @@ const problems = [
     number: "03",
     title: "AI tools generate from training, not your domain.",
     description:
-      "The copilot doesn't know your invariants. Foundry's copilot is different — it reads your domain model live from the compiler, your ADRs, your compliance links, and your sensitivity classifications before proposing anything.",
+      "The copilot doesn't know your invariants — and it doesn't know your system. Foundry's copilot reads your domain model live from the compiler, your ADRs, your compliance links, and your sensitivity classifications before proposing anything.",
   },
   {
     number: "04",
@@ -92,19 +92,19 @@ export function FeaturesSection() {
     <section
       id="features"
       ref={sectionRef}
-      className="bg-[#F5F1EA] py-24 lg:py-40"
+      className="bg-[#F5F1EA] py-24"
     >
       <div className="mx-auto max-w-[1400px] px-6 lg:px-12">
         {/* Bridging paragraph */}
         <div
-          className={`max-w-2xl mb-20 lg:mb-28 transition-all duration-700 ${
+          className={`max-w-3xl mb-20 lg:mb-28 transition-all duration-700 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <p className="text-xl lg:text-xl leading-relaxed text-[#6B6860] border-l-2 border-[#A4471C] pl-6">
+          <p className="text-xl lg:text-2xl leading-relaxed text-[#6B6860] border-l-2 border-[#A4471C] pl-6">
             Starting is no longer the hard part. An AI tool scaffolds a working application in an afternoon. The first demo runs. The database schema looks reasonable. Everyone is optimistic.
             <br /><br />
-            Then the system grows.
+            Then the system grows. The AI keeps writing — into a system it has never seen whole. Researches measured what happens next: +9% bug rate, +91% review time, code churn doubled.
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export function FeaturesSection() {
             isVisible ? "opacity-100" : "opacity-0"
           }`}
         >
-          <span className="font-mono text-xs text-[#6B6860] tracking-widest uppercase">
+          <span className="font-mono text-xlg text-[#6B6860] tracking-widest uppercase">
             This happens because
           </span>
           <div className="flex-1 h-px bg-[#D8D2C8]" />

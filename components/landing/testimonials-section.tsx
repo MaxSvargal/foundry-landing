@@ -17,7 +17,7 @@ const faqs = [
   },
   {
     q: "Won't the LLM hallucinate Ash code?",
-    a: "The agent doesn't write raw DSL. It produces a graph diff that Foundry validates against the actual Ash schema. Invalid DSL never reaches your codebase. This is the single biggest reason Foundry exists.",
+    a: "Less than you'd expect — and structurally less than with TypeScript or Go. Elixir's pattern matching rejects hallucinated data shapes at compile time, not at runtime. Immutability means there's no shared state for the model to incorrectly assume. AutoCodeBench found Elixir scores 80.3% Pass@1 on Claude Opus 4 — roughly 30 percentage points above Python and Java. The benchmark authors note that low-resource languages may receive slightly easier test cases — read the 80.3% directionally rather than as an absolute ceiling. The structural reasons hold regardless. Beyond that: the agent doesn't write raw DSL. It produces a graph diff that Foundry validates against the actual Ash schema before anything reaches your codebase.",
   },
   {
     q: "How do you handle versioning?",
@@ -128,7 +128,7 @@ export function TestimonialsSection() {
       </section>
 
       {/* A Quiet Moment — off-grid, bordered honesty section */}
-      <section className="bg-[#F5F1EA] pb-24 lg:pb-40">
+      {/* <section className="bg-[#F5F1EA] pb-24 lg:pb-40">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           <div className="border border-[#D8D2C8] p-10 lg:p-16 lg:ml-[8.333%] lg:mr-[8.333%]">
             <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-6">
@@ -151,7 +151,7 @@ export function TestimonialsSection() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </>
   );
 }

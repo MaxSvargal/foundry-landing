@@ -7,7 +7,7 @@ const steps = [
     number: "01",
     title: "Declare your domain.",
     description:
-      "Write resources and actions in Ash. Subscription, Order, Invoice — the things, and what can be done to them. What code cannot express — decisions, rationale, compliance obligations — lives in a structured spec-kit that the linter keeps honest.",
+      "Model your system in conversation. No new language to learn — just a clean, domain-focused DSL that's equally readable to humans and optimized for LLM reasoning. Elixir's immutability and pattern matching make every declaration locally verifiable: the LLM can't silently hallucinate a side effect that doesn't exist in the type. Your resource definitions, policies, and invariants become a living specification that the copilot can reason about in context, visualize from multiple angles, and keep in sync across every view.",
     code: `defmodule Billing.Subscription do
   use Ash.Resource
 
@@ -29,7 +29,7 @@ end`,
     number: "02",
     title: "Foundry reflects it.",
     description:
-      "Every action, policy, relationship, and external boundary becomes a node. Every call, dependency, and data flow becomes an edge. The map is not a diagram someone drew once — it is a live, interactive graph that tells the truth about what is running in production.",
+      "Derive a live graph from your compiled system — every resource, action, policy, and invariant becomes a traceable node. See test execution step-by-step, with runtime traces that show exactly how your logic flows. Different team members see different layers: architects see blast radius and dependencies, compliance sees policy enforcement, engineers see behavioral traces. One true map, infinite perspectives.",
     code: `# System map — derived from compiler output
 # Not a diagram. Not documentation.
 # The code, rendered as a graph.
@@ -48,9 +48,9 @@ Billing.Subscription
   },
   {
     number: "03",
-    title: "Edit through the graph or through code.",
+    title: "Edit through the graph or code.",
     description:
-      "Ask the copilot for a change in plain language. It reads your domain model live from the compiler — every resource, every action, every policy — plus your ADRs and invariants. It proposes on a branch. It never touches your working tree.",
+      "The copilot holds your entire system map in context — compressed, explicit, and LLM-native. It sees the blast radius before you do, avoids reinventing logic by understanding what already exists, and operates on the graph abstraction rather than raw imperative code. Elixir's ExUnit tests pass on first try because pure functions have no mocks to hallucinate, and pattern matching makes assertions self-evident — AutoCodeBench measured 80.3% Pass@1 on Claude Opus 4, highest of any language tested. Changes are instructions the code transformation pipeline (Igniter + Sourceror) translates into precise AST modifications. Edit visually, edit semantically, or write code — the graph ensures consistency either way.",
     code: `you: Add a spending limit rule to the
      withdrawal reactor. UK players,
      £500 daily.

@@ -73,9 +73,6 @@ export function PricingSection() {
               <br />
               <span className="text-[#F5F1EA]/35">Governed copilot.</span>
             </h2>
-            <p className="text-[#F5F1EA]/50 max-w-sm leading-relaxed">
-              The architecture is yours, regardless of plan. No proprietary runtime. No black box. Every Foundry project compiles to a standard Elixir application you own entirely.
-            </p>
           </div>
         </div>
 

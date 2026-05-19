@@ -36,7 +36,7 @@ export function CtaSection() {
               two of them.
             </h2>
             <p className="text-lg lg:text-xl text-[#6B6860] leading-relaxed max-w-2xl mb-12 lg:mb-16">
-              If you are building something complex, domain-heavy, and long-lived — and you want to build it in a way your team, your AI, and your auditors can all understand three years from now — foundry is built for you.
+              If you are building something complex, domain-heavy, and long-lived — and you want to build it in a way your team, your AI <span className="text-[#1B1B19]">(on the language where it gets it right most often)</span>, and your auditors can all understand three years from now — foundry is built for you.
             </p>
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <a

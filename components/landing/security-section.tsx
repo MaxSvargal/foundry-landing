@@ -92,51 +92,6 @@ export function SecuritySection() {
               ))}
             </div>
           </div>
-
-          {/* CLI commands */}
-          <div
-            className={`transition-all duration-700 delay-100 ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-            }`}
-          >
-            <p className="font-mono text-xs text-[#F5F1EA]/30 tracking-widest uppercase mb-8">
-              The CLI
-            </p>
-            <div className="space-y-0">
-              {cliCommands.map((item, index) => (
-                <div
-                  key={item.cmd}
-                  className={`py-5 border-b border-[#F5F1EA]/10 group transition-all duration-700 ${
-                    isVisible ? "opacity-100" : "opacity-0"
-                  }`}
-                  style={{ transitionDelay: `${150 + index * 60}ms` }}
-                >
-                  <code className="font-mono text-sm text-[#F5F1EA] block mb-1">
-                    {item.cmd}
-                  </code>
-                  <p className="text-xs text-[#F5F1EA]/40 leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="mt-8 text-sm text-[#F5F1EA]/40 leading-relaxed">
-              Open source CLI. The graph stays on your machine. The SaaS tier is opt-in, for teams who want hosted history, multi-user views, and one-click deploys.
-            </p>
-          </div>
-        </div>
-
-        {/* Key guarantee */}
-        <div
-          className={`border border-[#F5F1EA]/10 p-8 lg:p-12 transition-all duration-700 delay-200 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <p className="text-lg lg:text-xl text-[#F5F1EA] leading-relaxed font-display font-semibold">
-            Everything Foundry shows you is derived from code you own.{" "}
-            <span className="text-[#F5F1EA]/40">
-              Delete Foundry tomorrow and your app keeps running.
-            </span>
-          </p>
         </div>
       </div>
     </section>

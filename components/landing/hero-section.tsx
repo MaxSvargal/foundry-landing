@@ -19,6 +19,8 @@ const stats = [
   { value: "150→5", label: "Servers" },
   { value: "$2M/yr", label: "Savings in case" },
   { value: "$150/mo", label: "vs $16k Lambda" },
+  { value: "80.3%", label: "LLM Pass@1 on Elixir" },
+  { value: "2–3×", label: "Less code than TypeScript" },
 ];
 
 export function HeroSection() {
@@ -156,7 +158,7 @@ export function HeroSection() {
               )}
             >
               Foundry is the governed development environment for complex domain
-              platforms
+              platforms.
               </p>
             <p
               className={cn(
@@ -164,7 +166,7 @@ export function HeroSection() {
                 "text-white/80",
               )}
             >
-              Turn your code and tests into a living visualization and queryable map of itself. Kept honest by invariants instead of folklore.Eliminating drift and keeping your team in sync
+              Turn your code and tests into a living visualization and queryable map of itself. Eliminating drift and keeping your team in sync.
               {/* Your code is the specification. The spec captures the intent. The copilot holds both. Nothing drifts. */}
             </p>
           </div>

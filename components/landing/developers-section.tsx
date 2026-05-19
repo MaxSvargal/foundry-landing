@@ -34,6 +34,14 @@ const rows = [
     foundry: "yes",
   },
   {
+    label: "AI first-try rate",
+    editor: "~50%",
+    diagram: "n/a",
+    lowcode: "proprietary",
+    foundry: "80.3%",
+    foundryAccent: true,
+  },
+  {
     label: "You can grep it",
     editor: "yes",
     diagram: "no",
@@ -140,8 +148,26 @@ export function DevelopersSection() {
             Everything Foundry shows you is derived from code you own.
           </p>
           <p className="mt-3 text-base text-[#6B6860]">
-            Delete Foundry tomorrow and your app keeps running. This is the distinction from vibe coding — the agent operates against your declared architecture as a gold standard.
+            Delete Foundry tomorrow and your app keeps running. This is the distinction from vibe coding — the agent operates against your declared architecture as a gold standard. Elixir's compile-time guarantees mean the model can't hallucinate a valid-looking function that silently mishandles state: pattern matching fails loudly, or the code doesn't compile.
           </p>
+            <p className=" leading-relaxed">
+              The architecture is yours, regardless of plan. No proprietary runtime. No black box. Every Foundry project compiles to a standard Elixir application you own entirely.
+            </p>
+
+
+        {/* Key guarantee */}
+        <div
+          className={`border border-[#F5F1EA]/10 p-8 lg:p-12 transition-all duration-700 delay-200 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <p className="text-lg lg:text-xl leading-relaxed font-display font-semibold">
+            Everything Foundry shows you is derived from code you own.{" "}
+            
+              Delete Foundry tomorrow and your app keeps running.
+            
+          </p>
+        </div>
         </div>
       </div>
     </section>
