@@ -169,7 +169,7 @@ export function HeroSection() {
                 "text-[#f5f1ea]",
               )}
             >
-              A full-stack development environment with a live system graph that knows your domain. Your AI copilot works from code, tests, traces, and decisions — not from guesses. Everything your team needs from day one. 
+              A full-stack development environment with a live system graph that knows your domain. Your AI copilot works from declarative code as specs, tests, traces, and decisions — not from guesses. Everything your team needs from day one. 
               </p>
             <p
               className={cn(

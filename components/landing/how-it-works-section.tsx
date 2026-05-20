@@ -2,499 +2,708 @@
 
 import { useEffect, useRef, useState } from "react";
 import cytoscape from "cytoscape";
+// @ts-ignore
+import coseBilkent from "cytoscape-cose-bilkent";
 import type { Core, ElementDefinition } from "cytoscape";
+
+if (typeof window !== "undefined") {
+  try {
+    cytoscape.use(coseBilkent);
+  } catch {
+    // already registered
+  }
+}
 
 const steps = [
   {
     number: "I",
     title: "Your domain as a live graph",
-    description: "The system map is extracted directly from your Ash code by the compiler. Every node is a resource. Every edge is a relationship or side effect.",
+    description:
+      "The system map is extracted directly from your Ash code by the compiler. Every node is a resource. Every edge is a relationship or side effect.",
   },
   {
     number: "II",
     title: "Click a node. See everything.",
-    description: "Click any resource to open the details panel. You see its code, tests, linked ADRs, compliance rules, and test coverage.",
+    description:
+      "Click any resource to open the details panel. You see its code, tests, linked ADRs, compliance rules, and test coverage.",
   },
   {
     number: "III",
     title: "Tests light up the map",
-    description: "Run a test. The execution path highlights on the graph. You see every node touched, in order, with side effects.",
+    description:
+      "Run a test. The execution path highlights on the graph. You see every node touched, in order, with side effects.",
   },
   {
     number: "IV",
     title: "Copilot reads your domain",
-    description: "Ask for a feature. The copilot reads your live domain model, finds constraints, and proposes on a branch with blast radius shown.",
+    description:
+      "Ask for a feature. The copilot reads your live domain model, finds constraints, and proposes on a branch with blast radius shown.",
   },
 ];
 
-interface Message {
-  id: string;
-  type: 'user' | 'copilot' | 'thinking';
-  content: string;
-}
-
-const copilotMessages: Message[][] = [
-  [],
-  [],
+// Activity feed event cards per scene
+const activityFeedScenes = [
+  // Scene I — idle
+  [] as ActivityEvent[],
+  // Scene II — node detail open
   [
-    { id: '1', type: 'user', content: 'Add a spending limit to withdrawals. UK players, £500 daily.' },
+    {
+      id: "a1",
+      kind: "info" as const,
+      title: "WithdrawalTransfer selected",
+      body: "5 actions · ADR-005 · RG-UK-014",
+    },
   ],
+  // Scene III — test trace
   [
-    { id: '1', type: 'user', content: 'Add a spending limit to withdrawals. UK players, £500 daily.' },
-    { id: '2', type: 'thinking', content: 'Analyzing WithdrawalReactor… checking ADRs and compliance…' },
-    { id: '3', type: 'copilot', content: 'Found ADR-005 (enforcement at reactor boundary) and RG-UK-014 (UK compliance).\n\nThis is a :behavioral change.\nDomain lead approval required.\n\nProposal:\n• Add SpendingLimitRule\n• Generate 3 BDD scenarios\n• Link RG-UK-014\n• Open for review\n\nConfirm?' },
+    {
+      id: "b1",
+      kind: "success" as const,
+      title: "Test run complete",
+      body: "3 scenarios traced across Finance domain",
+    },
+    {
+      id: "b2",
+      kind: "coverage" as const,
+      title: "Coverage: 87%",
+      body: "WithdrawalTransfer fully covered",
+    },
+  ],
+  // Scene IV — copilot proposal
+  [
+    {
+      id: "c1",
+      kind: "user" as const,
+      title: "You",
+      body: "Add a spending limit to withdrawals. UK players, £500 daily.",
+    },
+    {
+      id: "c2",
+      kind: "thinking" as const,
+      title: "Foundry Copilot",
+      body: "Analyzing WithdrawalReactor… checking ADRs and compliance…",
+    },
+    {
+      id: "c3",
+      kind: "proposal" as const,
+      title: "Proposal ready",
+      body: ":behavioral change · Domain lead approval required · 3 BDD scenarios generated",
+      badge: ":behavioral",
+    },
   ],
 ];
 
-interface ResourceDetail {
+interface ActivityEvent {
   id: string;
-  name: string;
-  type: string;
-  actions: string[];
-  attributes: number;
-  relationships: number;
-  adrs: string[];
+  kind: "info" | "success" | "coverage" | "user" | "thinking" | "proposal";
+  title: string;
+  body: string;
+  badge?: string;
 }
 
-const resourceDetails: Record<string, ResourceDetail> = {
-  'withdrawal-reactor': {
-    id: 'withdrawal-reactor',
-    name: 'WithdrawalReactor',
-    type: 'reactor',
-    actions: ['handle_withdrawal', 'apply_compliance'],
-    attributes: 0,
-    relationships: 3,
-    adrs: ['ADR-005', 'RG-UK-014'],
-  },
-  'withdrawal': {
-    id: 'withdrawal',
-    name: 'Withdrawal',
-    type: 'resource',
-    actions: ['request', 'approve', 'process'],
-    attributes: 7,
-    relationships: 3,
-    adrs: ['ADR-003'],
-  },
+// Detail drawer data for WithdrawalTransfer (shown in scenes II+)
+const drawerDetail = {
+  name: "WithdrawalTransfer",
+  type: "transfer",
+  actions: [
+    { name: "initiate", badge: "write" },
+    { name: "verify_limit", badge: "read" },
+    { name: "execute", badge: "write" },
+    { name: "settle", badge: "write" },
+    { name: "rollback", badge: "write" },
+  ],
+  compliance: ["RG-UK-014"],
+  adrs: ["ADR-005"],
+  coverage: 87,
 };
+
+function ActivityFeed({
+  events,
+  sceneIndex,
+}: {
+  events: ActivityEvent[];
+  sceneIndex: number;
+}) {
+  return (
+    <div className="w-64 shrink-0 border-l border-white/5 bg-[#13131A] flex flex-col text-xs">
+      {/* Header */}
+      <div className="border-b border-white/5 px-3 py-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#A4471C]" />
+          <span className="text-xs font-semibold text-white/80 font-mono">
+            Activity Feed
+          </span>
+        </div>
+      </div>
+
+      {/* Events */}
+      <div className="flex-1 overflow-y-auto p-2 space-y-2">
+        {events.length === 0 && (
+          <p className="text-white/25 text-xs font-mono mt-4 text-center leading-relaxed">
+            Ask a question or describe a change…
+          </p>
+        )}
+        {events.map((ev) => (
+          <div
+            key={ev.id}
+            className={`rounded border p-2 space-y-1 text-xs font-mono ${
+              ev.kind === "user"
+                ? "bg-[#A4471C]/15 border-[#A4471C]/30"
+                : ev.kind === "thinking"
+                ? "bg-white/5 border-white/10 animate-pulse"
+                : ev.kind === "proposal"
+                ? "bg-[#1E1A2E] border-purple-500/30"
+                : ev.kind === "success"
+                ? "bg-[#0E1E12] border-green-500/30"
+                : ev.kind === "coverage"
+                ? "bg-[#1A1A0E] border-yellow-500/30"
+                : "bg-white/5 border-white/10"
+            }`}
+          >
+            <div className="flex items-center justify-between gap-1">
+              <span
+                className={`font-semibold truncate ${
+                  ev.kind === "user"
+                    ? "text-[#A4471C]"
+                    : ev.kind === "proposal"
+                    ? "text-purple-400"
+                    : ev.kind === "success"
+                    ? "text-green-400"
+                    : ev.kind === "coverage"
+                    ? "text-yellow-400"
+                    : "text-white/60"
+                }`}
+              >
+                {ev.title}
+              </span>
+              {ev.badge && (
+                <span className="shrink-0 px-1 py-0.5 rounded text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {ev.badge}
+                </span>
+              )}
+            </div>
+            <p className="text-white/50 leading-relaxed">{ev.body}</p>
+            {ev.kind === "proposal" && (
+              <button className="mt-1 w-full text-center py-1 rounded bg-[#A4471C]/30 border border-[#A4471C]/40 text-[#A4471C] text-xs font-semibold hover:bg-[#A4471C]/50 transition-colors">
+                Review →
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="border-t border-white/5 p-2 shrink-0">
+        <div className="flex gap-1 items-center bg-white/5 rounded border border-white/10 px-2 py-1">
+          <input
+            type="text"
+            placeholder="Ask anything…"
+            className="flex-1 bg-transparent text-xs text-white placeholder-white/30 outline-none font-mono"
+            readOnly
+          />
+          <span className="text-white/30 text-xs">↑</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailDrawer({
+  visible,
+  sceneIndex,
+}: {
+  visible: boolean;
+  sceneIndex: number;
+}) {
+  return (
+    <div
+      className={`w-72 shrink-0 border-r border-white/5 bg-[#13131A] flex flex-col text-xs transition-all duration-500 overflow-hidden ${
+        visible ? "opacity-100" : "opacity-0 w-0"
+      }`}
+      style={{ width: visible ? "18rem" : 0 }}
+    >
+      {/* Header */}
+      <div className="border-b border-white/5 px-3 py-2.5 shrink-0">
+        <div className="flex items-center gap-2 mb-1">
+          <span className="px-1.5 py-0.5 rounded text-xs font-mono bg-green-500/15 text-green-400 border border-green-500/25">
+            transfer
+          </span>
+          <span className="text-white/30 text-xs">Finance</span>
+        </div>
+        <h3 className="text-sm font-semibold text-white font-mono">
+          {drawerDetail.name}
+        </h3>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-2.5 space-y-3">
+        {/* Actions */}
+        <div>
+          <p className="text-white/40 uppercase tracking-widest text-xs mb-1.5 font-mono">
+            Actions
+          </p>
+          <div className="space-y-1">
+            {drawerDetail.actions.map((a) => (
+              <div
+                key={a.name}
+                className="flex items-center justify-between px-2 py-1 rounded bg-white/5 border border-white/5"
+              >
+                <span className="font-mono text-white/80 text-xs">
+                  {a.name}
+                </span>
+                <span
+                  className={`px-1 py-0.5 rounded text-xs font-mono ${
+                    a.badge === "write"
+                      ? "bg-orange-500/15 text-orange-400 border border-orange-500/20"
+                      : "bg-blue-500/15 text-blue-400 border border-blue-500/20"
+                  }`}
+                >
+                  {a.badge}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Compliance */}
+        <div>
+          <p className="text-white/40 uppercase tracking-widest text-xs mb-1.5 font-mono">
+            Compliance
+          </p>
+          <div className="space-y-1">
+            {drawerDetail.compliance.map((c) => (
+              <div
+                key={c}
+                className="px-2 py-1 rounded bg-white/5 border-l-2 border-[#A4471C] font-mono text-white/70 text-xs"
+              >
+                {c}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ADRs */}
+        <div>
+          <p className="text-white/40 uppercase tracking-widest text-xs mb-1.5 font-mono">
+            Linked ADRs
+          </p>
+          <div className="space-y-1">
+            {drawerDetail.adrs.map((a) => (
+              <div
+                key={a}
+                className="px-2 py-1 rounded bg-white/5 border-l-2 border-blue-500/50 font-mono text-white/70 text-xs"
+              >
+                {a}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Coverage */}
+        <div>
+          <p className="text-white/40 uppercase tracking-widest text-xs mb-1.5 font-mono">
+            Test Coverage
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-green-500"
+                style={{ width: `${drawerDetail.coverage}%` }}
+              />
+            </div>
+            <span className="text-green-400 font-mono text-xs font-semibold">
+              {drawerDetail.coverage}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const ELEMENTS: ElementDefinition[] = [
+  // Finance domain
+  {
+    data: { id: "domain-finance", label: "Finance", type: "domain", domainColor: "#3B82F6" },
+    classes: "domain",
+  },
+  {
+    data: { id: "wallet", label: "Wallet", type: "resource", parent: "domain-finance" },
+    classes: "resource",
+  },
+  {
+    data: { id: "withdrawal-request", label: "WithdrawalRequest", type: "resource", parent: "domain-finance" },
+    classes: "resource",
+  },
+  {
+    data: { id: "sufficient-balance", label: "SufficientBalance", type: "rule", parent: "domain-finance" },
+    classes: "rule",
+  },
+  {
+    data: { id: "limit-rule", label: "WithdrawalLimitNotExceeded", type: "rule", parent: "domain-finance" },
+    classes: "rule",
+  },
+  {
+    data: { id: "withdrawal-transfer", label: "WithdrawalTransfer", type: "transfer", parent: "domain-finance" },
+    classes: "transfer",
+  },
+  {
+    data: { id: "billing-reactor", label: "BillingReactor", type: "reactor", parent: "domain-finance" },
+    classes: "reactor",
+  },
+
+  // Players domain
+  {
+    data: { id: "domain-players", label: "Players", type: "domain", domainColor: "#A855F7" },
+    classes: "domain",
+  },
+  {
+    data: { id: "player", label: "Player", type: "resource", parent: "domain-players" },
+    classes: "resource",
+  },
+  {
+    data: { id: "kyc", label: "KycVerification", type: "resource", parent: "domain-players" },
+    classes: "resource",
+  },
+  {
+    data: { id: "self-exclusion", label: "SelfExclusion", type: "rule", parent: "domain-players" },
+    classes: "rule",
+  },
+
+  // Compliance domain
+  {
+    data: { id: "domain-compliance", label: "Compliance", type: "domain", domainColor: "#EAB308" },
+    classes: "domain",
+  },
+  {
+    data: { id: "audit-log", label: "AuditLog", type: "resource", parent: "domain-compliance" },
+    classes: "resource",
+  },
+  {
+    data: { id: "compliance-rule", label: "ComplianceRule", type: "resource", parent: "domain-compliance" },
+    classes: "resource",
+  },
+
+  // External
+  {
+    data: { id: "stripe-gateway", label: "StripeGateway", type: "external" },
+    classes: "external",
+  },
+
+  // Edges
+  { data: { source: "withdrawal-request", target: "wallet" }, classes: "read" },
+  { data: { source: "sufficient-balance", target: "wallet" }, classes: "guard" },
+  { data: { source: "limit-rule", target: "withdrawal-request" }, classes: "guard" },
+  { data: { source: "withdrawal-transfer", target: "withdrawal-request" }, classes: "write" },
+  { data: { source: "billing-reactor", target: "wallet" }, classes: "write" },
+  { data: { source: "billing-reactor", target: "audit-log" }, classes: "write" },
+  { data: { source: "withdrawal-transfer", target: "stripe-gateway" }, classes: "external-edge" },
+  { data: { source: "player", target: "kyc" }, classes: "read" },
+  { data: { source: "self-exclusion", target: "player" }, classes: "guard" },
+  { data: { source: "withdrawal-request", target: "player" }, classes: "read" },
+  { data: { source: "compliance-rule", target: "audit-log" }, classes: "write" },
+  { data: { source: "billing-reactor", target: "compliance-rule" }, classes: "read" },
+];
+
+// Nodes that get highlighted in scene III trace
+const TRACE_NODES = ["withdrawal-request", "sufficient-balance", "withdrawal-transfer", "audit-log"];
+const TRACE_EDGES_PAIRS: [string, string][] = [
+  ["withdrawal-request", "wallet"],
+  ["sufficient-balance", "wallet"],
+  ["withdrawal-transfer", "withdrawal-request"],
+  ["billing-reactor", "audit-log"],
+];
 
 function CytoscapeGraph({ sceneIndex }: { sceneIndex: number }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef = useRef<Core | null>(null);
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
 
+  // Init graph once
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Graph data with proper domain clustering
-    const elements: ElementDefinition[] = [
-      // Accounting domain
-      { data: { id: 'domain-accounting', label: 'Accounting', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'invoice', label: 'Invoice', type: 'resource', parent: 'domain-accounting' }, classes: 'resource' },
-      { data: { id: 'ledger', label: 'Ledger', type: 'resource', parent: 'domain-accounting' }, classes: 'resource' },
-
-      // Billing domain
-      { data: { id: 'domain-billing', label: 'Billing', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'subscription', label: 'Subscription', type: 'resource', parent: 'domain-billing' }, classes: 'resource' },
-      { data: { id: 'plan', label: 'Plan', type: 'resource', parent: 'domain-billing' }, classes: 'resource' },
-      { data: { id: 'billing-reactor', label: 'BillingReactor', type: 'reactor', parent: 'domain-billing' }, classes: 'reactor' },
-
-      // Payments domain
-      { data: { id: 'domain-payments', label: 'Payments', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'payment', label: 'Payment', type: 'resource', parent: 'domain-payments' }, classes: 'resource' },
-      { data: { id: 'payment-method', label: 'PaymentMethod', type: 'resource', parent: 'domain-payments' }, classes: 'resource' },
-      { data: { id: 'stripe-gateway', label: 'Stripe', type: 'external', parent: 'domain-payments' }, classes: 'external' },
-
-      // Accounts domain
-      { data: { id: 'domain-accounts', label: 'Accounts', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'user', label: 'User', type: 'resource', parent: 'domain-accounts' }, classes: 'resource' },
-      { data: { id: 'customer', label: 'Customer', type: 'resource', parent: 'domain-accounts' }, classes: 'resource' },
-
-      // Withdrawals domain
-      { data: { id: 'domain-withdrawals', label: 'Withdrawals', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'withdrawal', label: 'Withdrawal', type: 'resource', parent: 'domain-withdrawals' }, classes: 'resource' },
-      { data: { id: 'withdrawal-state', label: 'WithdrawalStateMachine', type: 'resource', parent: 'domain-withdrawals' }, classes: 'resource' },
-      { data: { id: 'withdrawal-reactor', label: 'WithdrawalReactor', type: 'reactor', parent: 'domain-withdrawals' }, classes: 'reactor' },
-
-      // Compliance domain
-      { data: { id: 'domain-compliance', label: 'Compliance', type: 'domain' }, classes: 'domain' },
-      { data: { id: 'compliance-rule', label: 'ComplianceRule', type: 'resource', parent: 'domain-compliance' }, classes: 'resource' },
-      { data: { id: 'audit-log', label: 'AuditLog', type: 'resource', parent: 'domain-compliance' }, classes: 'resource' },
-
-      // Edges
-      { data: { source: 'subscription', target: 'plan' }, classes: 'relationship' },
-      { data: { source: 'subscription', target: 'customer' }, classes: 'relationship' },
-      { data: { source: 'billing-reactor', target: 'invoice' }, classes: 'sideeffect' },
-      { data: { source: 'billing-reactor', target: 'ledger' }, classes: 'sideeffect' },
-      { data: { source: 'payment', target: 'payment-method' }, classes: 'relationship' },
-      { data: { source: 'payment', target: 'ledger' }, classes: 'sideeffect' },
-      { data: { source: 'payment', target: 'stripe-gateway' }, classes: 'external-edge' },
-      { data: { source: 'customer', target: 'user' }, classes: 'relationship' },
-      { data: { source: 'customer', target: 'subscription' }, classes: 'relationship' },
-      { data: { source: 'withdrawal', target: 'customer' }, classes: 'relationship' },
-      { data: { source: 'withdrawal', target: 'withdrawal-state' }, classes: 'relationship' },
-      { data: { source: 'withdrawal-reactor', target: 'payment' }, classes: 'sideeffect' },
-      { data: { source: 'withdrawal-reactor', target: 'compliance-rule' }, classes: 'sideeffect' },
-      { data: { source: 'withdrawal-reactor', target: 'ledger' }, classes: 'sideeffect' },
-      { data: { source: 'compliance-rule', target: 'audit-log' }, classes: 'sideeffect' },
-    ];
-
     const cy = cytoscape({
       container: containerRef.current,
-      elements,
+      elements: ELEMENTS,
       style: [
+        // Base node
         {
-          selector: 'node',
+          selector: "node",
           style: {
-            'background-color': '#3A3A3F',
-            'border-color': 'rgba(255, 255, 255, 0.3)',
-            'border-width': 1.5,
-            'text-valign': 'center',
-            'text-halign': 'center',
-            'font-size': 8,
-            'font-family': 'monospace',
-            'color': 'rgba(255, 255, 255, 0.85)',
-            'padding': 4,
-            'text-max-width': '60px',
-            'text-overflow': 'ellipsis',
+            "background-color": "#2A2A32",
+            "border-color": "rgba(255,255,255,0.18)",
+            "border-width": 1.5,
+            "shape": "round-rectangle",
+            "width": 84,
+            "height": 32,
+            "text-valign": "center",
+            "text-halign": "center",
+            "font-size": 8,
+            "font-family": "monospace",
+            "color": "rgba(255,255,255,0.75)",
+            "text-max-width": "76px",
+            "text-wrap": "ellipsis",
+            "label": "data(label)",
+          },
+        },
+        // Domain compound
+        {
+          selector: "node.domain",
+          style: {
+            "background-color": "rgba(255,255,255,0.02)",
+            "border-color": "rgba(255,255,255,0.08)",
+            "border-width": 1,
+            "border-style": "dashed",
+            "font-size": 9,
+            "font-weight": "bold",
+            "color": "rgba(255,255,255,0.25)",
+            "text-valign": "top",
+            "text-halign": "center",
+            "text-margin-y": -4,
+            "padding": "18px",
+            "min-width": "180px",
+            "min-height": "100px",
+            "shape": "round-rectangle",
+          },
+        },
+        // Resource — blue border
+        {
+          selector: "node.resource",
+          style: {
+            "border-color": "#3B82F6",
+            "border-width": 1.5,
+          },
+        },
+        // Transfer — green border
+        {
+          selector: "node.transfer",
+          style: {
+            "border-color": "#22C55E",
+            "border-width": 1.5,
+          },
+        },
+        // Reactor — purple border
+        {
+          selector: "node.reactor",
+          style: {
+            "border-color": "#A855F7",
+            "border-width": 1.5,
+          },
+        },
+        // Rule — yellow border
+        {
+          selector: "node.rule",
+          style: {
+            "border-color": "#EAB308",
+            "border-width": 1.5,
+          },
+        },
+        // External — teal dashed
+        {
+          selector: "node.external",
+          style: {
+            "border-color": "#2DD4BF",
+            "border-width": 1.5,
+            "border-style": "dashed",
+            "background-color": "#1A2A2A",
+            "opacity": 0.75,
+          },
+        },
+        // Highlighted (scene II selected)
+        {
+          selector: "node.highlighted",
+          style: {
+            "background-color": "#1E2A1E",
+            "border-color": "#22C55E",
+            "border-width": 2.5,
+            "color": "rgba(255,255,255,0.95)",
+            "z-index": 999,
+          },
+        },
+        // Trace nodes (scene III)
+        {
+          selector: "node.trace",
+          style: {
+            "background-color": "#2A1A0E",
+            "border-color": "#A4471C",
+            "border-width": 2.5,
+            "color": "rgba(255,255,255,0.95)",
+            "z-index": 998,
+          },
+        },
+        // Dimmed (scene III non-trace)
+        {
+          selector: "node.dimmed",
+          style: {
+            "opacity": 0.15,
+          },
+        },
+        // Base edge
+        {
+          selector: "edge",
+          style: {
+            "line-color": "rgba(255,255,255,0.12)",
+            "width": 1,
+            "curve-style": "bezier",
+            "target-arrow-shape": "none",
+            "opacity": 0.6,
           },
         },
         {
-          selector: 'node.domain',
+          selector: "edge.read",
           style: {
-            'background-color': 'transparent',
-            'border-color': 'rgba(164, 71, 28, 0.2)',
-            'border-width': 1,
-            'border-style': 'dashed',
-            'font-size': 9,
-            'font-weight': 'bold',
-            'color': 'rgba(164, 71, 28, 0.6)',
-            'text-background-color': 'rgba(14, 14, 12, 0.8)',
-            'text-background-padding': 3,
-            'text-background-shape': 'rectangle',
-            'text-background-opacity': 0.8,
+            "line-color": "rgba(59,130,246,0.3)",
+            "target-arrow-shape": "none",
           },
         },
         {
-          selector: 'node.resource',
+          selector: "edge.write",
           style: {
-            'width': 28,
-            'height': 28,
-            'shape': 'circle',
+            "line-color": "rgba(249,115,22,0.45)",
+            "target-arrow-shape": "triangle",
+            "target-arrow-color": "rgba(249,115,22,0.45)",
+            "arrow-scale": 0.8,
           },
         },
         {
-          selector: 'node.reactor',
+          selector: "edge.guard",
           style: {
-            'width': 34,
-            'height': 34,
-            'shape': 'circle',
-            'background-color': '#2B2B2F',
-            'border-color': 'rgba(255, 255, 255, 0.4)',
-            'border-width': 2,
+            "line-color": "rgba(234,179,8,0.35)",
+            "line-style": "dotted",
+            "target-arrow-shape": "none",
           },
         },
         {
-          selector: 'node.external',
+          selector: "edge.external-edge",
           style: {
-            'width': 26,
-            'height': 26,
-            'shape': 'circle',
-            'background-color': '#4B3F37',
-            'border-color': 'rgba(164, 71, 28, 0.6)',
+            "line-color": "rgba(45,212,191,0.3)",
+            "line-style": "dashed",
+            "line-dash-pattern": [4, 4],
+            "target-arrow-shape": "triangle",
+            "target-arrow-color": "rgba(45,212,191,0.3)",
+            "arrow-scale": 0.7,
+          },
+        },
+        // Trace edges
+        {
+          selector: "edge.trace",
+          style: {
+            "line-color": "#A4471C",
+            "width": 2.5,
+            "line-style": "solid",
+            "target-arrow-color": "#A4471C",
+            "target-arrow-shape": "triangle",
+            "arrow-scale": 0.9,
+            "opacity": 1,
+            "z-index": 10,
           },
         },
         {
-          selector: 'node:selected',
+          selector: "edge.dimmed",
           style: {
-            'background-color': '#A4471C',
-            'border-color': '#A4471C',
-            'border-width': 2.5,
-            'box-shadow': '0 0 8px rgba(164, 71, 28, 0.6)',
-          },
-        },
-        {
-          selector: 'node.highlighted',
-          style: {
-            'background-color': '#A4471C',
-            'border-color': '#A4471C',
-            'border-width': 2.5,
-            'box-shadow': '0 0 12px rgba(164, 71, 28, 0.8)',
-          },
-        },
-        {
-          selector: 'edge',
-          style: {
-            'line-color': 'rgba(255, 255, 255, 0.15)',
-            'width': 1,
-            'curve-style': 'bezier',
-            'target-arrow-shape': 'none',
-          },
-        },
-        {
-          selector: 'edge.relationship',
-          style: {
-            'line-color': 'rgba(255, 255, 255, 0.15)',
-            'width': 1,
-          },
-        },
-        {
-          selector: 'edge.sideeffect',
-          style: {
-            'line-color': 'rgba(164, 71, 28, 0.3)',
-            'width': 1.5,
-            'line-style': 'dashed',
-            'line-dash-pattern': [4, 3],
-          },
-        },
-        {
-          selector: 'edge.external-edge',
-          style: {
-            'line-color': 'rgba(164, 71, 28, 0.4)',
-            'width': 1.5,
-            'line-style': 'dotted',
-          },
-        },
-        {
-          selector: 'edge.trace',
-          style: {
-            'line-color': '#A4471C',
-            'width': 2.5,
-            'line-style': 'solid',
-            'z-index': 10,
+            "opacity": 0.08,
           },
         },
       ],
       layout: {
-        name: 'breadthfirst',
-        roots: ['domain-accounting', 'domain-billing', 'domain-payments', 'domain-accounts', 'domain-withdrawals', 'domain-compliance'],
-        directed: true,
-        spacingFactor: 1.5,
+        name: "cose-bilkent",
+        // @ts-ignore
+        idealEdgeLength: 70,
+        // @ts-ignore
+        nodeRepulsion: 5000,
+        // @ts-ignore
+        gravity: 0.35,
+        // @ts-ignore
+        nestingFactor: 0.4,
+        padding: 36,
+        animate: false,
+        fit: true,
       },
     });
 
     cyRef.current = cy;
 
-    // Handle scene changes
-    cy.elements().removeClass('highlighted');
-
-    if (sceneIndex >= 1) {
-      const node = cy.$('#withdrawal-reactor');
-      node.addClass('highlighted');
-      cy.animate(
-        {
-          fit: {
-            eles: cy.$('#domain-withdrawals').descendants(),
-            padding: 50,
-          },
-        },
-        {
-          duration: 800,
-          easing: 'ease-in-out-cubic',
-        }
-      );
-    } else {
-      cy.animate(
-        {
-          fit: {
-            eles: cy.elements(),
-            padding: 80,
-          },
-        },
-        {
-          duration: 800,
-          easing: 'ease-in-out-cubic',
-        }
-      );
-    }
-
-    // Trace path for scenes 2-3
-    if (sceneIndex === 2 || sceneIndex === 3) {
-      const tracePath = ['withdrawal-reactor', 'ledger', 'compliance-rule', 'audit-log'];
-      for (let i = 0; i < tracePath.length - 1; i++) {
-        const edge = cy.$(`#${tracePath[i]}`).edgesWith(`#${tracePath[i + 1]}`);
-        edge.addClass('trace');
-      }
-    }
-
-    // Node click handler
-    cy.on('tap', 'node', (evt) => {
-      const node = evt.target;
-      if (!node.isParent()) {
-        setSelectedNode(node.id());
-      }
-    });
-
     return () => {
       cy.destroy();
     };
+  }, []);
+
+  // React to scene changes
+  useEffect(() => {
+    const cy = cyRef.current;
+    if (!cy) return;
+
+    // Reset all classes
+    cy.elements().removeClass("highlighted trace dimmed");
+
+    if (sceneIndex === 0) {
+      // Scene I: fit full graph
+      cy.animate(
+        { fit: { eles: cy.elements(), padding: 36 } },
+        { duration: 700, easing: "ease-in-out-cubic" }
+      );
+    } else if (sceneIndex === 1) {
+      // Scene II: zoom Finance cluster, highlight WithdrawalTransfer
+      cy.$('#withdrawal-transfer').addClass("highlighted");
+      cy.animate(
+        {
+          fit: {
+            eles: cy.$("#domain-finance").union(cy.$(".external")),
+            padding: 60,
+          },
+        },
+        { duration: 700, easing: "ease-in-out-cubic" }
+      );
+    } else if (sceneIndex === 2) {
+      // Scene III: trace path, dim others
+      const traceSet = cy.collection();
+      TRACE_NODES.forEach((id) => {
+        const node = cy.$(`#${id}`);
+        node.addClass("trace");
+        traceSet.merge(node);
+      });
+      TRACE_EDGES_PAIRS.forEach(([src, tgt]) => {
+        cy.$(`#${src}`).edgesWith(`#${tgt}`).addClass("trace");
+      });
+      // Dim non-trace leaves (not domain parents)
+      cy.nodes(":childless").forEach((n) => {
+        if (!n.hasClass("trace")) n.addClass("dimmed");
+      });
+      cy.edges().forEach((e) => {
+        if (!e.hasClass("trace")) e.addClass("dimmed");
+      });
+      cy.animate(
+        {
+          fit: {
+            eles: cy.$(".trace"),
+            padding: 80,
+          },
+        },
+        { duration: 700, easing: "ease-in-out-cubic" }
+      );
+    } else if (sceneIndex === 3) {
+      // Scene IV: same trace + activity feed shows proposal
+      TRACE_NODES.forEach((id) => {
+        cy.$(`#${id}`).addClass("trace");
+      });
+      TRACE_EDGES_PAIRS.forEach(([src, tgt]) => {
+        cy.$(`#${src}`).edgesWith(`#${tgt}`).addClass("trace");
+      });
+      cy.nodes(":childless").forEach((n) => {
+        if (!n.hasClass("trace")) n.addClass("dimmed");
+      });
+      cy.edges().forEach((e) => {
+        if (!e.hasClass("trace")) e.addClass("dimmed");
+      });
+      cy.animate(
+        {
+          fit: { eles: cy.$(".trace"), padding: 80 },
+        },
+        { duration: 700, easing: "ease-in-out-cubic" }
+      );
+    }
   }, [sceneIndex]);
 
-  const focusedResource = selectedNode ? resourceDetails[selectedNode] : null;
-
-  return (
-    <div className="relative w-full bg-[#0E0E0C] rounded-lg overflow-hidden border border-white/10 flex flex-col h-full" style={{ minHeight: '600px' }}>
-      {/* macOS title bar */}
-      <div className="h-8 bg-[#16161A] border-b border-white/5 flex items-center px-3 gap-2 shrink-0">
-        <div className="flex gap-1.5">
-          <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-          <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
-        </div>
-        <span className="text-xs font-mono text-white/40 ml-1.5">foundry.studio</span>
-      </div>
-
-      {/* Main 3-panel layout */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar - Resources */}
-        <div className="w-32 border-r border-white/5 bg-[#16161A] flex flex-col text-xs shrink-0">
-          {/* Tabs */}
-          <div className="border-b border-white/5 flex px-2 py-1.5 gap-0.5 shrink-0">
-            <button className="px-1.5 py-0.5 text-xs font-mono uppercase tracking-wide text-[#A4471C] bg-white/5 rounded">
-              Map
-            </button>
-            <button className="px-1.5 py-0.5 text-xs font-mono uppercase tracking-wide text-white/30">
-              Spec
-            </button>
-          </div>
-
-          {/* Resources list */}
-          <div className="flex-1 overflow-y-auto p-1.5 space-y-0.5 text-xs">
-            {['Withdrawal', 'Customer', 'Payment', 'Ledger', 'Compliance'].map((item) => (
-              <div
-                key={item}
-                className={`px-1.5 py-0.5 rounded text-xs font-mono transition-all cursor-pointer truncate ${
-                  selectedNode && item === 'Withdrawal'
-                    ? 'bg-[#A4471C] text-white font-semibold'
-                    : 'text-white/50 hover:bg-white/5'
-                }`}
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Center - Cytoscape graph */}
-        <div
-          ref={containerRef}
-          className="flex-1 bg-[#0E0E0C] overflow-hidden relative"
-          style={{ minHeight: '600px' }}
-        />
-
-        {/* Right sidebar - Copilot */}
-        <div className="w-28 border-l border-white/5 bg-[#16161A] flex flex-col text-xs shrink-0">
-          {/* Header */}
-          <div className="border-b border-white/5 px-2 py-1.5 shrink-0">
-            <div className="flex items-center gap-1.5 mb-1">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#A4471C]" />
-              <h3 className="text-xs font-semibold text-white">Chat</h3>
-            </div>
-            <p className="text-xs text-white/50 leading-tight">AI reads domain</p>
-          </div>
-
-          {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-1.5 space-y-1 flex flex-col justify-end text-xs">
-            {copilotMessages[sceneIndex].slice(0, 2).map((msg, idx) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-16 px-1.5 py-1 rounded text-xs leading-tight font-mono break-words ${
-                    msg.type === 'user'
-                      ? 'bg-[#A4471C] text-white'
-                      : msg.type === 'thinking'
-                      ? 'bg-white/5 text-white/60 italic border border-white/10'
-                      : 'bg-white/10 text-white border border-white/10'
-                  }`}
-                >
-                  {msg.type === 'thinking'
-                    ? 'Analyzing…'
-                    : msg.content.substring(0, 25) + (msg.content.length > 25 ? '…' : '')}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Input */}
-          <div className="border-t border-white/5 p-1 shrink-0">
-            <div className="bg-white/5 rounded p-1 border border-white/10">
-              <input
-                type="text"
-                placeholder="Ask"
-                className="w-full bg-transparent text-xs text-white placeholder-white/40 outline-none font-mono"
-                readOnly
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Resource details panel */}
-      {focusedResource && (
-        <div className="absolute bottom-3 left-36 w-56 bg-[#16161A]/95 backdrop-blur border border-white/10 rounded-lg p-2.5 space-y-2 animate-fadeIn-slow text-xs shadow-xl z-20">
-          <div>
-            <h4 className="text-sm font-display font-semibold text-[#A4471C] mb-0.5">
-              {focusedResource.name}
-            </h4>
-            <p className="text-xs font-mono text-white/50">
-              {focusedResource.type} · {focusedResource.actions.length} actions
-            </p>
-          </div>
-
-          {/* Actions */}
-          <div className="bg-[#0E0E0C] p-1.5 rounded border border-white/10 space-y-1">
-            <p className="text-xs font-mono text-white/50 uppercase tracking-wider">Actions</p>
-            <div className="flex flex-wrap gap-1">
-              {focusedResource.actions.map((action) => (
-                <span key={action} className="px-1 py-0.5 bg-[#2B2B2F] rounded text-xs font-mono text-white/70 border border-white/5">
-                  {action}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Attributes & Relationships */}
-          <div className="grid grid-cols-2 gap-1.5 text-xs">
-            <div className="bg-white/5 rounded p-1 border border-white/10">
-              <p className="text-white/50 uppercase tracking-wider mb-0.5 font-mono text-xs">Attrs</p>
-              <p className="font-mono font-semibold text-white text-sm">{focusedResource.attributes}</p>
-            </div>
-            <div className="bg-white/5 rounded p-1 border border-white/10">
-              <p className="text-white/50 uppercase tracking-wider mb-0.5 font-mono text-xs">Rels</p>
-              <p className="font-mono font-semibold text-white text-sm">{focusedResource.relationships}</p>
-            </div>
-          </div>
-
-          {/* Linked specs */}
-          {focusedResource.adrs.length > 0 && (
-            <div>
-              <p className="text-xs font-mono text-white/50 uppercase tracking-wider font-semibold mb-1">
-                Specs
-              </p>
-              <div className="space-y-1">
-                {focusedResource.adrs.map((adr) => (
-                  <div key={adr} className="px-1.5 py-0.5 bg-[#2B2B2F] rounded text-xs border-l-2 border-[#A4471C] font-mono text-white/70">
-                    {adr}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      <style jsx>{`
-        @keyframes fadeIn-slow {
-          from { opacity: 0; transform: translateY(8px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn-slow {
-          animation: fadeIn-slow 0.6s ease-out;
-        }
-      `}</style>
-    </div>
-  );
+  return <div ref={containerRef} className="flex-1 bg-[#0E0E12] overflow-hidden" />;
 }
 
 export function HowItWorksSection() {
@@ -510,22 +719,22 @@ export function HowItWorksSection() {
       },
       { threshold: 0.3 }
     );
-
     if (sectionRef.current) observer.observe(sectionRef.current);
     return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
     if (!isVisible) return;
-
     autoplayRef.current = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % steps.length);
     }, 6000);
-
     return () => {
       if (autoplayRef.current) clearInterval(autoplayRef.current);
     };
   }, [isVisible]);
+
+  const showDrawer = activeStep >= 1;
+  const feedEvents = activityFeedScenes[activeStep];
 
   return (
     <section
@@ -544,14 +753,15 @@ export function HowItWorksSection() {
             Foundry Studio
           </h2>
           <p className="text-lg text-background/70 max-w-xl">
-            See how the domain model becomes your single source of truth — and how AI reads it in real time.
+            See how the domain model becomes your single source of truth — and
+            how AI reads it in real time.
           </p>
         </div>
 
-        {/* Two-column layout: Steps on left, Demo on right */}
+        {/* Two-column: step nav + studio shell */}
         <div className="flex gap-8 lg:gap-12 items-stretch">
-          {/* Left column - Steps navigation */}
-          <div className="w-72 shrink-0">
+          {/* Step navigator */}
+          <div className="w-64 shrink-0">
             <div className="space-y-1 sticky top-32">
               {steps.map((step, index) => (
                 <button
@@ -565,7 +775,9 @@ export function HowItWorksSection() {
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <span className="font-display text-lg text-background/50 shrink-0">{step.number}</span>
+                    <span className="font-display text-lg text-background/50 shrink-0">
+                      {step.number}
+                    </span>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-display font-semibold mb-1 group-hover:translate-x-0.5 transition-transform text-background">
                         {step.title}
@@ -573,15 +785,11 @@ export function HowItWorksSection() {
                       <p className="text-xs text-background/60 leading-relaxed">
                         {step.description}
                       </p>
-
-                      {/* Progress bar */}
                       {activeStep === index && (
                         <div className="mt-3 h-0.5 bg-background/20 overflow-hidden rounded-full">
                           <div
                             className="h-full bg-[#A4471C] w-0"
-                            style={{
-                              animation: 'progress 6s linear forwards'
-                            }}
+                            style={{ animation: "progress 6s linear forwards" }}
                           />
                         </div>
                       )}
@@ -592,17 +800,68 @@ export function HowItWorksSection() {
             </div>
           </div>
 
-          {/* Right column - Studio Demo with Cytoscape */}
+          {/* Studio shell */}
           <div
-            className={`flex-1 transition-all duration-700 ${
+            className={`flex-1 min-w-0 transition-all duration-700 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
-            <CytoscapeGraph sceneIndex={activeStep} />
+            <div
+              className="w-full rounded-xl overflow-hidden border border-white/8 bg-[#0E0E12] flex flex-col"
+              style={{ height: 560 }}
+            >
+              {/* Top bar */}
+              <div className="h-9 bg-[#16161A] border-b border-white/5 flex items-center px-3 gap-3 shrink-0">
+                {/* Traffic lights */}
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/80" />
+                </div>
+
+                {/* Tabs */}
+                <div className="flex gap-0.5 ml-2">
+                  {["System Map", "Coverage", "Compliance", "Activity"].map(
+                    (tab) => (
+                      <span
+                        key={tab}
+                        className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+                          tab === "System Map"
+                            ? "bg-white/10 text-white/80"
+                            : "text-white/30 hover:text-white/50"
+                        }`}
+                      >
+                        {tab}
+                      </span>
+                    )
+                  )}
+                </div>
+
+                {/* Search */}
+                <div className="ml-auto flex items-center bg-white/5 rounded border border-white/8 px-2 py-0.5 gap-1.5">
+                  <span className="text-white/30 text-xs">⌕</span>
+                  <span className="text-xs font-mono text-white/25">
+                    Search modules…
+                  </span>
+                </div>
+              </div>
+
+              {/* Body: detail drawer + graph + activity feed */}
+              <div className="flex flex-1 overflow-hidden">
+                {/* Left detail drawer */}
+                <DetailDrawer visible={showDrawer} sceneIndex={activeStep} />
+
+                {/* Cytoscape graph */}
+                <CytoscapeGraph sceneIndex={activeStep} />
+
+                {/* Right activity feed */}
+                <ActivityFeed events={feedEvents} sceneIndex={activeStep} />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Navigation dots - below demo */}
+        {/* Navigation dots */}
         <div className="flex justify-center gap-2 mt-8">
           {steps.map((_, index) => (
             <button
@@ -621,8 +880,12 @@ export function HowItWorksSection() {
 
       <style jsx>{`
         @keyframes progress {
-          from { width: 0%; }
-          to { width: 100%; }
+          from {
+            width: 0%;
+          }
+          to {
+            width: 100%;
+          }
         }
       `}</style>
     </section>
