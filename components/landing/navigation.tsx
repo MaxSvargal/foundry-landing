@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { name: "Product", href: "#features" },
+  { name: "Platform", href: "#features" },
   { name: "How it works", href: "#how-it-works" },
-  { name: "For your team", href: "#for-your-team" },
-  { name: "Pricing", href: "#pricing" },
+  { name: "Foundry Cloud", href: "#foundry-cloud" },
+  { name: "Why Elixir", href: "#why-elixir" },
 ];
 
 export function Navigation() {
@@ -68,14 +68,17 @@ export function Navigation() {
 
           <div className="hidden md:flex items-center gap-4">
             <Link href="#" className={`text-white/60 transition-all duration-500 hover:text-white ${isScrolled ? "text-xs" : "text-sm"}`}>
-              Source Code
+              Docs
+            </Link>
+            <Link href="#" className={`text-white/60 transition-all duration-500 hover:text-white ${isScrolled ? "text-xs" : "text-sm"}`}>
+              GitHub
             </Link>
             <Button
               asChild
               size="sm"
               className={`rounded-full border border-white bg-white text-black transition-all duration-500 hover:bg-white/92 ${isScrolled ? "h-9 px-4 text-xs" : "px-6"}`}
             >
-              <Link href="#">Take a Tour</Link>
+              <Link href="#">Start →</Link>
             </Button>
           </div>
 
@@ -122,26 +125,26 @@ export function Navigation() {
           </div>
           
           <div className={`flex gap-4 border-t border-white/10 pt-8 transition-all duration-500 ${
-            isMobileMenuOpen 
-              ? "opacity-100 translate-y-0" 
+            isMobileMenuOpen
+              ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-4"
           }`}
           style={{ transitionDelay: isMobileMenuOpen ? "300ms" : "0ms" }}
           >
-            <Button 
+            <Button
               asChild
               variant="outline"
               className="h-14 flex-1 rounded-full border-white/20 bg-transparent text-base text-white hover:bg-white/6 hover:text-white"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <Link href="#">Source Code</Link>
+              <Link href="#">Docs</Link>
             </Button>
-            <Button 
+            <Button
               asChild
               className="h-14 flex-1 rounded-full bg-white text-base text-black hover:bg-white/92"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <Link href="#">Take a Tour</Link>
+              <Link href="#">Start →</Link>
             </Button>
           </div>
         </div>

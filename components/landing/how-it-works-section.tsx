@@ -16,27 +16,27 @@ const STEPS = [
   {
     number: "I",
     title: "Your domain as a live graph",
-    description: "The system map is extracted directly from your Ash code. Every node is a resource, transfer, rule, or reactor. Every edge is a relationship or side effect.",
+    description: "Foundry reads your Ash codebase and reflects it: every action, policy, relationship, and external boundary becomes a node; every call, dependency, and data flow becomes a typed edge.",
   },
   {
     number: "II",
     title: "Click a node. See everything.",
-    description: "Click any resource to open the details panel — actions, linked ADRs, compliance rules, and test coverage at a glance.",
+    description: "Select any node — see the transitive set of everything a change would touch, as a number and a highlighted subgraph. The graph is derived, never drifts. Code is the source of truth.",
   },
   {
     number: "III",
     title: "Tests light up the map",
-    description: "Run a scenario. The execution path traces across the graph — every node touched, in order, with side effects visible.",
+    description: "Run a test and replay it as an inspectable trace — step by step, state by state — and validate the logic without opening a source file. Reviewers see what the system does, not just what it says.",
   },
   {
     number: "IV",
     title: "Copilot proposes a change",
-    description: "Ask for a feature. The copilot reads your live domain model, finds constraints, and opens a proposal — blast radius included.",
+    description: "Ask for a feature. The copilot reads your live domain model, finds constraints, and produces a graph diff, validated against your real schema. Invalid structure never compiles into your codebase.",
   },
   {
     number: "V",
     title: "Change lands on the graph",
-    description: "The copilot's code changes light up in real time. New rules, new transfers — all wired into the live domain map instantly.",
+    description: "The copilot's code changes light up in real time. Every edit is scoped before it lands. New rules, new transfers — all wired into the live domain map instantly.",
   },
 ];
 
@@ -763,13 +763,13 @@ export function HowItWorksSection() {
         <div className="mb-16">
           <span className="inline-flex items-center gap-3 text-sm font-mono text-background/60 mb-4">
             <span className="h-px w-8 bg-background/20" />
-            Interactive walkthrough
+            The on-ramp
           </span>
           <h2 className="text-4xl lg:text-5xl font-display font-semibold text-background mb-3 leading-tight">
-            Foundry Studio
+            From idea to running app, without leaving Studio.
           </h2>
           <p className="text-lg text-background/70 max-w-xl">
-            See how the domain model becomes your single source of truth — and how AI reads it in real time.
+            Ten minutes, end to end — because every step operates on a structure, not on a wall of generated text.
           </p>
         </div>
 

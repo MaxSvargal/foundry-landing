@@ -28,15 +28,13 @@ export function CtaSection() {
         >
           <div className="max-w-[1400px] mx-auto">
             <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-10">
-              The map is the territory now.
+              The closer
             </p>
             <h2 className="text-5xl lg:text-8xl xl:text-9xl font-display font-semibold text-[#1B1B19] leading-[0.95] tracking-tight mb-10 lg:mb-16">
-              Stop maintaining
-              <br />
-              two of them.
+              The system of record for software that AI helped build.
             </h2>
-            <p className="text-lg lg:text-xl text-[#6B6860] leading-relaxed max-w-2xl mb-12 lg:mb-16">
-              If you are building something complex, domain-heavy, and long-lived — and you want to build it in a way your team, your AI, and your auditors can all understand three years from now — foundry is built for you.
+            <p className="text-lg lg:text-2xl text-[#6B6860] leading-relaxed max-w-2xl mb-12 lg:mb-16">
+              That's the whole promise.
             </p>
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <a
@@ -49,7 +47,7 @@ export function CtaSection() {
                 href="#"
                 className="inline-flex items-center gap-2 border border-[#D8D2C8] text-[#1B1B19] px-8 py-4 text-sm font-medium hover:border-[#1B1B19]/40 transition-colors duration-200"
               >
-                Read the technical paper
+                Open Foundry Cloud
               </a>
             </div>
           </div>

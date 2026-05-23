@@ -33,7 +33,7 @@ export function FooterSection() {
               <span className="font-mono text-[10px] text-[#A4471C] tracking-widest uppercase">beta</span>
             </a>
             <p className="text-sm text-[#6B6860] leading-relaxed max-w-xs mb-8">
-              Built on Ash, Elixir, and the BEAM. Open source. Made by people who've shipped distributed systems and don't want to do it the hard way again.
+              Open-source platform for software that AI helped build. Elixir, Ash, BEAM. Made by people who've run distributed systems and refuse to do it the hard way again.
             </p>
             <div className="flex gap-5">
               <a href="#" className="text-sm text-[#6B6860] hover:text-[#1B1B19] transition-colors">
@@ -78,7 +78,7 @@ export function FooterSection() {
         {/* Bottom bar */}
         <div className="py-6 border-t border-[#D8D2C8] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <p className="text-xs text-[#6B6860] font-mono">
-            © 2026 Foundry. Your codebase is the spec. It never lies.
+            © 2026 Foundry. Software you can still understand.
           </p>
           <p className="text-xs text-[#6B6860]/60 font-mono">
             Product · Docs · GitHub · Changelog · Security · Pricing

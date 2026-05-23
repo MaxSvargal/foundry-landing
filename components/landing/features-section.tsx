@@ -6,30 +6,30 @@ import { LiquidGlassBackdrop } from "./liquid-glass-backdrop";
 const features = [
   {
     number: "01",
-    title: "Constraints become code.",
+    title: "Foundry's agent doesn't edit text. It edits a validated structure.",
     description:
-      "Right now the reason a resource is sensitive exists in one person's memory and nowhere else. When that person leaves, the constraint vanishes. Foundry makes constraints executable — they live in code as specs, and the linter fires when they're violated.",
+      "Other agents generate code and pray. Foundry's agent operates on a graph derived from your real codebase: It cannot reference a resource that doesn't exist — the graph won't allow it. It cannot make a change without the blast radius being computed — every edit is scoped before it lands. It cannot violate an invariant silently — the model rejects the change at the boundary.",
     visual: "collab",
   },
   {
     number: "02",
-    title: "The map is the code.",
+    title: "Foundry reads your Ash codebase and reflects it.",
     description:
-      "The diagram drawn in week one describes a system that no longer exists. In Foundry, the system map is not inferred from code — it is the code. A lossless rendering generated from the same source the compiler validates. It cannot drift.",
+      "Every action, policy, relationship, and external boundary becomes a node; every call, dependency, and data flow becomes a typed edge. You stop reading code to understand the system. You read the system. Navigate by meaning, not by filename. Blast radius is computed, not guessed. The graph is derived, never drifts. Execution is an overlay, not a guess.",
     visual: "deploy",
   },
   {
     number: "03",
-    title: "Your copilot reads your domain, not its training data.",
+    title: "From idea to running app, without leaving Studio.",
     description:
-      "The copilot doesn't know your invariants. It knows what Elixir looked like in its training data. Foundry's copilot reads your domain model live from the compiler, your ADRs, your compliance links, and your sensitivity classifications before proposing anything.",
+      "Ask. Describe the project or the feature in Foundry Studio. Preview. Studio spins up a live dev server. You see it running, immediately. Review. Inspect the change as a graph diff, walk the test traces, read the invariants. Fix. Correct in plain language or in code. Both round-trip. Commit & deploy. One click to production.",
     visual: "ai",
   },
   {
     number: "04",
-    title: "Blast radius before merge, not after.",
+    title: "Tests you can read without reading code.",
     description:
-      "Nobody knew that modifying this action would break three downstream compliance obligations. Foundry proposes on a branch, classifies the change as :structural, :behavioral, or :compliance, and routes it to the right approver before anything merges.",
+      "A serious system needs a real test pyramid: Unit, Property (thousands of inputs and action sequences), Integration, Scenario (end-to-end domain flows in business language), Regression (every fixed bug, pinned). Each test attaches to the graph node it exercises. Click a node, watch the test execute as a trace — and Foundry checks the tests themselves with mutation analysis.",
     visual: "security",
   },
 ];
@@ -221,16 +221,16 @@ export function FeaturesSection() {
           <div className="mb-16">
             <span className="mb-6 inline-flex items-center gap-3 text-sm font-mono text-black/52">
               <span className="h-px w-8 bg-black/20" />
-              The problem nobody talks about honestly
+              The core idea
             </span>
             <h2
               className={`text-4xl font-display tracking-tight text-black transition-all duration-700 lg:text-8xl ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
               }`}
             >
-              Starting is no longer
+              Foundry's agent doesn't
               <br />
-              <span className="text-black/45">the hard part.</span>
+              <span className="text-black/45">edit text.</span>
             </h2>
           </div>
           <div>

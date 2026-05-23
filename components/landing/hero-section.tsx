@@ -3,12 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { FluidBackground } from "./fluid-background";
 
-const words = ["governs", "enforces", "scales", "endures"];
+const words = ["understand", "change", "trust", "audit", "reason"];
 const stats = [
   { value: "2M", label: "WebSockets on a single node" },
   { value: "0%", label: "Spec-code drift" },
@@ -105,8 +104,8 @@ export function HeroSection() {
         )}
       /> */}
 
-      <div className="pointer-events-none relative z-10 mx-auto flex w-full max-w-[1440px] flex-1 flex-col justify-center px-6 pb-40 pt-32 sm:pt-36 lg:px-20 lg:pb-44 lg:pt-40">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-center">
+      <div className="pointer-events-none relative z-10 mx-auto flex w-full flex-1 flex-col justify-center px-8 py-40">
+        <div className="flex justify-center gap-8 flex-row lg:items-center">
           <div
             className={cn(
               "transition-all duration-1000",
@@ -116,29 +115,23 @@ export function HeroSection() {
             <Image
               src="/foundry-logo.png"
               alt="Foundry logo"
-              width={400}
-              height={400}
+              width={248}
+              height={320}
               priority
-              className="h-24 w-auto drop-shadow-[0_0_40px_rgba(255,255,255,0.08)] sm:h-32 lg:h-72"
+              className="h-48 w-auto sm:h-46 lg:h-64 object-contain"
             />
           </div>
 
-          <h1
-            className={cn(
-              "max-w-[10ch] font-sans text-[clamp(3.5rem,11vw,9.5rem)] leading-[0.84] font-normal tracking-[-0.04em] [text-shadow:1px_0_30px_rgba(0,0,0,0.2)] transition-all duration-1000",
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
-            )}
-          >
-            <span className="block">Your codebase</span>
-            <span className="block">
-              that{" "}
-              <span key={wordIndex} className="inline-flex min-w-[1.2em] text-[#fc7b03]">
-                {words[wordIndex].split("").map((char, index) => (
-                  <span
-                    key={`${wordIndex}-${index}`}
-                    className="inline-block animate-char-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  >
+          <h1 className={cn(
+            "self-center max-w-[14ch] font-sans text-[clamp(3rem,8vw,10rem)] leading-[0.9] [text-shadow:1px_0_4px_rgba(0,0,0,0.22)] font-normal tracking-tighter transition-all duration-1000",
+            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
+          )}>
+            <span>Software <br/>you can still </span>
+            <span>
+              <span key={wordIndex} className="inline-flex min-w-[7ch] text-[#fc7b03]">
+                {words[wordIndex].split("").map((char, i) => (
+                  <span key={`${wordIndex}-${i}`} className="inline-block animate-char-in"
+                        style={{ animationDelay: `${i * 50}ms` }}>
                     {char}
                   </span>
                 ))}
@@ -156,29 +149,20 @@ export function HeroSection() {
           >
             <p
               className={cn(
-                "mb-8 text-3xl font-medium leading-tight xxl:text-44xl xxl:leading-[1.18]",
+                "mb-8 text-xl md:text-2xl lg:text-3xl font-medium leading-tight xxl:text-4xl xxl:leading-[1.18]",
                 "text-white/96",
               )}
             >
-              Build, run, and understand complex platforms — without the complexity.
-              
+              Generating an app is the easy part now. Keeping it understandable, changeable, and correct as it grows is the part nobody solved. That's Foundry.
               </p>
                           <p
               className={cn(
-                "mb-3 text-xl font-medium leading-6 xxl:text-2xl xxl:leading-8",
+                "mb-3 text-md md:text-xl font-medium leading-6 xxl:text-2xl xxl:leading-8",
                 "text-[#f5f1ea]",
               )}
             >
-              A full-stack development environment with a live system graph that knows your domain. Your AI copilot works from declarative code as specs, tests, traces, and decisions — not from guesses. Everything your team needs from day one. 
+              Open-source. Built on Elixir and Ash. Your codebase, reflected as a living graph that the agent can read, reason about, and never lie to.
               </p>
-            <p
-              className={cn(
-                "mt-8 text-md italic leading-tight",
-                "text-white/80",
-              )}
-            >
-              Foundry built on Elixir/Ash ecosystem and Open Source. <br/>Eject code any time.
-            </p>
           </div>
 
           <div
@@ -193,8 +177,7 @@ export function HeroSection() {
               className="h-auto rounded-full border border-white bg-white px-8 py-4 text-base font-bold text-black shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[##f5f1ea] hover:text-black sm:px-10 sm:py-5 sm:text-lg"
             >
               <Link href="#">
-                Take a Tour
-                <ArrowRight className="ml-2 h-4 w-4" />
+                Install Foundry →
               </Link>
             </Button>
             <Button
@@ -203,7 +186,7 @@ export function HeroSection() {
               variant="outline"
               className="h-auto rounded-full border-white/30 bg-transparent px-8 py-4 text-base font-bold text-white transition-all duration-300 hover:border-transparent hover:bg-black hover:text-white sm:px-10 sm:py-5 sm:text-lg"
             >
-              <Link href="#">Source Code</Link>
+              <Link href="#">See it on a real system →</Link>
             </Button>
           </div>
         </div>

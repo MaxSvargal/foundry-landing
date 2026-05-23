@@ -4,32 +4,36 @@ import { useEffect, useState, useRef } from "react";
 
 const faqs = [
   {
-    q: "Is this a low-code tool?",
-    a: "No. The output is plain Ash code in your repo. If Foundry disappears, you still have an Elixir application. Low-code tools own the runtime. We don't.",
+    q: "Is this a low-code platform?",
+    a: "No. Output is plain Ash code you own. Low-code platforms own the runtime; Foundry doesn't. Your app runs on plain BEAM with or without us.",
+  },
+  {
+    q: "Won't the agent hallucinate Ash code?",
+    a: "It doesn't write raw DSL into your repo. It produces a graph diff, validated against your real schema. Invalid structure never compiles into your codebase.",
+  },
+  {
+    q: "Is the \"ten minutes\" real?",
+    a: "Yes — and it's the whole loop, not a build metric: ask, live preview, review the graph diff and traces, fix, commit, deploy. Not a template drop. A real change you reviewed and shipped.",
   },
   {
     q: "Does it work with my existing Elixir app?",
-    a: "If you're using Ash, yes, immediately. If you're on raw Phoenix/Ecto, Foundry can read the parts that map cleanly, but the graph gets richer as you migrate to Ash. We don't force the migration.",
+    a: "If you're on Ash, immediately. On raw Phoenix/Ecto, Foundry reads what maps cleanly and gets richer as you adopt Ash. No forced migration.",
   },
   {
-    q: "What about Python / TypeScript services we already have?",
-    a: "They appear in the graph as external resources with typed boundaries (OpenAPI, Protobuf, JSON Schema). Foundry won't pretend to understand their internals, but it will track the contract.",
+    q: "What about our Python / TypeScript services?",
+    a: "They appear in the graph as external resources with typed contracts. Foundry tracks the boundary; it won't pretend to understand their internals.",
   },
   {
-    q: "Won't the LLM hallucinate Ash code?",
-    a: "Less than you'd expect — and structurally less than with TypeScript or Go. Elixir's pattern matching rejects hallucinated data shapes at compile time, not at runtime. Immutability means there's no shared state for the model to incorrectly assume. AutoCodeBench found Elixir scores 80.3% Pass@1 on Claude Opus 4 — roughly 30 percentage points above Python and Java. The benchmark authors note that low-resource languages may receive slightly easier test cases — read the 80.3% directionally rather than as an absolute ceiling. The structural reasons hold regardless. Beyond that: the agent doesn't write raw DSL. It produces a graph diff that Foundry validates against the actual Ash schema before anything reaches your codebase.",
+    q: "How do you handle versioning and collaboration?",
+    a: "Git. Code is the source of truth, the graph is derived deterministically, standard PR workflows apply. Multi-user graph editing in Foundry Cloud builds on the same foundation.",
   },
   {
-    q: "How do you handle versioning?",
-    a: "Git. Code is the source of truth, the graph is derived deterministically. Standard PR workflows. Schema-level migration tools (mix ash.codegen, ash_postgres) handle the database side.",
-  },
-  {
-    q: "Can I host this myself?",
-    a: "The CLI and graph are local-first. The SaaS — hosted history, team views, deploy — is opt-in and we publish a self-hosted edition for teams who need it.",
+    q: "Where does Foundry Cloud deploy?",
+    a: "Into a Foundry-managed environment. You deploy your app; we run the infrastructure under it. The open-source platform stays fully usable on its own.",
   },
   {
     q: "What's the catch?",
-    a: "You're trusting Ash and the BEAM. Both have been load-bearing in production for over a decade. Neither is going anywhere. That's the bet.",
+    a: "You're betting on Elixir, Ash, and the BEAM. All three have been load-bearing in production for over a decade. That's the bet — and we think it's the right one for software meant to last.",
   },
 ];
 
@@ -104,12 +108,10 @@ export function TestimonialsSection() {
               }`}
             >
               <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
-                FAQ
+                FAQ (real objections, answered straight)
               </span>
               <h2 className="text-4xl lg:text-5xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight">
-                Handle the real objections,
-                <br />
-                <span className="text-[#1B1B19]/35">not the marketing ones.</span>
+                What Foundry is not.
               </h2>
             </div>
 

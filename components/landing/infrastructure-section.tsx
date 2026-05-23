@@ -90,10 +90,10 @@ export function InfrastructureSection() {
           }`}
         >
           <span className="font-mono text-lg text-[#A4471C] tracking-widest uppercase block mb-6">
-            Why Elixir and Ash
+            Why Elixir and Ash — the part that makes this defensible
           </span>
           <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight max-w-3xl">
-            Foundry isn't a wrapper. It's a layer on top of a stack chosen deliberately.
+            This is a deliberate stack bet, and it's the reason Foundry is hard to copy.
           </h2>
         </div>
 

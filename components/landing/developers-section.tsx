@@ -80,10 +80,10 @@ export function DevelopersSection() {
           }`}
         >
           <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
-            What's different
+            For the rest of your team
           </span>
           <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight">
-            The line that matters.
+            The same graph, projected for whoever needs it.
           </h2>
         </div>
 
@@ -145,7 +145,7 @@ export function DevelopersSection() {
           }`}
         >
           <p className="text-xl lg:text-2xl font-display font-semibold text-[#1B1B19] leading-snug">
-            Everything Foundry shows you is derived from code you own. Delete Foundry tomorrow and your app keeps running.
+            Staff engineers — architecture decisions pinned to nodes. Product — the domain layer in business language. Audit & compliance — the authorization model *is* the documentation.
           </p>
         </div>
       </div>

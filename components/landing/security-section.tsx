@@ -59,10 +59,10 @@ export function SecuritySection() {
           }`}
         >
           <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
-            What you get on day one
+            Foundry, open source
           </span>
           <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight max-w-3xl">
-            A complete, production-grade platform — built to your domain exactly, owned entirely by you.
+            The platform is open source and local-first.
           </h2>
         </div>
 
