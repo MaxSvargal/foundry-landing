@@ -23,14 +23,10 @@ const stats = [
 ];
 
 export function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible] = useState(true);
   const [wordIndex, setWordIndex] = useState(0);
   const [fluidMode, setFluidMode] = useState<"hero" | "feature" | "how-it-works" | "off">("hero");
   const [isFluidMuted, setIsFluidMuted] = useState(true);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -89,7 +85,7 @@ export function HeroSection() {
 
   return (
     <section
-      className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-[#050408] text-white"
+      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#050408] text-white"
       onPointerMove={(event) => {
         setIsFluidMuted(event.target === event.currentTarget);
       }}
@@ -104,11 +100,11 @@ export function HeroSection() {
         )}
       /> */}
 
-      <div className="pointer-events-none relative z-10 mx-auto flex w-full flex-1 flex-col justify-center px-8 py-40">
-        <div className="flex justify-center gap-8 flex-column items-center">
+      <div className="mx-auto max-w-360 px-6 lg:px-12 pointer-events-none relative z-10 flex flex-1 flex-col justify-center py-40">
+        <div className="flex items-center gap-8">
           <div
             className={cn(
-              "transition-all duration-1000",
+              "shrink-0 transition-all duration-3000",
               isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
             )}
           >
@@ -118,12 +114,12 @@ export function HeroSection() {
               width={248}
               height={320}
               priority
-              className="h-48 w-auto sm:h-46 lg:h-64 object-contain"
+              className="h-[clamp(10rem,20vw,20rem)] w-auto object-contain"
             />
           </div>
 
           <h1 className={cn(
-            "self-center max-w-[14ch] font-sans text-[clamp(3rem,8vw,10rem)] leading-[0.9] [text-shadow:1px_0_4px_rgba(0,0,0,0.22)] font-normal tracking-tighter transition-all duration-1000",
+            "font-sans text-[clamp(3rem,8vw,10rem)] leading-[0.87] [text-shadow:1px_0_4px_rgba(0,0,0,0.22)] font-normal tracking-tight transition-all duration-3000",
             isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
           )}>
             <span>Software <br/>you can still </span>
@@ -140,7 +136,7 @@ export function HeroSection() {
           </h1>
         </div>
 
-        <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-12">
+        <div className="mt-12 grid items-center lg:mt-34 lg:grid-cols-2">
           <div
             className={cn(
               "max-w-2xl transition-all duration-700 delay-200 [text-shadow:1px_0_2px_rgba(0,0,0,0.22)]",
@@ -153,7 +149,7 @@ export function HeroSection() {
                 "text-white/96",
               )}
             >
-              Generating an app is the easy part now. Keeping it understandable, changeable, and correct as it grows is the part nobody solved. That's Foundry.
+              Generating code is the easy part now. Keeping it understandable, changeable, and correct as it grows is the part nobody solved. That's Foundry.
               </p>
                           <p
               className={cn(
@@ -161,7 +157,7 @@ export function HeroSection() {
                 "text-[#f5f1ea]",
               )}
             >
-              Open-source. Built on Elixir and Ash. Your codebase, reflected as a living graph that the agent can read, reason about, and never lie to.
+              Open-source. Built on Elixir and Ash. Your codebase, reflected as a living graph that you and agent can read, reason about, and never lie to.
               </p>
           </div>
 
