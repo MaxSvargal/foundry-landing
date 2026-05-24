@@ -168,23 +168,24 @@ function FeatureCard({ feature, index }: { feature: (typeof features)[0]; index:
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
-      <div className="flex flex-col gap-8 border-b border-black/10 py-12 lg:flex-row lg:gap-16 lg:py-4">
-        <div className="shrink-0">
+      <div className="flex flex-col gap-8 border-b border-black/10 py-12 lg:flex-row lg:gap-16 lg:py-8">
+        {/* <div className="shrink-0">
           <span className="font-mono text-sm text-black/40">{feature.number}</span>
-        </div>
+        </div> */}
         <div className="flex-1 grid lg:grid-cols-2 gap-8 items-center">
           <div>
-            <h3 className="mb-4 text-3xl font-display text-black transition-transform duration-500 group-hover:translate-x-2 lg:text-4xl">
+            <h3 className="mb-4 text-2xl font-display text-black transition-transform duration-500 group-hover:translate-x-2 lg:text-3xl">
               {feature.title}
             </h3>
-            <p className="text-lg leading-relaxed text-black/72">
-              {feature.description}
-            </p>
           </div>
           <div className="flex justify-center lg:justify-end">
-            <div className="h-64 w-64 text-black/80">
+            {/* <div className="h-64 w-64 text-black/80">
               <Visual />
-            </div>
+            </div> */}
+
+            <p className="text-lg leading-relaxed">
+              {feature.description}
+            </p>
           </div>
         </div>
       </div>

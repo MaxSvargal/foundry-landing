@@ -105,7 +105,7 @@ export function HeroSection() {
       /> */}
 
       <div className="pointer-events-none relative z-10 mx-auto flex w-full flex-1 flex-col justify-center px-8 py-40">
-        <div className="flex justify-center gap-8 flex-row lg:items-center">
+        <div className="flex justify-center gap-8 flex-column items-center">
           <div
             className={cn(
               "transition-all duration-1000",

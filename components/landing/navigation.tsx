@@ -35,8 +35,8 @@ export function Navigation() {
       <nav 
         className={`mx-auto transition-all duration-500 ${
           isScrolled || isMobileMenuOpen
-            ? "max-w-[1320px] rounded-4xl bg-[#0c0a12]/72 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
-            : "max-w-[1400px] rounded-4xl bg-transparent"
+            ? "max-w-330 rounded-4xl bg-[#0c0a12]/72 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl"
+            : "max-w-350 rounded-4xl bg-transparent"
         }`}
       >
         <div 
@@ -58,7 +58,7 @@ export function Navigation() {
               <Link
                 key={link.name}
                 href={link.href}
-                className="group relative text-sm tracking-[0.08em] text-white/70 transition-colors duration-300 hover:text-white"
+                className="group relative text-sm tracking-[0.08em] text-white/70 transition-colors duration-300 px-4 py-2 rounded-4xl overflow-hidden hover:text-black hover:bg-white"
               >
                 {link.name}
                 <span className="absolute -bottom-1 left-0 h-px w-0 bg-[#FC7B03] transition-all duration-300 group-hover:w-full" />
