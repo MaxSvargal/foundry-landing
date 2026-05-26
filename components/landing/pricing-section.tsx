@@ -68,7 +68,7 @@ export function PricingSection() {
             Pricing
           </span>
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-            <h2 className="text-4xl lg:text-6xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight">
+            <h2 className="text-4xl lg:text-7xl font-display font-semibold text-[#F5F1EA] leading-[1.05] tracking-tight">
               Open source core.
               <br />
               <span className="text-[#F5F1EA]/35">Governed copilot.</span>

@@ -756,35 +756,109 @@ export function HowItWorksSection() {
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="relative py-24 lg:py-40 bg-[#0c090b] text-background overflow-hidden"
+      className="relative py-24 lg:py-40 bg-foreground text-background overflow-hidden"
     >
-      <div className="relative z-10 max-w-350 w-full aspect-video mx-auto px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
         <div className="mb-16">
           <span className="inline-flex items-center gap-3 text-sm font-mono text-background/60 mb-4">
             <span className="h-px w-8 bg-background/20" />
             The on-ramp
           </span>
-          <h2 className="text-4xl lg:text-6xl font-display font-semibold text-background mb-3 leading-tight">
-            Code and tests as a living map
+          <h2 className="text-4xl lg:text-5xl font-display font-semibold text-background mb-3 leading-tight">
+            Reflection — code as a living map
           </h2>
-          <p className="text-xl text-background/80 mt-2">
-            Ten minutes to feature, end to end — because every step operates on a structure, not on a wall of generated text.
+          <p className="text-lg text-background/70 max-w-xl">
+            Ten minutes, end to end — because every step operates on a structure, not on a wall of generated text.
           </p>
         </div>
 
-        <div className="w-full rounded-xl overflow-hidden border border-white/[0.07] bg-[#0C0C12] flex flex-col">
-          <div className="h-8 bg-[#15151C] border-b border-white/5 flex items-center px-3 gap-3 shrink-0">
-            <div className="flex gap-1.5">
-              <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
-              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
-              <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+        <div className="flex gap-8 lg:gap-12 items-stretch">
+          {/* Step navigator */}
+          <div className="w-60 shrink-0">
+            <div className="space-y-0.5 sticky top-32">
+              {STEPS.map((step, index) => (
+                <button
+                  key={step.number}
+                  type="button"
+                  onClick={() => handleStepClick(index)}
+                  className={`w-full text-left py-3.5 px-4 border-l-2 transition-all duration-300 group ${
+                    activeStep === index
+                      ? "opacity-100 border-l-[#A4471C] bg-white/5"
+                      : "opacity-55 border-l-transparent hover:opacity-75"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="font-display text-base text-background/45 shrink-0 mt-px">{step.number}</span>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-sm font-display font-semibold mb-0.5 text-background group-hover:translate-x-0.5 transition-transform">
+                        {step.title}
+                      </h3>
+                      <p className="text-[11px] text-background/55 leading-relaxed">
+                        {step.description}
+                      </p>
+                      {activeStep === index && (
+                        <div className="mt-2.5 h-0.5 bg-background/15 overflow-hidden rounded-full">
+                          <div className="h-full bg-[#A4471C] w-0" style={{ animation: "progress 7s linear forwards" }} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
-          <video src="/ScreenFlow.mp4" width="100%" autoPlay muted loop className="aspect-video inset-0 w-full h-full object-fill" />
+
+          {/* Studio shell */}
+          <div
+            className={`flex-1 min-w-0 transition-all duration-700 ${
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <div className="w-full rounded-xl overflow-hidden border border-white/[0.07] bg-[#0C0C12] flex flex-col" style={{ height: 560 }}>
+              {/* Top bar */}
+              <div className="h-8 bg-[#15151C] border-b border-white/5 flex items-center px-3 gap-3 shrink-0">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/70" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/70" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/70" />
+                </div>
+                <div className="flex gap-0.5 ml-2">
+                  {["System Map", "Coverage", "Compliance", "Activity"].map((tab) => (
+                    <span key={tab} className={`px-2 py-0.5 rounded text-[10px] font-mono transition-colors ${
+                      tab === "System Map" ? "bg-white/8 text-white/75" : "text-white/28 hover:text-white/45"
+                    }`}>{tab}</span>
+                  ))}
+                </div>
+                <div className="ml-auto flex items-center bg-white/4 rounded border border-white/[0.07] px-2 py-0.5 gap-1.5">
+                  <span className="text-white/25 text-[10px]">⌕</span>
+                  <span className="text-[10px] font-mono text-white/20">Search modules…</span>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex flex-1 overflow-hidden">
+                <DetailDrawer sceneIndex={activeStep} />
+                <CytoscapeGraph sceneIndex={activeStep} />
+                <ActivityFeed events={feedEvents} />
+              </div>
+            </div>
+          </div>
         </div>
 
-        
+        {/* Dots */}
+        <div className="flex justify-center gap-2 mt-8">
+          {STEPS.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => handleStepClick(index)}
+              className={`transition-all duration-300 rounded-full ${
+                index === activeStep ? "w-6 h-2 bg-background" : "w-2 h-2 bg-background/25 hover:bg-background/45"
+              }`}
+              aria-label={`Scene ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
       <style jsx>{`

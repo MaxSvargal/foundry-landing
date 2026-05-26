@@ -27,10 +27,7 @@ export function CtaSection() {
           }`}
         >
           <div className="max-w-[1400px] mx-auto">
-            <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-10">
-              The closer
-            </p>
-            <h2 className="text-5xl lg:text-8xl xl:text-9xl font-display font-semibold text-[#1B1B19] leading-[0.95] tracking-tight mb-10 lg:mb-16">
+            <h2 className="text-5xl lg:text-6xl xl:text-8xl font-display font-semibold text-[#1B1B19] leading-[0.95] tracking-tight mb-10 lg:mb-16">
               The system of record for software that AI helped build.
             </h2>
             <p className="text-lg lg:text-2xl text-[#6B6860] leading-relaxed max-w-2xl mb-12 lg:mb-16">

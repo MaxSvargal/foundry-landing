@@ -76,9 +76,11 @@ export function Navigation() {
             <Button
               asChild
               size="sm"
-              className={`rounded-full border border-white bg-white text-black transition-all duration-500 hover:bg-white/92 ${isScrolled ? "h-9 px-4 text-xs" : "px-6"}`}
+              className={`rounded-full border border-white bg-[#F5F1EA] text-black transition-all duration-500 hover:bg-white/92 ${isScrolled ? "h-9 px-4 text-xs" : "px-6"}`}
             >
-              <Link href="#">Start →</Link>
+              <Link href="https://cloud.foundry.definitivespec.org/" target="_blank">
+                Sign Up
+              </Link>
             </Button>
           </div>
 

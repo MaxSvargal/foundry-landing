@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import Script from "next/script";
-import { cn } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -10,7 +9,7 @@ declare global {
   }
 }
 
-type FluidMode = "hero" | "feature" | "how-it-works" | "off";
+type FluidMode = "hero" | "off";
 
 interface FluidBackgroundProps {
   mode: FluidMode;
@@ -43,24 +42,33 @@ const FLUID_CONFIG: Record<string, unknown> = {
   SUNRAYS_WEIGHT: 1,
 };
 
+const PROXY_EVENT_TYPES: Array<keyof WindowEventMap> = ["mousemove", "mousedown", "touchstart", "touchmove"];
+
 export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const initializedRef = useRef(false);
+  const isMutedRef = useRef(isMuted);
+  isMutedRef.current = isMuted;
+
+  const loseContext = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const gl = canvas.getContext("webgl2") ?? canvas.getContext("webgl");
+    gl?.getExtension("WEBGL_lose_context")?.loseContext();
+    initializedRef.current = false;
+  }, []);
 
   const initializeFluid = useCallback(() => {
-    if (initializedRef.current) return;
-
-    const canvas = canvasRef.current;
-    const WebGLFluid = window.WebGLFluid;
-
-    if (!canvas || !WebGLFluid) return;
-
+    if (initializedRef.current || !canvasRef.current || !window.WebGLFluid) return;
     initializedRef.current = true;
-    WebGLFluid(canvas, FLUID_CONFIG);
+    window.WebGLFluid(canvasRef.current, FLUID_CONFIG);
   }, []);
 
   useEffect(() => {
-    if (mode === "off") return;
+    if (mode === "off") {
+      loseContext();
+      return;
+    }
 
     initializeFluid();
 
@@ -68,59 +76,41 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
     let moveSkipCounter = 0;
 
     const proxyEvent = (event: MouseEvent | TouchEvent) => {
-      if ("isProxy" in event && (event as Record<string, unknown>).isProxy) return;
-      if (isThrottled || !canvasRef.current) return;
+      if (!initializedRef.current || isThrottled || !canvasRef.current) return;
 
-      const shouldThinMouseMoves = mode === "feature" || mode === "how-it-works" || isMuted;
-
-      if (shouldThinMouseMoves && event.type === "mousemove") {
+      if (isMutedRef.current && event.type === "mousemove") {
         moveSkipCounter += 1;
-        if (moveSkipCounter % (mode === "feature" ? 3 : 4) !== 0) return;
+        if (moveSkipCounter % 4 !== 0) return;
       }
 
       isThrottled = true;
-      window.requestAnimationFrame(() => {
-        isThrottled = false;
-      });
+      requestAnimationFrame(() => { isThrottled = false; });
 
       let clientX: number;
       let clientY: number;
 
-      if ("touches" in event && event.touches.length > 0) {
-        clientX = event.touches[0].clientX;
-        clientY = event.touches[0].clientY;
-      } else if ("changedTouches" in event && event.changedTouches.length > 0) {
-        clientX = event.changedTouches[0].clientX;
-        clientY = event.changedTouches[0].clientY;
+      if (event instanceof TouchEvent) {
+        const touch = event.touches[0] ?? event.changedTouches[0];
+        if (!touch) return;
+        ({ clientX, clientY } = touch);
       } else {
-        const mouseEvent = event as MouseEvent;
-        clientX = mouseEvent.clientX;
-        clientY = mouseEvent.clientY;
+        ({ clientX, clientY } = event);
       }
 
-      const proxied = new MouseEvent(event.type, {
-        clientX,
-        clientY,
-        bubbles: false,
-        cancelable: true,
-        view: window,
-      }) as MouseEvent & { isProxy?: boolean };
-
-      proxied.isProxy = true;
-      canvasRef.current.dispatchEvent(proxied);
+      canvasRef.current.dispatchEvent(
+        new MouseEvent(event.type, { clientX, clientY, bubbles: false, cancelable: true, view: window })
+      );
     };
-    const eventTypes: Array<keyof WindowEventMap> = ["mousemove", "mousedown", "touchstart", "touchmove"];
 
-    eventTypes.forEach((type) => {
-      window.addEventListener(type, proxyEvent as EventListener, { passive: true });
-    });
+    PROXY_EVENT_TYPES.forEach((type) => window.addEventListener(type, proxyEvent as EventListener, { passive: true }));
 
     return () => {
-      eventTypes.forEach((type) => {
-        window.removeEventListener(type, proxyEvent as EventListener);
-      });
+      PROXY_EVENT_TYPES.forEach((type) => window.removeEventListener(type, proxyEvent as EventListener));
+      loseContext();
     };
-  }, [initializeFluid, isMuted, mode]);
+  }, [initializeFluid, mode, loseContext]);
+
+  if (mode === "off") return null;
 
   return (
     <>
@@ -132,16 +122,7 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className={cn(
-          "pointer-events-none fixed inset-0 z-[1] h-screen w-screen transition-all duration-[1200ms] ease-[cubic-bezier(0.4,0,0.2,1)] will-change-[filter,opacity]",
-          mode === "off"
-            ? "opacity-0 [filter:blur(0px)]"
-            : mode === "feature"
-              ? "opacity-100 [filter:invert(0)_hue-rotate(-10deg)_contrast(1.08)_saturate(1.05)_blur(0px)]"
-              : mode === "how-it-works"
-                ? "opacity-80 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(0.8)_blur(0px)]"
-                : "opacity-100 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]",
-        )}
+        className="pointer-events-none fixed inset-0 z-[1] h-screen w-screen opacity-100 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]"
       />
     </>
   );

@@ -106,33 +106,44 @@ export function InfrastructureSection() {
           >
             <div className="text-lg space-y-6 text-[#6B6860] leading-relaxed">
               <p>
-                <strong className="text-[#1B1B19] font-semibold">Ash</strong> is already declarative. Resources, actions, policies, and relationships are data, not code-shaped prose. That's why the graph is honest — there's no hidden imperative layer to misrepresent.
+                <strong>LLMs write Elixir unusually well — and there's a measured reason.</strong> Tencent's AutoCodeBench — 3,920 problems across 20 languages, generated and verified in sandboxes rather than hand-picked — found Elixir had the highest completion rate across models. Not because it's popular; because of what it is: immutability enables local reasoning, the ecosystem's documentation quality gives clean training signal, and the language's stability means that signal stays correct over time.
               </p>
               <p>
-                <strong className="text-[#1B1B19] font-semibold">Elixir on the BEAM</strong> was built by Ericsson for telephone exchanges — systems that needed to run without failure under millions of concurrent connections. That requirement shaped every design decision in the runtime.
+                <strong>Ash makes it better still.</strong> Generated JavaScript rots because nothing enforces structure — the agent can produce any shape, and usually does. Ash is declarative and introspectable: invalid DSL doesn't compile, structure is uniform, and many runtime failures become compile-time errors. An AI generating Ash *cannot* produce the unmaintainable sprawl it produces in a typical Next.js app. The framework won't let it.
               </p>
               <p>
-                Traditional stacks reach for external services — Redis for pub/sub, Kafka for message queuing, a separate job processor — because the runtime cannot handle these concerns natively. <strong className="text-[#1B1B19] font-semibold">The BEAM handles all of it inside the same runtime.</strong>
-              </p>
-              <p>
-                This also matters for LLM-generated code. Elixir's immutability forces local reasoning — functions can't share state, so the model can't silently hallucinate a race condition. Pattern matching rejects data shapes that don't exist in the spec at compile time. ExUnit tests pass on first attempt because pure functions have no mock APIs to invent. AutoCodeBench measured 80.3% Pass@1 for Elixir on Claude Opus 4 — against roughly 50–53% for Python, Java, and C++. 97.5% of Elixir problems were solved by at least one model, the highest of any language in the study.
-              </p>
-
-            <p className="mt-3 text-lg text-[#6B6860]">
-              Built on a runtime where LLMs get it right 80% of the time, versus 50% on any other language.
-            </p>
-              <p>
-                You don't need to be an Elixir expert to use Foundry. But the floor is high because the substrate is good.
+                <strong>The BEAM is the cheapest serious runtime at scale.</strong> One Elixir node handles what would otherwise be ten services. Per-process heaps, preemptive scheduling, supervision trees — the runtime that lets a single VPS hold millions of concurrent connections and stay up. Pinterest cut its backend fleet from 200 servers to 4 on this stack. You get concurrency, soft real-time, and fault tolerance without standing up Redis, Kafka, etcd, and a workflow engine on day one — the ecosystem already covers most of what those exist to do.
               </p>
             </div>
           </div>
 
           <div
-            className={`transition-all duration-700 delay-100 ${
+            className={` text-lg transition-all duration-700 delay-100 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-5">
+            <p>
+            The combination — a language AI writes well, a framework that keeps that output structurally honest, a runtime that scales without a microservice sprawl — is not a feature anyone can ship next quarter.
+          </p>
+
+          <p className="mt-6">
+            In practice, the layers compound. Phoenix LiveView collapses frontend component, state manager, REST endpoint, and DTO validation into one module. Pattern matching replaces blocks of nil-checks and type guards. GenServer replaces Redis plus connection pools plus a job processor. Teams migrating from TypeScript or Go cut backend LOC by 30–50% before counting the frontend delta. And the AI generates tests that pass on the first run, because pure functions need no mocks and ExUnit assertions match data shapes directly.
+          </p>
+
+          <p className="mt-6">
+            You don't need to be an Elixir expert to use Foundry. But the floor is high because the substrate is good.
+          </p>
+        <div
+          className={`mt-8 lg:mt-18 max-w-3xl transition-all duration-700 ${
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: "500ms" }}
+        >
+          <p className="text-xl leading-relaxed text-[#6B6860] border-l-2 border-[#A4471C] pl-6">
+            The BEAM removes the infrastructure layer. Ash removes the boilerplate layer. Foundry removes the knowledge layer — compile-time domain constraints, context-complete AI generation, and accumulated domain rules that fire at the moment a violation is about to be introduced.
+          </p>
+        </div>
+            {/* <p className="font-mono text-xs text-[#6B6860] tracking-widest uppercase mb-5">
               Native — not infrastructure you provision
             </p>
             <div className="flex flex-wrap gap-2">
@@ -144,12 +155,12 @@ export function InfrastructureSection() {
                   {cap}
                 </span>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* Resource paradox */}
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 mb-20 lg:mb-28">
+        {/* <div className="grid lg:grid-cols-2 gap-16 lg:gap-24 mb-20 lg:mb-28">
           <div
             className={`transition-all duration-700 delay-150 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -178,7 +189,7 @@ export function InfrastructureSection() {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Infrastructure bills — not benchmarks */}
         <div
@@ -208,30 +219,15 @@ export function InfrastructureSection() {
                 <p className="text-2xl lg:text-3xl font-display font-semibold text-[#1B1B19] mb-2 leading-tight">
                   {fact.stat}
                 </p>
-                <p className="text-sm text-[#6B6860]">{fact.detail}</p>
+                <p className="text-md text-[#6B6860]">{fact.detail}</p>
                 {fact.narrative && (
-                  <p className="text-sm text-[#6B6860] mt-3 leading-snug border-t border-[#D8D2C8] pt-3">
+                  <p className="text-lg text-[#6B6860] mt-3 leading-snug border-t border-[#D8D2C8] pt-3">
                     {fact.narrative}
                   </p>
                 )}
               </div>
             ))}
           </div>
-        </div>
-
-        {/* BEAM → Ash → Foundry synthesis */}
-        <div
-          className={`mt-16 lg:mt-24 max-w-3xl transition-all duration-700 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-          style={{ transitionDelay: "500ms" }}
-        >
-          <p className="text-xl leading-relaxed text-[#6B6860] border-l-2 border-[#A4471C] pl-6">
-            The BEAM removes the infrastructure layer. Ash removes the boilerplate layer. Foundry removes the knowledge layer — compile-time domain constraints, context-complete AI generation, and accumulated domain rules that fire at the moment a violation is about to be introduced.
-          </p>
-          <p className="text-lg leading-relaxed text-[#6B6860] border-l-2 border-[#A4471C] pl-6 mt-6">
-            In practice, the layers compound. Phoenix LiveView collapses frontend component, state manager, REST endpoint, and DTO validation into one module. Pattern matching replaces blocks of nil-checks and type guards. GenServer replaces Redis plus connection pools plus a job processor. Teams migrating from TypeScript or Go cut backend LOC by 30–50% before counting the frontend delta. And the AI generates tests that pass on the first run, because pure functions need no mocks and ExUnit assertions match data shapes directly.
-          </p>
         </div>
       </div>
     </section>

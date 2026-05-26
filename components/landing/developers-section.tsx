@@ -140,13 +140,15 @@ export function DevelopersSection() {
 
         {/* Key statement */}
         <div
-          className={`mt-14 lg:mt-20 max-w-3xl transition-all duration-700 delay-300 ${
+          className={`mt-14 lg:mt-20 max-w-4xl transition-all duration-700 delay-300 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <p className="text-xl lg:text-2xl font-display font-semibold text-[#1B1B19] leading-snug">
-            Staff engineers — architecture decisions pinned to nodes. Product — the domain layer in business language. Audit & compliance — the authorization model *is* the documentation.
-          </p>
+          <div className="text-xl lg:text-2xl font-display text-[#1B1B19] leading-snug flex flex-col gap-6">
+            <p><strong>Staff engineers</strong> — architecture decisions pinned to nodes. </p>
+            <p><strong>Product</strong> — the domain layer in business language. </p>
+            <p><strong>Audit & compliance</strong> — the authorization model *is* the documentation.</p>
+          </div>
         </div>
       </div>
     </section>

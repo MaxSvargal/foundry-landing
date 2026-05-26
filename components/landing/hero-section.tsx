@@ -23,10 +23,18 @@ const stats = [
 ];
 
 export function HeroSection() {
-  const [isVisible] = useState(true);
   const [wordIndex, setWordIndex] = useState(0);
-  const [fluidMode, setFluidMode] = useState<"hero" | "feature" | "how-it-works" | "off">("hero");
+  const [fluidMode, setFluidMode] = useState<"hero" | "off">("hero");
   const [isFluidMuted, setIsFluidMuted] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,26 +45,16 @@ export function HeroSection() {
   }, []);
 
   useEffect(() => {
-    const featuresSection = document.getElementById("features");
-    const howItWorksSection = document.getElementById("how-it-works");
-
-    if (!featuresSection || !howItWorksSection) return;
+    const heroSection = document.querySelector("section");
+    if (!heroSection) return;
 
     let ticking = false;
 
     const updateFluidMode = () => {
-      const featuresTop = featuresSection.getBoundingClientRect().top;
-      const howItWorksTop = howItWorksSection.getBoundingClientRect().top;
-      const featureThreshold = window.innerHeight * 0.82;
-      const howItWorksThreshold = window.innerHeight * 0.5;
-      const endThreshold = window.innerHeight * -0.5;
+      const heroBottom = heroSection.getBoundingClientRect().bottom;
 
-      if (howItWorksTop <= howItWorksThreshold) {
+      if (heroBottom <= 0) {
         setFluidMode("off");
-      } else if (howItWorksTop <= endThreshold) {
-        setFluidMode("how-it-works");
-      } else if (featuresTop <= featureThreshold) {
-        setFluidMode("feature");
       } else {
         setFluidMode("hero");
       }
@@ -91,7 +89,7 @@ export function HeroSection() {
       }}
       onPointerLeave={() => setIsFluidMuted(true)}
     >
-      <FluidBackground mode={fluidMode} isMuted={(fluidMode === "hero" || fluidMode === "how-it-works") && isFluidMuted} />
+      <FluidBackground mode={fluidMode} isMuted={fluidMode === "hero" && isFluidMuted} />
       {/* <div
         aria-hidden="true"
         className={cn(
@@ -100,13 +98,12 @@ export function HeroSection() {
         )}
       /> */}
 
-      <div className="mx-auto max-w-360 px-6 lg:px-12 pointer-events-none relative z-10 flex flex-1 flex-col justify-center py-40">
+      <div className={`mx-auto max-w-360 px-6 lg:px-12 pointer-events-none relative z-10 flex flex-1 flex-col justify-center py-40 transition-all duration-1600 delay-200 ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+      }`}>
         <div className="flex items-center gap-8">
           <div
-            className={cn(
-              "shrink-0 transition-all duration-3000",
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
-            )}
+            className="shrink-0 translate-y-0 opacity-100"
           >
             <Image
               src="/foundry-logo.png"
@@ -118,10 +115,7 @@ export function HeroSection() {
             />
           </div>
 
-          <h1 className={cn(
-            "font-sans text-[clamp(3rem,8vw,10rem)] leading-[0.87] [text-shadow:1px_0_4px_rgba(0,0,0,0.22)] font-normal tracking-tight transition-all duration-3000",
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0",
-          )}>
+          <h1 className="text-[#F5F1EA] font-sans text-[clamp(3rem,8vw,10rem)] leading-[0.87] [text-shadow:1px_0_4px_rgba(0,0,0,0.22)] font-normal tracking-tight translate-y-0 opacity-100">
             <span>Software <br/>you can still </span>
             <span>
               <span key={wordIndex} className="inline-flex min-w-[7ch] text-[#fc7b03]">
@@ -136,17 +130,14 @@ export function HeroSection() {
           </h1>
         </div>
 
-        <div className="mt-12 grid items-center lg:mt-34 lg:grid-cols-2">
+        <div className="mt-12 grid items-center lg:mt-24 lg:grid-cols-2">
           <div
-            className={cn(
-              "max-w-2xl transition-all duration-700 delay-200 [text-shadow:1px_0_2px_rgba(0,0,0,0.22)]",
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
-            )}
+            className="max-w-2xl translate-y-0 opacity-100 [text-shadow:1px_0_2px_rgba(0,0,0,0.22)]"
           >
             <p
               className={cn(
                 "mb-8 text-xl md:text-2xl lg:text-3xl font-medium leading-tight xxl:text-4xl xxl:leading-[1.18]",
-                "text-white/96",
+                "text-[#F5F1EA]",
               )}
             >
               Generating code is the easy part now. Keeping it understandable, changeable, and correct as it grows is the part nobody solved. That's Foundry.
@@ -162,17 +153,14 @@ export function HeroSection() {
           </div>
 
           <div
-            className={cn(
-              "pointer-events-auto flex flex-wrap items-center justify-start gap-4 transition-all duration-700 delay-300 lg:justify-end lg:gap-6",
-              isVisible ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0",
-            )}
+            className="pointer-events-auto flex flex-wrap items-center justify-start gap-4 translate-y-0 opacity-100 lg:justify-end lg:gap-6"
           >
             <Button
               asChild
               size="lg"
-              className="h-auto rounded-full border border-white bg-white px-8 py-4 text-base font-bold text-black shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[##f5f1ea] hover:text-black sm:px-10 sm:py-5 sm:text-lg"
+              className="h-auto rounded-full border border-white bg-[#F5F1EA] px-8 py-4 text-base font-bold text-black shadow-[0_12px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:bg-[#f5f1ea] hover:text-black sm:px-10 sm:py-5 sm:text-lg"
             >
-              <Link href="#">
+              <Link href="https://github.com/FoundryStack/foundry" target="_blank">
                 Install Foundry →
               </Link>
             </Button>
@@ -180,9 +168,11 @@ export function HeroSection() {
               asChild
               size="lg"
               variant="outline"
-              className="h-auto rounded-full border-white/30 bg-transparent px-8 py-4 text-base font-bold text-white transition-all duration-300 hover:border-transparent hover:bg-black hover:text-white sm:px-10 sm:py-5 sm:text-lg"
+              className="h-auto rounded-full bg-black/30 px-8 py-4 text-base font-bold text-white shadow-[0_12px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:border-transparent hover:bg-black hover:text-white sm:px-10 sm:py-5 sm:text-lg"
             >
-              <Link href="#">See it on a real system →</Link>
+              <Link href="https://studio.cloud.foundry.definitivespec.org/" target="_blank">
+                See it on a real system →
+              </Link>
             </Button>
           </div>
         </div>
@@ -190,8 +180,9 @@ export function HeroSection() {
 
       <div
         className={cn(
-          "pointer-events-none absolute inset-x-0 bottom-12 overflow-hidden transition-all duration-700 delay-500",
-          isVisible ? (fluidMode === "off" ? "opacity-25" : "opacity-40") : "opacity-0",
+          "pointer-events-none absolute inset-x-0 bottom-12 overflow-hidden transition-all duration-1600 delay-800",
+          fluidMode === "off" ? "opacity-25" : "opacity-40",
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}
       >
         <div className="whitespace-nowrap py-6">

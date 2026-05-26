@@ -8,16 +8,16 @@ const faqs = [
     a: "No. Output is plain Ash code you own. Low-code platforms own the runtime; Foundry doesn't. Your app runs on plain BEAM with or without us.",
   },
   {
-    q: "Won't the agent hallucinate Ash code?",
-    a: "It doesn't write raw DSL into your repo. It produces a graph diff, validated against your real schema. Invalid structure never compiles into your codebase.",
+    q: "Won't the agent hallucinate?",
+    a: "It doesn't just write raw DSL into your repo. It produces a graph diff, validated against your real schema. Invalid structure never compiles into your codebase.",
   },
   {
     q: "Is the \"ten minutes\" real?",
-    a: "Yes — and it's the whole loop, not a build metric: ask, live preview, review the graph diff and traces, fix, commit, deploy. Not a template drop. A real change you reviewed and shipped.",
+    a: "Yes, and it's the whole loop: ask, live preview, review the graph diff and traces, fix, commit, deploy. A real change you reviewed and shipped.",
   },
   {
     q: "Does it work with my existing Elixir app?",
-    a: "If you're on Ash, immediately. On raw Phoenix/Ecto, Foundry reads what maps cleanly and gets richer as you adopt Ash. No forced migration.",
+    a: "If you're on Ash, mostly immediately. On raw Phoenix/Ecto, Foundry reads what maps cleanly and gets richer as you adopt Ash. No forced migration.",
   },
   {
     q: "What about our Python / TypeScript services?",
@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "How do you handle versioning and collaboration?",
-    a: "Git. Code is the source of truth, the graph is derived deterministically, standard PR workflows apply. Multi-user graph editing in Foundry Cloud builds on the same foundation.",
+    a: "Git and Phoenix LiveView. Code is the source of truth, the graph is derived deterministically, standard PR workflows apply. Multi-user graph editing in Foundry Cloud builds on the same foundation.",
   },
   {
     q: "Where does Foundry Cloud deploy?",
@@ -72,7 +72,7 @@ function FaqItem({
         </span>
       </button>
       {open && (
-        <p className="pb-6 text-[#6B6860] leading-relaxed">{faq.a}</p>
+        <p className="pb-6 text-md leading-relaxed">{faq.a}</p>
       )}
     </div>
   );
@@ -100,22 +100,22 @@ export function TestimonialsSection() {
         ref={sectionRef}
         className="bg-[#F5F1EA] py-24 lg:py-40"
       >
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-          <div className="grid lg:grid-cols-2 gap-16 lg:gap-24">
+        <div className="max-w-350 mx-auto px-6 lg:px-12">
+          <div className="grid lg:grid-cols-2">
             <div
               className={`transition-all duration-700 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
             >
-              <span className="font-mono text-xs text-[#A4471C] tracking-widest uppercase block mb-6">
-                FAQ (real objections, answered straight)
+              <span className="font-mono text-2xl text-[#A4471C] tracking-widest uppercase block mb-4">
+                FAQ
               </span>
               <h2 className="text-4xl lg:text-5xl font-display font-semibold text-[#1B1B19] leading-[1.05] tracking-tight">
-                What Foundry is not.
+                What Foundry is.
               </h2>
             </div>
 
-            <div>
+            <div className="flex-2">
               {faqs.map((faq, index) => (
                 <FaqItem
                   key={faq.q}

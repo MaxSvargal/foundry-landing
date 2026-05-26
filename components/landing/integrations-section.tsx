@@ -54,7 +54,7 @@ export function IntegrationsSection() {
     <section
       id="for-your-team"
       ref={sectionRef}
-      className="bg-[#F5F1EA] py-24 lg:py-40"
+      className="bg-[#F5F1EA] py-24 lg:py-40 relative z-10"
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Header */}
