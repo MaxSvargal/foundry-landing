@@ -65,10 +65,7 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
   }, []);
 
   useEffect(() => {
-    if (mode === "off") {
-      loseContext();
-      return;
-    }
+    if (mode === "off") return;
 
     initializeFluid();
 
@@ -106,11 +103,12 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
 
     return () => {
       PROXY_EVENT_TYPES.forEach((type) => window.removeEventListener(type, proxyEvent as EventListener));
-      loseContext();
     };
-  }, [initializeFluid, mode, loseContext]);
+  }, [initializeFluid, mode]);
 
-  if (mode === "off") return null;
+  useEffect(() => {
+    return () => loseContext();
+  }, [loseContext]);
 
   return (
     <>
@@ -122,7 +120,8 @@ export function FluidBackground({ mode, isMuted }: FluidBackgroundProps) {
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-[1] h-screen w-screen opacity-100 [filter:invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]"
+        className="pointer-events-none fixed inset-0 z-1 h-screen w-screen transition-opacity duration-500 filter-[invert(0)_hue-rotate(0deg)_contrast(1)_saturate(1)_blur(0px)]"
+        style={{ opacity: mode === "off" ? 0 : 1 }}
       />
     </>
   );
